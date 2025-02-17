@@ -130,6 +130,6 @@ function crearFormCostosFijos() {
       return { nuevaSeccion: null };
     }
   }
-  
+
   
   
