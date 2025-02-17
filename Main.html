@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Gestión</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box; /* Para que el padding y bordes no afecten el tamaño total */
+    }
+    /*//////////////////////////////////////////////////////////////
+    /* ESTILO PARA EL ENCABEZADO, NAVBAR E IMAGEN ////////*/
+    /*//////////////////////////////////////////////////////*/
+    header {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    /* Contenedor de la imagen */
+    .image-container {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed; /* Activa el parallax */
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    /* Imagen dinámica (cambiará desde el script) */
+    .image-container img {
+      display: none;
+    }
+
+    /* Texto sobre la imagen */
+    .texto-sobre-imagen {
+      font-size: 35px;
+      padding: 0px 80px;
+      text-align: center;
+      color: #FFFFFF;
+      position: absolute;
+      z-index: 10;
+      top: 20%;
+      left: 5%;
+    }
+    /* Estilo para el contenedor de la lista */
+    nav {
+        position: fixed;
+        top: 0px; 
+        width: 100%;
+        padding: 20px 0px;
+        background-color: transparent; /* Transparente por defecto */
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        z-index: 1000; /* Asegura que esté por encima de otros elementos */
+        text-align: right; /* Alinea el contenido hacia la derecha */
+    }
+
+    nav.scrolled {
+        background-color: black; /* Cambia a negro al hacer scroll */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Añade sombra para destacar */
+    }
+
+    nav ul{
+        display: inline-flex; /* Organiza los elementos en una fila alineada a la derecha */
+        list-style-type: none; /* Elimina los puntos de la lista */
+        justify-content: flex-end; /* Alinea los elementos hacia la derecha */
+        width: 5%; /* Asegura que los elementos no ocupen todo el ancho */
+        padding-right: 50px;
+    }
+
+    nav li {
+        font-size: 25px;
+        color: #FFFFFF;
+        margin-left: 20px; 
+
+        cursor: pointer; /* Cambia el cursor cuando pasas sobre los elementos */
+    }
+
+    nav li a {
+        text-decoration: none; /* Elimina el subrayado por defecto de los enlaces */
+    }
+
+    nav li:hover {
+        color: #ff7d3b; /* Cambia el color al pasar el mouse por encima */
+    }
+
+
+    /*//////////////////////////////////////////////////////////////////*/
+    /*ESTILO CUERPO //////////////////////////////////////////*/
+    /*//////////////////////////////////////////////////////////////////*/
+    .pagina { 
+        display: none; 
+    }
+
+    .pagina.activa { 
+        display: block; 
+    }
+    /*////////////////////
+    STYLE IMGS INICIO/////
+    ///////////////////*/
+    .tarjetasInicio-style {
+      display: flex; /* Organiza las tarjetas en fila */
+      gap: 250px; /* Espacio entre las tarjetas */
+      justify-content: center; /* Centra las tarjetas horizontalmente */
+      margin-top: 100px;
+      margin-right: 150px;
+    }
+
+    .tarjeta {
+      text-align: left; /* Centra los textos respecto a cada tarjeta */
+      width: 350px; /* Define un ancho fijo para las tarjetas */
+
+    }
+
+    .tarjeta img {
+      width: 350px; 
+      height: 230px; 
+    }
+
+    .titulo {
+      font-size: 40px;
+      color: #99003e;
+      margin: 10px 0;
+    }
+
+    .descripcion {
+      font-size: 20px;
+      margin: 10px 0;
+    }
+
+    /*STYLE IMGS GESTION
+    /////////////////////*/
+    .tarjetasGestion-style{
+        display: flex; /* Organiza las tarjetas en fila */
+      gap: 30px; /* Espacio entre las tarjetas */
+      justify-content: center; /* Centra las tarjetas horizontalmente */
+      margin-top: 100px;
+    }
+
+    /*STYLE IMGS RESULTADOS
+    ////////////////////////*/
+    .tarjetasRes-style{
+        display: flex; /* Organiza las tarjetas en fila */
+        gap: 300px; /* Espacio entre las tarjetas */
+        justify-content: center; /* Centra las tarjetas horizontalmente */
+        margin-top: 100px;
+        margin-right: 100px;
+    }
+    /*/////////////////////////////
+    STYLE BOTONES DE AGREGAR COSAS
+    ///////////////////////////////*/
+
+    .botonesAdd{
+        font-size: 16px; /* Tamaño de la fuente */
+        font-family: Arial, sans-serif; /* Tipo de fuente */
+        padding: 10px 20px; /* Espaciado interno del botón */
+        border: none; /* Sin borde */
+        border-radius: 8px; /* Bordes redondeados */
+        background-color: #4CAF50; /* Color de fondo */
+        color: white; /* Color del texto */
+        cursor: pointer; /* Cambia el cursor a un dedo al pasar */
+        transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+    .botonesAdd:hover {
+        background-color: #45a049; /* Cambia el color al pasar el cursor */
+        transform: scale(1.1); /* Aumenta ligeramente el tamaño */
+    }
+
+    .botonesAdd:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño al hacer clic */
+    }
+
+    /*//////////////////////////////////////////////////////////////////*/
+    /* ARMADO DE LA PAGINA COMUN Y CORRIENTE //////////////////////////////////////////*/
+    /*//////////////////////////////////////////////////////////////////*/
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="image-container">
+        <img id="header-image" src="" alt="Imagen dinámica">
+    </div>
+    <div class="texto-sobre-imagen">
+      <h1 id="header-title"></h1>
+      <p id="header-description"></p>
+    </div>
+    <nav>
+      <ul>
+        <li onclick="mostrarPagina('inicio')">Inicio</li>
+        <li onclick="mostrarPagina('gestion')">Gestión</li>
+        <li onclick="mostrarPagina('resultado')">Resultado</li>
+      </ul>
+    </nav>
+  </header>
+  <div id="contenido">
+        <!-- //////////////////////////////////////////////////////-->
+        <!-- SUBPAGINA INICIO////////////////////////////////////// -->
+        <!-- //////////////////////////////////////////////////////-->
+      <div id="inicio" class="pagina">
+        <p style="font-size: 60px; color:#99003e; text-align: center; margin-top: 40px">Gestiona tus datos y visualiza tu resultados</p>
+        
+        <div class="tarjetasInicio-style">
+          <div class="tarjeta">
+            <img src="https://github.com/SZ1011h/PortalGestionImages/blob/main/GESTION.jpeg?raw=true" 
+                 alt="img-gestion-inicio">
+            <p class="titulo">Gestión</p>
+            <p class="descripcion">Manejo de cantidades: insumos, productos terminados y dinero (finanzas).</p>
+          </div>          
+          <div class="tarjeta">
+            <img src="https://github.com/SZ1011h/PortalGestionImages/blob/main/RESULTADOS_2.jpg?raw=true" 
+                 alt="img-resultados-inicio">
+            <p class="titulo">Resultados</p>
+            <p class="descripcion">Visualización de los datos recolectados en gráficos y reportes.</p>
+          </div>
+        </div>
+
+      </div>
+      <!-- //////////////////////////////////////////////////////-->
+        <!-- SUBPAGINA GESTION////////////////////////////////////// -->
+        <!-- //////////////////////////////////////////////////////-->
+
+        <div id="gestion" class="pagina">
+        <p style="font-size: 60px; color:#99003e; text-align: center; margin-top: 40px  ">Apartado para gestionar por medio de formularios</p>
+        <div class="tarjetasGestion-style">
+            <div class="tarjeta">
+                <img onclick="window.open('<?= fComprasUrl ?>', '_blank')"   
+                src="https://github.com/SZ1011h/PortalGestionImages/blob/main/SubGestion_Insumos.png?raw=true"
+                alt="img-subGestion-Compras">  
+                <p class="titulo">Form - Compras</p>
+                <button type="button" onclick="mostrarInput('Compras')" class="botonesAdd">Añadir Articulo</button>
+                <div id="contenedorCompras"></div>   
+                <form style="margin: 50px 0px;">
+                    
+                    
+                </form>
+            </div>
+            
+            <div class="tarjeta">
+                <img onclick="window.open('<?= fProduccionUrl ?>' , '_blank')" 
+                src="https://github.com/SZ1011h/PortalGestionImages/blob/main/SubGestion_Productos.png?raw=true"
+                alt="img-subGestion-Produccion">
+                <p class="titulo">Form - Produccion</p>
+                <button type="button" onclick="mostrarInput('Produccion')" class="botonesAdd">Añadir Producto</button>
+                <div id="contenedorProduccion"></div>
+            </div>
+            
+            <div class="tarjeta">
+                <img onclick="window.open('<?= fEventosUrl ?>' , '_blank')"   
+                src="https://github.com/SZ1011h/PortalGestionImages/blob/main/SubGestion_Eventos.png?raw=true"
+                alt="img-subGestion-Eventos">
+                <p class="titulo">Form - Eventos</p>
+            </div>
+            
+        </div>
+        <!-- SEGUNDA FILA DE IMAGENES FORM --> 
+        <div class="tarjetasGestion-style" style=" margin-top: 20px;">
+            <div class="tarjeta">
+                <img onclick="window.open('<?= fStockInsumosUrl ?>' , '_blank')" 
+                src="https://github.com/SZ1011h/PortalGestionImages/blob/main/SubGestion_ProdTerminados.png?raw=true"
+                alt= "img-subGestion-Insumos">
+                <p class="titulo">Form - Stock Insumos</p>
+            </div>
+            <div class="tarjeta">
+                <img onclick="window.open('<?= fPedidosUrl ?>' , '_blank')"
+                src="https://github.com/SZ1011h/PortalGestionImages/blob/main/SubGestion_Pedidos.jpg?raw=true"
+                alt= "img-subGestion-Pedidos">
+                <p class="titulo">Form - Pedidos</p>
+                <button type="button" onclick="mostrarInput('Pedidos')" class="botonesAdd">Añadir Cliente</button>
+                <div id="contenedorPedidos"></div>
+            </div>
+            <div class="tarjeta">
+                <img onclick="window.open('<?= fCostoFijoUrl ?>' , '_blank')" 
+                src="https://github.com/SZ1011h/PortalGestionImages/blob/main/SubGestion_CostosFijos.jpg?raw=true"
+                alt= "img-subGestion-CostoFijo">
+                <p class="titulo">Form - Costos Fijos</p>
+                <button type="button" onclick="mostrarInput('CostoFijo')" class="botonesAdd">Añadir Empleado</button>
+                <div id="contenedorCostoFijo"></div>
+            </div>
+        </div>
+      </div>
+        <!-- //////////////////////////////////////////////////////-->
+        <!-- SUBPAGINA RESULTADOS////////////////////////////////////// -->
+        <!-- //////////////////////////////////////////////////////-->  
+        <div id="resultado" class="pagina">
+        <p style="font-size: 60px; color:#99003e; text-align: center; margin-top: 40px  ">Analiza tus resultados</p>
+        <button type="button" onclick="informeApp()" class="botonesAdd"> IMPRIMIR INFORME </button>
+        <div class="tarjetasRes-style">
+            <div class="tarjeta">
+                <img style="width: 500px; height: 300px;" src="https://github.com/SZ1011h/PortalGestionImages/blob/main/SubResult-CostoPr.jpeg?raw=true"
+                alt="img-subResultados-CostoProd">
+                <p class="titulo">Costos producción</p>
+                <p class="descripcion">(Hoja de calculo con los resultados)</p>
+            </div>
+
+            <div class="tarjeta">
+                <img style="width: 500px; height: 300px;" src="https://github.com/SZ1011h/PortalGestionImages/blob/main/SubResult-prodVendidos.jpeg?raw=true"
+                alt="img-subResultados-prodVendidos">                
+                <p class="titulo">Productos vendidos</p>
+                <p class="descripcion">(Hoja de calculo con los resultados)</p>
+            </div>
+        </div>
+      </div>
+
+  </div>
+  
+  <script>
+        const paginas = {
+      inicio: {
+        imagen: "https://github.com/SZ1011h/PortalGestionImages/blob/main/imagen_Encabezado.jpg?raw=true",
+        titulo: "Productor y vendedor",
+        descripcion: "Para manejar tu información, tenés un apartado de gestión y otro de resultados, donde encontrarás modelos de formularios predefinidos que podés completar para gestionar tus datos. En el formulario de cantidad de insumos, encontrarás 5 ítems con sus cantidades como ejemplo, listos para que les pongas el nombre que prefieras y en la sección de resultados, visualizar estos datos."
+      },
+      gestion: {
+        imagen: "https://github.com/SZ1011h/PortalGestionImages/blob/main/GestionSubpagina.jpg?raw=true",
+        titulo: "Gestión",
+        descripcion: ""
+      },
+      resultado: {
+        imagen: "https://github.com/SZ1011h/PortalGestionImages/blob/main/ResultadosSubPagina-recortado.jpg?raw=true",
+        titulo: "Resultados",
+        descripcion: ""
+      }
+    };  
+        //////////////////////////////////////////////////////////////
+        // EVENTO CAMBIO DE IMAGEN, TITULO Y DESCRIPCIÓN POR SUBPAGINA
+        //////////////////////////////////////////////////////////////
+        function mostrarPagina(id) {
+          const { imagen, titulo, descripcion } = paginas[id];
+          const imageContainer = document.querySelector(".image-container");
+
+          // Cambia la imagen de fondo del contenedor
+          imageContainer.style.backgroundImage = `url(${imagen})`;
+
+          // Cambia el texto del header
+          document.getElementById("header-title").textContent = titulo;
+          document.getElementById("header-description").textContent = descripcion;
+
+          // Oculta todas las páginas
+          document.querySelectorAll('.pagina').forEach(pagina => {
+            pagina.classList.remove('activa');
+          });
+
+          // Muestra la página seleccionada
+          document.getElementById(id).classList.add('activa');
+        }
+
+        // Mostrar inicio al cargar la página
+        document.addEventListener("DOMContentLoaded", () => {
+          mostrarPagina('inicio');
+        });
+
+
+        /////////////////////////////////////////////////
+        // EVENTO NAVBAR EFECTO SOMBREADO AL HACER SCROLL
+        /////////////////////////////////////////////////
+        window.addEventListener("scroll", function () {
+            const navbar = document.querySelector("nav"); // Selecciona el navbar
+            const scrollY = window.scrollY; // Obtén la posición del scroll
+            if (scrollY > 50) { // Cambia cuando el scroll pase los 50px
+                navbar.classList.add("scrolled");
+            } else {
+                navbar.classList.remove("scrolled");
+            }
+        });
+
+        ////////////////////////////////////////////
+        // EVENTO APARECER INPUT///////////////////
+        //////////////////////////////////////////
+
+        function mostrarInput(bAddId) {
+            let contenedor;
+          switch(bAddId){
+                case "Compras":
+                    contenedor = document.getElementById('contenedorCompras');
+                break;
+                case "Produccion":
+                    contenedor = document.getElementById('contenedorProduccion');
+                break;
+                case "Pedidos":
+                    contenedor = document.getElementById('contenedorPedidos');
+                break;
+                case "CostoFijo":
+                    contenedor = document.getElementById('contenedorCostoFijo');
+                break;    
+          }
+          const inputId = "aprenderInputs";
+          const inputExiste = document.getElementById(inputId);
+
+          // Eliminar el elemento si ya existe
+          if (inputExiste) {
+              contenedor.removeChild(inputExiste);
+          } else {
+              const input = document.createElement('input');
+
+              input.type = 'text';
+              input.id = inputId;
+              input.placeholder = 'Escribe algo...';
+              input.style.width = '200px';
+              input.style.height = '30px';
+              input.style.fontSize = '17px';
+
+              // Detectar cuando se presiona Enter
+              input.addEventListener('keydown', (event) => {
+                  if (event.key === 'Enter') { // Detecta la tecla Enter
+                      event.preventDefault(); // Evita el comportamiento predeterminado
+
+                      const valor = input.value;
+                      if (valor) {
+                          alert('El valor ' + valor + ' ha sido añadido.');
+                          google.script.run.agregarFinal(valor,bAddId); // Llamada a Google Apps Script
+                          input.value = ''; // Limpiar el campo de entrada
+                      } else {
+                          alert('Por favor, escribe algo antes de enviar.');
+                      }
+                  }
+              });
+
+              contenedor.appendChild(input);
+          }
+      }
+
+    ////////////////////////////////////////////////////
+    //EVENTO INFORME Y MANDARLO A GMAIL///////////////
+    ////////////////////////////////////////////////////
+    function informeApp(){
+      google.script.run.envioInformeGmail();
+      alert("El informe se esta enviando a su correo");
+    }
+
+
+
+            
+    </script>
+
+</body>
+</html>
