@@ -4,7 +4,7 @@
 function proveedorCF (){
     Logger.log("Iniciando creación del formulario de proveedor de costos fijos");
 
-    let formularioProveedorCF = FormApp.create("Proveedor");
+    let formularioProveedorCF = FormApp.create("Proveedor Costos Fijos");
     let formularioProveedorCFID = formularioProveedorCF.getId();
     PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioProveedorCFID);
 
@@ -21,7 +21,7 @@ function proveedorCF (){
     
 
     const preguntasProveedorCF = [
-      { tipo: "list", titulo: "Tipo de personeria", opciones: opcionesTipoPersona, requerido: true,textoAyuda: "Seleccione si el proveedor es una persona fisica o una persona juridica como una S.A o S.R.L"},
+      { tipo: "seleccion", titulo: "Tipo de personeria", opciones: opcionesTipoPersona, requerido: true,textoAyuda: "Seleccione si el proveedor es una persona fisica o una persona juridica como una S.A o S.R.L"},
       { tipo: "text", titulo: "Nombre y apellido o Razon social", requerido: true},
       { tipo: "text", titulo: "CUIT/CUIL/DNI", requerido: true, textoAyuda: "Ingrese número de CUIT/CUIL o DNI del proveedor"},
       { tipo: "text", titulo: "Telefono", requerido: true, textoAyuda: "Ingrese numero telefonico de la persona contacto con el proveedor"},

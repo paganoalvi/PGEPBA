@@ -28,7 +28,7 @@ function proveedor (){
 
     const preguntasProveedor = [
       { tipo: "seleccion", titulo: "Tipo de proveedor", opciones: opcionesTipoProveedor, requerido: true},
-      { tipo: "list", titulo: "Tipo de personeria", opciones: opcionesTipoPersona, requerido: true,textoAyuda: "Seleccione si el proveedor es una persona fisica o una persona juridica como una S.A o S.R.L"},
+      { tipo: "seleccion", titulo: "Tipo de personeria", opciones: opcionesTipoPersona, requerido: true,textoAyuda: "Seleccione si el proveedor es una persona fisica o una persona juridica como una S.A o S.R.L"},
       { tipo: "text", titulo: "Nombre completo o Razón social", requerido: true},
       { tipo: "text", titulo: "Domicilio completo del proveedor", textoAyuda: "Ingrese el domicilio fisico del proveedor"},
       { tipo: "text", titulo: "Teléfono", textoAyuda: "Ingrese número telefónico"},

@@ -8,25 +8,16 @@ function articulo (){
       let formularioArticulos = FormApp.create("Articulo");
       let formularioArticulosID = formularioArticulos.getId();
       PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioArticulosID);
-      let opcionesConceptoA = ["Materia prima", "Herramienta" , "Servicio"];// concepto de la compra
-
-
-
+      let opcionesConceptoA =  ["Herramienta" ,"Maquinaria","Insumo extraordinario"];// concepto de la compra
 
       formularioArticulos.setDescription(
         "Este formulario permite llevar registro de los artículos comprados por tu emprendimiento"
       );
-
-      let imageItem = formularioArticulos.addImageItem();
-      imageItem.setTitle("Título de la imagen");
-      imageItem.setHelpText("Texto descriptivo");
-      imageItem.setImage(UrlFetchApp.fetch("https://example.com/imagen.jpg").getBlob());
-
-
+     
       formularioArticulos.addTextItem()
         .setTitle("Nombre artículo")
         .setRequired(true)
-        .setHelpText("Ingrese el nombre de Materia Prima / Herramienta / Servicio");
+        .setHelpText("Ingrese el nombre del articulo");
      
       formularioArticulos.addMultipleChoiceItem()
         .setTitle("Tipo de artículo")
