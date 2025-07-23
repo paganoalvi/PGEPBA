@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+  <title>Portal de Gestión</title>
+
+  <?!= include('estilos'); ?>
+
+</head>
+
+<body>
+  
+  <header>
+    <h2 onclick="mostrarPagina('definirProducto')" >DEFINE TU PRODUCTO</h2>
+    <nav>
+      <ul>
+        <li onclick="mostrarPagina('gestion')">Carga</li>
+        <li onclick="mostrarPagina('resultado')">Resultados</li>
+        <li onclick="window.open('https://sites.google.com/view/guiausuariopge/guia-usuario' , '_blank')">Ayuda</li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+
+      <!-- ////// PÁGINA GESTION ////// -->
+      <div id="gestion" class="contenido visible">
+        <div class="contenedorTarjetas">
+          <!-- Bloquea el fondo -->
+          <div id="overlayBloqueo" style="
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.3); /* fondo semitransparente */
+            z-index: 9998;
+          "></div>
+
+          <!-- Alerta flotante -->
+          <div id="alertaTemporal" style="
+            display: none;
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: yellow;
+            padding: 15px 25px;
+            border: 2px solid black;
+            font-size: 18px;
+            z-index: 9999;
+            box-shadow: 0 0 10px gray;
+          ">
+            POR FAVOR ESPERE
+          </div>
+
+      <!------------ CONTENIDO GESTION -------------->
+            <section class="tarjeta">
+                <img onclick="window.open('<?= fComprasUrl ?>', '_blank')"   
+                  src="https://github.com/SZ1011h/PortalGestionImages/blob/main/ComprasIcono.png?raw=true"
+                  alt="img-subGestion-Compras">  
+                <h2>Compras</h2>
+                <div class="posBotones">
+                  <button type="button" onclick="repetirCompras()" class="BotonRepetir">
+                    Repetir Form Compras
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[0] ?>', '_blank')" id="e0">
+                    <?= nombresPrellenado[0] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[1] ?>', '_blank')" id="e1">
+                    <?= nombresPrellenado[1] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[2] ?>', '_blank')" id="e2">
+                    <?= nombresPrellenado[2] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[3] ?>', '_blank')" id="e3">
+                    <?= nombresPrellenado[3] ?>
+                  </button> 
+                </div>
+            </section>
+        
+            <section class="tarjeta">
+                <img onclick="window.open('<?= fProduccionUrl ?>' , '_blank')" 
+                  src="https://github.com/SZ1011h/PortalGestionImages/blob/main/ProduccionIcono.png?raw=true"
+                  alt="img-subGestion-Produccion">
+                <h2>Producción</h2>
+                <div class="posBotones">
+                  <button type="button" onclick="repetirProduccion()" class="BotonRepetir">
+                    Repetir Form Produccion
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[4] ?>', '_blank')" id="e4">
+                    <?= nombresPrellenado[4] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[5] ?>', '_blank')" id="e5">
+                    <?= nombresPrellenado[5] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[6] ?>', '_blank')" id="e6">
+                    <?= nombresPrellenado[6] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[7] ?>', '_blank')" id="e7">
+                    <?= nombresPrellenado[7] ?>
+                  </button>  
+                </div>
+            </section>
+        
+            <section class="tarjeta">
+                <img onclick="window.open('<?= fVentasUrl ?>' , '_blank')" 
+                  src="https://github.com/SZ1011h/PortalGestionImages/blob/main/ventasIcon.png?raw=true"
+                  alt= "img-subGestion-Insumos">
+                <h2>Ventas</h2>
+                <div class="posBotones">
+                  <button type="button" onclick="repetirVentas()" class="BotonRepetir">
+                    Repetir Form Ventas
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[8] ?>', '_blank')" id="e8">
+                    <?= nombresPrellenado[8] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[9] ?>', '_blank')" id="e9">
+                    <?= nombresPrellenado[9] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[10] ?>', '_blank')" id="e10">
+                    <?= nombresPrellenado[10] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[11] ?>', '_blank')" id="e11">
+                    <?= nombresPrellenado[11] ?>
+                  </button>  
+                </div>
+            </section>
+
+            <section class="tarjeta">
+                <img onclick="window.open('<?= fCostoFijoUrl ?>' , '_blank')" 
+                  src="https://github.com/SZ1011h/PortalGestionImages/blob/main/CostoFijoIcono.png?raw=true"
+                  alt= "img-subGestion-CostoFijo">
+                <h2>Costos Fijos</h2>
+                <div class="posBotones">
+                  <button type="button" onclick="repetirCostoFijo()" class="BotonRepetir">
+                    Repetir Form Costos Fijos
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[12] ?>', '_blank')" id="e12">
+                    <?= nombresPrellenado[12] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[13] ?>', '_blank')" id="e13">
+                    <?= nombresPrellenado[13] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[14] ?>', '_blank')" id="e14">
+                    <?= nombresPrellenado[14] ?>
+                  </button> 
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[15] ?>', '_blank')" id="e15">
+                    <?= nombresPrellenado[15] ?>
+                  </button>  
+                </div>
+            </section> 
+        </div> 
+       <section class="FuncionesAdicionales"> 
+          <button type="button" onclick="abrirModal(10)">
+            Asignar Form Compras
+          </button>
+          <button type="button" onclick="abrirModal(20)">
+            Asignar Form Producción
+          </button>
+          <button type="button" onclick="abrirModal(30)">
+            Asignar Form Ventas
+          </button>
+          <button type="button" onclick="abrirModal(40)">
+            Asignar Form Costo Fijo
+          </button>
+        </section>
+
+        <!-- ////// Modal para asignar prellenados ////// -->
+        <section id="modalOverlay" class="modal-prellenado">
+          <div class="modal">
+            <label for="entrada" >Escriba un nombre para un form <span id="textoSegunForm"></span></label><br>
+            <input type="text" id="entrada" placeholder="Nombre:"> <br><br>
+
+            <div class="selector">
+              <button type="button" id="a1" onclick="seleccionarBotonPrellenado(this)">1</button>
+              <button type="button" id="a2" onclick="seleccionarBotonPrellenado(this)">2</button>
+              <button type="button" id="a3" onclick="seleccionarBotonPrellenado(this)">3</button>
+              <button type="button" id="a4" onclick="seleccionarBotonPrellenado(this)">4</button>
+            </div>
+
+            <button type="button" onclick="aceptarYguardarModal()">Aceptar y guardar</button>
+            <button type="button"  onclick="cerrarModal()">Cerrar sin guardar</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- ////// PÁGINA RESULTADOS ////// -->
+      <div id="resultado" class="contenido">
+          
+        <input type="date" id="fechaInicio" name="fecha">
+        <input type="date" id="fechaFin" name="fecha">
+        
+        <section class="tarjeta">
+          <button onclick="obtenerBalance()">
+             Mostrar Balance
+          </button>
+          <div id="balance_div"></div>
+        </section>
+          
+        <div class="tarjetasResultados">
+          <section class="tarjeta tarjetaGrafico">
+            <button onclick="comprasGrafico()">
+              Mostrar Compras
+            </button>
+            <div id="comprasChart_div" style="width: 600px; height: 400px; margin:0px;"></div>
+          </section>
+
+          <section class="tarjeta tarjetaGrafico">
+            <button onclick="ventasGrafico()">
+              Mostrar Ventas
+            </button>
+            <div id="ventasChart_div" style="width: 600px; height: 400px; margin:0px;"></div>
+          </section>
+          
+          <section class="tarjeta tarjetaGrafico">
+            <button onclick="stockChart()">
+              Mostrar Stock
+            </button>
+            <div style="overflow-x: auto; width: 100%; max-width: 1000px; border: 1px solid #ccc; margin: auto;">
+              <div id="stock_divT" style="width: 1600px; height: 400px;"></div>
+            </div>
+          </section>
+        </div>
+
+        <h2>Carteras</h2>
+        <div class="tarjetasCartera">
+          <section class="tarjeta">
+            <img  onclick="window.open('<?= urlClientes ?>' , '_blank')"  
+              src="https://github.com/SZ1011h/PortalGestionImages/blob/main/ClientesIcono.png?raw=true">                
+            <h2>Cartera Clientes</h2>
+            <p>(Información de todos los clientes)</p>
+          </section>
+
+          <section class="tarjeta">
+            <img  onclick="window.open('<?= urlProveedores ?>' , '_blank')"  
+              src="https://github.com/SZ1011h/PortalGestionImages/blob/main/ProveedorIcono.png?raw=true">               
+            <h2>Cartera Proveedores</h2>
+            <p>(Información de todos los Proveedores)</p>
+          </section>
+        </div>
+        
+      </div>
+
+      <!-- ////// PÁGINA PARA DEFINIR UNA RECETA ////// -->
+      <div id="definirProducto" class="contenido">
+        <button id="agg" onclick="agregarElemento('form','contenedorElementos')"> + Agregar elemento </button>
+        <button id="supr" onclick="eliminarElemento('form')"> - Eliminar elemento </button>
+        <h2>Crea tu producto</h2>
+        <form action="ruta o url para obtener los datos" method="post" id="form">
+          <p class="element">
+              <label for="nombreProducto">Nombre del producto:</label>
+              <input type="text" id="nombreProducto" name="producto" required/>
+            </p>
+          <h2>Receta del producto</h2>
+          <fieldset id="contenedorElementos"> 
+            <p class="element">
+              <label for="nombreMateriaPrima">Materia Prima:</label>
+              <input type="text" id="nombreMateriaPrima" name="materiaPrima[]"/>
+            </p>
+            <p class="cant">
+              <label for="cantidad">Cantindad:</label>
+              <input type="number" id="cantidad" name="cantidad[]"/>
+            </p>
+            <p class="unit">
+              <label for="unidad">Unidad:</label>
+              <select name="unidad[]" id="unidad">
+                <option value="">--Por favor elige una opción--</option>
+                <option value="unidades">Unidades</option>
+                <option value="litros">Litros</option>
+                <option value="mililitro">Mililitros</option>
+                <option value="kilos">Kilos</option>
+                <option value="gramos">Gramos</option>
+                <option value="kilogramo">Kilogramos</option>
+                <option value="miligramo">Miligramos</option>
+                <option value="libra">Libras</option>
+              </select>
+            </p>
+          </fieldset>
+          <p id="msgFinal">
+            <label for="msg">Message:</label>
+            <textarea id="msg" name="user_message"></textarea>
+          </p>
+          <button type="submit">Enviar</button>
+        </form>
+      </div>
+
+    
+    <?!= include('javascript'); ?>
+    <?!= include('javasegundo'); ?>
+  
+  </main>
+   
+</body>
+</html>

@@ -1,0 +1,461 @@
+<script>     
+    //DESCRIPCION DE AYUDA: Para manejar tu información, tenés un apartado de gestión y otro de resultados, donde encontrarás modelos de formularios predefinidos que podés completar para gestionar
+    //tus datos. En el formulario de cantidad de insumos, encontrarás 5 ítems con sus cantidades como ejemplo, listos para que les pongas el nombre que prefieras y en la sección de resultados, 
+    //visualizar estos datos.
+ 
+
+
+    //////////////////////////////////////////////////////////////
+    // EVENTO PARA OCULTAR Y MOSTRAR LAS PAGINAS CORRESPONDIENTES
+    //////////////////////////////////////////////////////////////
+    function mostrarPagina(id) {
+      // Ocultar todos los divs(páginas) de contenido
+      const secciones = document.querySelectorAll('.contenido');
+      secciones.forEach(sec => sec.classList.remove('visible'));
+
+      // Mostrar solo la seleccionada
+      document.getElementById(id).classList.add('visible');
+    }       
+
+    /////////////////////////////////////////////////
+    // EVENTO NAVBAR EFECTO SOMBREADO AL HACER SCROLL
+    /////////////////////////////////////////////////
+      // Escucha el evento "scroll" en la ventana del navegador
+      window.addEventListener("scroll", () => {
+      // Selecciona el elemento <nav> de la página
+      const navbar = document.querySelector("nav");
+      // Aplica o quita la clase "scrolled" dependiendo de si el usuario hizo scroll más de 50 píxeles
+      navbar.classList.toggle("scrolled", window.scrollY > 50);
+    });
+
+    /////////////////////////////////////////////////////
+    //FUNCIONES REPETIR PARA REPETIR FORMULARIO////////////////////
+    /////////////////////////////////////////////////////
+    function repetirCompras(){
+      google.script.run.envioRespuestasCompras()
+      alert("Formulario ventas Repetido con exito")
+    }
+    function repetirVentas(){
+      google.script.run.envioRespuestasVentas()
+      alert("Formulario ventas Repetido con exito")
+    }
+    function repetirProduccion(){
+      google.script.run.envioRespuestasProduccion()
+      alert("Formulario ventas Repetido con exito")
+    }
+    function repetirCostoFijo(){
+      google.script.run.envioRespuestasCostoFijo()
+      alert("Formulario ventas Repetido con exito")
+    }
+  ////////////////////////////////////////////////////////GRAFICOS////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////
+  /////////////////////GRAFICO COMPRAS////////////////////////
+  ////////////////////////////////////////////////////////
+
+    google.charts.load('current', { packages: ['corechart'] });
+    //google.charts.setOnLoadCallback(drawChart);
+
+    let chart;
+    const spreadsheetId = '<?= idParaGraficoPrueba ?>';
+    
+
+    async function comprasChart() {
+      let fechaInicio = document.getElementById("fechaInicio").value;
+      let fechaFin = document.getElementById("fechaFin").value;
+      let comprasData, costoD, costoH, costoM;
+      if (!fechaInicio || !fechaFin) {
+        [comprasData, costoD, costoH, costoM] = await Promise.all([
+        fetchSheetData('Compras', `SELECT I WHERE I IS NOT NULL`),
+        fetchSheetData('Costos fijos', `SELECT D WHERE D IS NOT NULL `),
+        fetchSheetData('Costos fijos', `SELECT H WHERE H IS NOT NULL `),
+        fetchSheetData('Costos fijos', `SELECT M WHERE M IS NOT NULL `)
+      ]);
+      alert("No hay fechas, se mostrará un historico")
+      }else{
+          //Para que contemple el ultimo dia
+        const finDate = new Date(fechaFin);
+        finDate.setDate(finDate.getDate() + 1);
+        const fechaFinAjustada = finDate.toISOString().split("T")[0]; // yyyy-mm-dd
+
+        [comprasData, costoD, costoH, costoM] = await Promise.all([
+          fetchSheetData('Compras', `SELECT I WHERE I IS NOT NULL AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`),
+          fetchSheetData('Costos fijos', `SELECT D WHERE D IS NOT NULL AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`),
+          fetchSheetData('Costos fijos', `SELECT H WHERE H IS NOT NULL AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`),
+          fetchSheetData('Costos fijos', `SELECT M WHERE M IS NOT NULL AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`)
+        ]);
+      }
+      
+
+      const totals = { "Compras": 0, "Costos Fijos": 0 };
+
+      [comprasData, costoD, costoH, costoM].forEach((data, index) => {
+        const rows = data.getDataTable().getFilteredRows([{ column: 0, minValue: 0 }])
+           // Excluye la fila 0 (encabezado)
+        rows.forEach(rowIndex => {
+          let valor = data.getDataTable().getValue(rowIndex, 0);
+          valor = (typeof valor === 'number' && !isNaN(valor)) ? valor : 0;
+          if (index === 0) {
+            totals["Compras"] += valor;
+          } else {
+            totals["Costos Fijos"] += valor;
+          }
+        });
+      });
+
+      let montoTotal = totals["Costos Fijos"] + totals["Compras"];
+      const dataTable = new google.visualization.DataTable();
+      dataTable.addColumn('string', 'Categoría');
+      dataTable.addColumn('number', 'Monto');
+      dataTable.addRows([
+        ['Compras - $'+totals["Compras"], totals["Compras"]],
+        ['Costos Fijos - $'+totals["Costos Fijos"], totals["Costos Fijos"]],
+      ]);
+
+      const options = {
+        title: `Monto total de compras realizadas ::${montoTotal}`,
+        pieHole: 0.4,
+        legend: { position: 'right' }
+      };
+
+      chart = new google.visualization.ColumnChart(document.getElementById('comprasChart_div'));
+      chart.draw(dataTable, options);
+      return montoTotal;
+    }
+
+
+    ////////////////////////////////////////////////////////
+  /////////////////////GRAFICO VENTAS////////////////////////
+  ////////////////////////////////////////////////////////
+
+
+    async function ventasChart() {
+      let fechaInicio = document.getElementById("fechaInicio").value;
+      let fechaFin = document.getElementById("fechaFin").value;
+      let ventasP, ventasS;
+      if (!fechaInicio || !fechaFin) {
+         [ventasP, ventasS] = await Promise.all([
+        fetchSheetData('Ventas', `SELECT R WHERE R IS NOT NULL`),
+        fetchSheetData('Ventas', `SELECT I WHERE I IS NOT NULL`)
+      ]);
+        alert("No hay fechas, se mostrará un historico")
+      }else{
+        const finDate = new Date(fechaFin);
+        finDate.setDate(finDate.getDate() + 1);
+        const fechaFinAjustada = finDate.toISOString().split("T")[0]; // yyyy-mm-dd
+
+         [ventasP, ventasS] = await Promise.all([
+          fetchSheetData('Ventas', `SELECT R WHERE R IS NOT NULL AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`),
+          fetchSheetData('Ventas', `SELECT I WHERE I IS NOT NULL AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`)
+        ]);
+      }
+      
+
+      const totals = { "Ventas de Productos": 0, "Ventas de Servicios": 0 };
+
+      [ventasP, ventasS].forEach((data, index) => {
+        const rows = data.getDataTable().getFilteredRows([{ column: 0, minValue: 0 }]);
+
+        rows.forEach(rowIndex => {
+          let valor = data.getDataTable().getValue(rowIndex, 0);
+          // Si no es un número, reemplazar por 0
+          valor = (typeof valor === 'number' && !isNaN(valor)) ? valor : 0;
+
+          if (index === 0) {
+            totals["Ventas de Productos"] += valor;
+          } else {
+            totals["Ventas de Servicios"] += valor;
+          }
+        });
+      });
+
+      let montoTotal = totals["Ventas de Productos"] + totals["Ventas de Servicios"];
+
+      const dataTable = new google.visualization.DataTable();
+      dataTable.addColumn('string', 'Categoría');
+      dataTable.addColumn('number', 'Monto');
+      dataTable.addRows([
+        ['Ventas de Productos - $' + totals["Ventas de Productos"], totals["Ventas de Productos"]],
+        ['Ventas de Servicios - $' + totals["Ventas de Servicios"],totals["Ventas de Servicios"]]
+      ]);
+
+      const options = {
+        title: `Monto total de ventas realizadas ::${montoTotal}`,
+        pieHole: 0.4,
+        legend: { position: 'right' }
+      };
+
+      const chart = new google.visualization.ColumnChart(document.getElementById('ventasChart_div'));
+      chart.draw(dataTable, options);
+      return montoTotal;
+    }
+
+      ////////////////////////////////////////////////////////
+      /////////////////////GRAFICO STOCK////////////////////////
+      ////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////CIERRE GRAFICOS////////////////////////////////////////////////////////
+      async function stockChart() {
+        const [productoResponse, cantidadResponse] = await Promise.all([
+          fetchSheetData('Hoja 1', "SELECT B WHERE B IS NOT NULL"),
+          fetchSheetData('Hoja 1', "SELECT C WHERE C IS NOT NULL")
+        ]);
+
+        const productoTable = productoResponse.getDataTable();
+        const cantidadTable = cantidadResponse.getDataTable();
+
+        const chartDataArray = [['Producto', 'Cantidad']];
+        const numRows = Math.min(productoTable.getNumberOfRows(), cantidadTable.getNumberOfRows());
+
+        for (let i = 0; i < numRows; i++) {
+          let nombre = productoTable.getValue(i, 0);
+          let valor = cantidadTable.getValue(i, 0);
+
+          nombre = (typeof nombre === 'string') ? nombre : 'Desconocido';
+          valor = (!isNaN(Number(valor))) ? Number(valor) : 0;
+
+          chartDataArray.push([nombre, valor]);
+        }
+
+        // Ajustar el ancho del gráfico según la cantidad de productos
+        const chartWidth = Math.max(600, chartDataArray.length * 80);
+        const chartDiv = document.getElementById('stock_divT');
+        chartDiv.style.width = chartWidth + 'px';
+
+        const data = google.visualization.arrayToDataTable(chartDataArray);
+
+        const options = {
+          title: 'Cantidad total de productos terminados disponibles',
+          legend: { position: 'right' },
+          annotations: { alwaysOutside: true }
+        };
+
+        const chart = new google.visualization.ColumnChart(chartDiv);
+        chart.draw(data, options);
+      }
+
+
+
+
+
+    ///////////////////////////////////////FUNCION FETCH/////////////////////////////////////////
+
+    async function fetchSheetData(sheetName, queryText) {
+      const spreadsheetId = '<?= idParaGraficoPrueba ?>'; // Solo para probar
+      const queryString = encodeURIComponent(queryText);
+      const url = "https://docs.google.com/spreadsheets/d/"+spreadsheetId+"/gviz/tq?sheet="+sheetName+"&tq="+queryString;
+      return new Promise((resolve, reject) => {
+        const query = new google.visualization.Query(url);
+        query.send(response => {
+          if (response.isError()) {
+            reject('Error: ' + response.getMessage() + response.getDetailedMessage());
+          } else {
+            resolve(response);
+          }
+        });
+      });
+    }
+    function abrirModal(numeroForm) {
+      document.getElementById('modalOverlay').style.display = 'flex';
+      const nombreLabel = document.getElementById('textoSegunForm')
+      switch (numeroForm){
+        case 10: 
+          nombreLabel.textContent = "compras:"
+          break;
+        case 20: 
+          nombreLabel.textContent = "producción:"
+          break;
+        case 30: 
+          nombreLabel.textContent = "ventas:"
+          break;
+        case 40: 
+          nombreLabel.textContent = "costo-fijo:"
+          break; 
+      }
+    }
+    function seleccionarBotonPrellenado(boton) {
+      const botones = document.querySelectorAll('.selector button');
+      botones.forEach(b => b.classList.remove('activo'));
+      boton.classList.add('activo');
+    }
+    function cerrarModal() {
+      document.getElementById('modalOverlay').style.display = 'none';
+    }
+//////////////////////////////////////////////////////////////////////////////////////////
+
+    function aceptarYguardarModal() {
+      const nombre = document.getElementById('entrada').value
+      const formElegido = document.getElementById('textoSegunForm').textContent
+      const botonActivo = document.querySelector('.selector button.activo');
+      const bId = botonActivo.id
+      const numeroId = parseInt(bId.match(/\d+$/)[0])
+      let numeroFinal
+      let botonGuardado
+      let enlaceAGuardar
+      if (botonActivo) {
+        switch (formElegido){
+        case "compras:":
+          numeroFinal = 0 + (numeroId - 1)
+          botonGuardado = document.getElementById(`e${numeroFinal}`)
+          botonGuardado.textContent = nombre
+          google.script.run.withSuccessHandler(function(enlaceAGuardar) {
+            imprimirDatosPrellenadoProperties(enlaceAGuardar,nombre,numeroFinal)
+            botonGuardado.onclick = function () {
+              window.open(enlaceAGuardar, '_blank');
+            };
+            document.getElementById('modalOverlay').style.display = 'none';
+          })
+          .enlacePrellenadoCompras();
+          break;
+        case "producción:":
+           numeroFinal = 4 + (numeroId - 1)
+          botonGuardado = document.getElementById(`e${numeroFinal}`)
+          botonGuardado.textContent = nombre
+          google.script.run.withSuccessHandler(function(enlaceAGuardar) {
+            imprimirDatosPrellenadoProperties(enlaceAGuardar,nombre,numeroFinal)
+            botonGuardado.onclick = function () {
+              window.open(enlaceAGuardar, '_blank');
+            };
+            document.getElementById('modalOverlay').style.display = 'none';
+          })
+          .enlacePrellenadoProduccion();
+          break;
+        case "ventas:":
+          numeroFinal = 8 + (numeroId - 1)
+          botonGuardado = document.getElementById(`e${numeroFinal}`)
+          botonGuardado.textContent = nombre
+          google.script.run.withSuccessHandler(function(enlaceAGuardar) {
+            imprimirDatosPrellenadoProperties(enlaceAGuardar,nombre,numeroFinal)
+            botonGuardado.onclick = function () {
+              window.open(enlaceAGuardar, '_blank');
+            };
+            document.getElementById('modalOverlay').style.display = 'none';
+          })
+          .enlacePrellenadoVentas();
+          break;
+        case "costo-fijo:":
+          numeroFinal = 12 + (numeroId - 1)
+          botonGuardado = document.getElementById(`e${numeroFinal}`)
+          botonGuardado.textContent = nombre
+          google.script.run.withSuccessHandler(function(enlaceAGuardar) {
+            imprimirDatosPrellenadoProperties(enlaceAGuardar,nombre,numeroFinal)
+            botonGuardado.onclick = function () {
+              window.open(enlaceAGuardar, '_blank');
+            };
+            document.getElementById('modalOverlay').style.display = 'none';
+          })
+          .enlacePrellenadoCostoFijo();
+          break;
+        }
+        mostrarAlertaTemporal("Por favor espere - guardando form", 7000);
+      }else{
+        alert("Porfavor seleccione un boton donde guardarlo");
+      }
+    }
+
+    function imprimirDatosPrellenadoProperties(enlace,name,num){
+
+      google.script.run.aplicarDatosPropertiesPrellenado(enlace,name,num);
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+    function ventasGrafico() {
+      ventasChart();
+    }
+    function comprasGrafico() {
+      comprasChart();
+    }
+    async function obtenerBalance() {
+      const ventas = await ventasChart();   // Espera a que se resuelva la Promesa
+      const compras = await comprasChart(); // Igual aquí
+      const valorBalance = ventas - compras;
+      
+      console.log(valorBalance);
+
+      const visualizacionDiv = document.getElementById("balance_div");
+      visualizacionDiv.textContent = `BALANCE :: ${valorBalance}`;
+    }
+
+    function mostrarAlertaTemporal(mensaje, duracionMs = 2000) {
+      const alerta = document.getElementById("alertaTemporal");
+      const overlay = document.getElementById("overlayBloqueo");
+
+      alerta.textContent = mensaje;
+
+      overlay.style.display = "block"; // Bloquea el fondo
+      alerta.style.display = "block";  // Muestra el mensaje
+
+      setTimeout(() => {
+        alerta.style.display = "none";
+        overlay.style.display = "none";
+      }, duracionMs);
+    }
+    ////////////////////////////////////////////////////////////
+    //////Manejo del formulario/////////////////////////////////
+    ////////////////////////////////////////////////////////////
+
+    //////Funciones para hacer el formulario con imputs dinamicos
+    let contador = 1;
+
+    //----Agregar elementos----//
+    function agregarElemento(idFormulario) {
+      const form = document.getElementById(idFormulario);
+      const original = form.querySelector("fieldset");
+      const clon = original.cloneNode(true);
+
+      // Agregar clase para identificar que es un clon
+      clon.classList.add("clonado");
+
+      // Limpiar los valores del clon y generar nuevos IDs únicos
+      const inputs = clon.querySelectorAll("input, select, textarea");
+      inputs.forEach((input) => {
+        input.value = "";
+
+        if (input.id) {
+          const baseId = input.id.split("-")[0]; // id base sin sufijo
+          const nuevoId = baseId + "-" + contador;
+          input.id = nuevoId;
+
+          // Buscar el label asociado al id base y actualizar su atributo for
+          const label = clon.querySelector(`label[for="${baseId}"]`);
+          if (label) {
+            label.setAttribute("for", nuevoId);
+          }
+        }
+      });
+
+      // Insertar antes del mensaje final (mantener botón al final)
+      const final = form.querySelector("p[id='msgFinal']");
+      form.insertBefore(clon, final);
+
+      // Incrementar contador
+      contador++;
+
+      // Hacer scroll hasta el nuevo clon
+      clon.scrollIntoView({ behavior: "smooth" });
+    }
+
+    //----Eliminar elementos----//
+    function eliminarElemento(idFormulario){
+      const form = document.getElementById(idFormulario);
+      const clones = form.querySelectorAll("fieldset.clonado");
+      if (clones.length > 0) {
+        form.removeChild(clones[clones.length - 1]);
+        contador--;
+      }
+    }
+    //----Enviar datos del formulario----//
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // procesar y guardar datos
+
+
+      // limpiar dinámicos
+      const dinámicos = form.querySelectorAll("fieldset.clonado");
+      dinámicos.forEach(el => el.remove());
+      // opcional: resetear el formulario completo
+      form.reset();
+      // reiniciar contador
+      contador = 1;
+    });
+   
+</script>
