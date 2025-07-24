@@ -7,6 +7,15 @@ function proveedorCF (){
     let formularioProveedorCF = FormApp.create("Proveedor Costos Fijos");
     let formularioProveedorCFID = formularioProveedorCF.getId();
     PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioProveedorCFID);
+    
+    const valCE = FormApp.createTextValidation()
+      .requireTextIsEmail()
+      .build();
+    const val = FormApp.createTextValidation()
+      .requireNumber()
+      .requireNumberGreaterThan(0)
+      .build();
+
 
     // Titulos específicos a validar
     const TITULO_DNI= "CUIT/CUIL/DNI";
@@ -21,12 +30,12 @@ function proveedorCF (){
     
 
     const preguntasProveedorCF = [
-      { tipo: "seleccion", titulo: "Tipo de personeria", opciones: opcionesTipoPersona, requerido: true,textoAyuda: "Seleccione si el proveedor es una persona fisica o una persona juridica como una S.A o S.R.L"},
+      { tipo: "list", titulo: "Tipo de personeria", opciones: opcionesTipoPersona, requerido: true},
       { tipo: "text", titulo: "Nombre y apellido o Razon social", requerido: true},
-      { tipo: "text", titulo: "CUIT/CUIL/DNI", requerido: true, textoAyuda: "Ingrese número de CUIT/CUIL o DNI del proveedor"},
-      { tipo: "text", titulo: "Telefono", requerido: true, textoAyuda: "Ingrese numero telefonico de la persona contacto con el proveedor"},
-      { tipo: "text", titulo: "Correo electronico", requerido: true, textoAyuda: "Ingrese el email de la persona de contacto con el proveedor"},
-      { tipo: "text", titulo: "Nombre completo de contacto", requerido: true, textoAyuda: "Ingrese ingrese nombre y apellido de la persona contacto con el proveedor"},
+      { tipo: "text", titulo: "CUIT/CUIL/DNI", requerido: true,textoAyuda: "sin puntos, comas o guiones"},
+      { tipo: "text", titulo: "Telefono", requerido: true},
+      { tipo: "text", titulo: "Correo electronico"},
+      { tipo: "text", titulo: "Descripcion adicional"},
     ];
 
     preguntasProveedorCF.forEach(p => {
@@ -43,26 +52,15 @@ function proveedorCF (){
 
             // Validación para 
           if (p.titulo === TITULO_DNI) {
-            let val = FormApp.createTextValidation()
-              .requireNumber()
-              .requireNumberGreaterThan(0)
-              .build();
             pregunta.setValidation(val);
           }
           // Validación para numero de telefono (entero positivo)
             if (p.titulo === TITULO_TELEFONO) {
-              let val = FormApp.createTextValidation()
-                .requireWholeNumber()
-                .requireNumberGreaterThan(0)
-                .build();
               pregunta.setValidation(val);
             }
             //Validación para correo electrónico
             if (p.titulo === TITULO_CORREO_ELECTRONICO) {
-              let val = FormApp.createTextValidation()
-                .requireTextIsEmail()
-                .build();
-              pregunta.setValidation(val);
+              pregunta.setValidation(valCE);
             }
           break;
         case "date":

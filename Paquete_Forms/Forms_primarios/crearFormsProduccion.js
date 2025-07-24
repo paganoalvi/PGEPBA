@@ -1,5 +1,5 @@
-////////////////////////////////////////////////////
-// FUNCIÓN PRINCIPAL: Crear el Form PRODUCCION /////
+///////////////////////////////////////////////////
+// FUNCIÓN PRINCIPAL: Crear el Form PRODUCCION ////
 ///////////////////////////////////////////////////
 function produccion (){
     try {
@@ -10,14 +10,16 @@ function produccion (){
       PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioProduccionID);
 
       formularioProduccion.setDescription(
-        "Este formulario permite llevar registro de los productos que fabrica tu emprendimiento"
+        "Este formulario permite llevar registro de los productos que fabrica tu emprendimiento, contemplando cantidades por lote"
       );
       const TITULO_CANTIDAD = "Cantidad"
+      let opcionesProductos = [" "];
 
       const preguntasProduccion = [
-        {tipo: "text",titulo: "Producto",requerido: true, textoAyuda: "Seleccione de cual producto quiere llevar cuenta"},
-        {tipo: "text",titulo: "Cantidad",requerido: true, textoAyuda: "Indique la cantidad de productos fabricada"},
-        {tipo: "text",titulo: "Lote", textoAyuda: "Indique numero de lote si es que posee"},
+        {tipo: "list",titulo: "Producto",opciones: opcionesProductos,requerido: true},
+        {tipo: "text",titulo: "Cantidad",requerido: true, textoAyuda: "Indique la cantidad de productos fabricados en este lote"},
+        {tipo: "text",titulo: "Lote",requerido: true, textoAyuda: "Indique codigo de lote"},
+        {tipo: "text",titulo: "Descripcion adicional"},
       ]
 
       preguntasProduccion.forEach(p =>{

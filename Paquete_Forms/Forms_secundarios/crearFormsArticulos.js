@@ -1,33 +1,32 @@
 ////////////////////////////////////////////////////
 // FUNCIÓN PRINCIPAL: Crear el Form ARTICULOS /////
 ///////////////////////////////////////////////////
-function articulo (){
+function articulo (){  
     try {
       Logger.log("Iniciando creación del formulario de articulos");
  
       let formularioArticulos = FormApp.create("Articulo");
       let formularioArticulosID = formularioArticulos.getId();
       PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioArticulosID);
-      let opcionesConceptoA =  ["Herramienta" ,"Maquinaria","Insumo extraordinario"];// concepto de la compra
+      let opcionesConceptoA =  ["Herramienta" ,"Maquinaria","Servicio"];// concepto de la compra
 
       formularioArticulos.setDescription(
-        "Este formulario permite llevar registro de los artículos comprados por tu emprendimiento"
+        "Este formulario permite llevar registro de los artículos comprados por tu emprendimiento,aquellos que no son materias primas o insumos"
       );
      
       formularioArticulos.addTextItem()
-        .setTitle("Nombre artículo")
+        .setTitle("Nombre artículo") // Nombre
         .setRequired(true)
         .setHelpText("Ingrese el nombre del articulo");
      
       formularioArticulos.addMultipleChoiceItem()
-        .setTitle("Tipo de artículo")
+        .setTitle("Tipo de artículo") // Tipo articulo
         .setChoiceValues(opcionesConceptoA)
         .setRequired(true)
  
       formularioArticulos.addTextItem()
-        .setTitle("Codigo interno")
-        .setHelpText("Ingrese un codigo identificador para el artículo (si posee)");
-
+        .setTitle("Codigo interno") // Codigo interno
+        .setHelpText("Si es que posee");
 
       const formArticulosUrl = formularioArticulos.getPublishedUrl();
       Logger.log("Enlace a formulario: " + formArticulosUrl)
