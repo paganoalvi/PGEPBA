@@ -2,31 +2,24 @@
     //DESCRIPCION DE AYUDA: Para manejar tu información, tenés un apartado de gestión y otro de resultados, donde encontrarás modelos de formularios predefinidos que podés completar para gestionar
     //tus datos. En el formulario de cantidad de insumos, encontrarás 5 ítems con sus cantidades como ejemplo, listos para que les pongas el nombre que prefieras y en la sección de resultados, 
     //visualizar estos datos.
- 
-
 
     //////////////////////////////////////////////////////////////
     // EVENTO PARA OCULTAR Y MOSTRAR LAS PAGINAS CORRESPONDIENTES
     //////////////////////////////////////////////////////////////
-    function mostrarPagina(id) {
-      // Ocultar todos los divs(páginas) de contenido
-      const secciones = document.querySelectorAll('.contenido');
-      secciones.forEach(sec => sec.classList.remove('visible'));
+    function mostrarPagina(id, navegador) {
+      document.startViewTransition(() => {
+        // Ocultar todos los divs(páginas) de contenido
+        const secciones = document.querySelectorAll('.contenido');
+        secciones.forEach(sec => sec.classList.remove('visible'));
 
-      // Mostrar solo la seleccionada
-      document.getElementById(id).classList.add('visible');
+        // Mostrar solo la seleccionada
+        document.getElementById(id).classList.add('visible');
+      })
+  
+      //Estila el Header de la sección donde se encuentra el usuario
+      navegador.parentElement.querySelectorAll('li').forEach(li => li.classList.remove('activo'));
+      navegador.classList.add('activo');
     }       
-
-    /////////////////////////////////////////////////
-    // EVENTO NAVBAR EFECTO SOMBREADO AL HACER SCROLL
-    /////////////////////////////////////////////////
-      // Escucha el evento "scroll" en la ventana del navegador
-      window.addEventListener("scroll", () => {
-      // Selecciona el elemento <nav> de la página
-      const navbar = document.querySelector("nav");
-      // Aplica o quita la clase "scrolled" dependiendo de si el usuario hizo scroll más de 50 píxeles
-      navbar.classList.toggle("scrolled", window.scrollY > 50);
-    });
 
     /////////////////////////////////////////////////////
     //FUNCIONES REPETIR PARA REPETIR FORMULARIO////////////////////
@@ -47,11 +40,12 @@
       google.script.run.envioRespuestasCostoFijo()
       alert("Formulario ventas Repetido con exito")
     }
-  ////////////////////////////////////////////////////////GRAFICOS////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////
-  /////////////////////GRAFICO COMPRAS////////////////////////
-  ////////////////////////////////////////////////////////
 
+  //---------------------------------------------//
+  //--------------GRAFICOS-----------------------//
+  //---------------------------------------------//
+
+  ////////////////GRAFICO COMPRAS/////////////////
     google.charts.load('current', { packages: ['corechart'] });
     //google.charts.setOnLoadCallback(drawChart);
 
@@ -123,11 +117,7 @@
     }
 
 
-    ////////////////////////////////////////////////////////
   /////////////////////GRAFICO VENTAS////////////////////////
-  ////////////////////////////////////////////////////////
-
-
     async function ventasChart() {
       let fechaInicio = document.getElementById("fechaInicio").value;
       let fechaFin = document.getElementById("fechaFin").value;
@@ -189,10 +179,11 @@
       return montoTotal;
     }
 
-      ////////////////////////////////////////////////////////
-      /////////////////////GRAFICO STOCK////////////////////////
-      ////////////////////////////////////////////////////////
-      /////////////////////////////////////////////////CIERRE GRAFICOS////////////////////////////////////////////////////////
+    //---------------------------------------------//
+    //--------------GRAFICO STOCK------------------//
+    //---------------------------------------------//
+    
+    //////////////CIERRE GRAFICOS////////////////////
       async function stockChart() {
         const [productoResponse, cantidadResponse] = await Promise.all([
           fetchSheetData('Hoja 1', "SELECT B WHERE B IS NOT NULL"),
@@ -233,15 +224,10 @@
       }
 
 
-
-
-
-    ///////////////////////////////////////FUNCION FETCH/////////////////////////////////////////
-
+    ////////////FUNCION FETCH////////////////////////
     async function fetchSheetData(sheetName, queryText) {
-      const spreadsheetId = '<?= idParaGraficoPrueba ?>'; // Solo para probar
       const queryString = encodeURIComponent(queryText);
-      const url = "https://docs.google.com/spreadsheets/d/"+spreadsheetId+"/gviz/tq?sheet="+sheetName+"&tq="+queryString;
+      const url = "https://docs.google.com/spreadsheets/d/"+idParaGraficoPrueba+"/gviz/tq?sheet="+sheetName+"&tq="+queryString;
       return new Promise((resolve, reject) => {
         const query = new google.visualization.Query(url);
         query.send(response => {
@@ -253,6 +239,7 @@
         });
       });
     }
+
     function abrirModal(numeroForm) {
       document.getElementById('modalOverlay').style.display = 'flex';
       const nombreLabel = document.getElementById('textoSegunForm')
@@ -279,7 +266,8 @@
     function cerrarModal() {
       document.getElementById('modalOverlay').style.display = 'none';
     }
-//////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////
 
     function aceptarYguardarModal() {
       const nombre = document.getElementById('entrada').value
@@ -356,7 +344,8 @@
       google.script.run.aplicarDatosPropertiesPrellenado(enlace,name,num);
     }
 
-//////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
     function ventasGrafico() {
       ventasChart();
     }
@@ -388,14 +377,107 @@
         overlay.style.display = "none";
       }, duracionMs);
     }
-    ////////////////////////////////////////////////////////////
-    //////Manejo del formulario/////////////////////////////////
-    ////////////////////////////////////////////////////////////
 
-    //////Funciones para hacer el formulario con imputs dinamicos
-    let contador = 1;
+  ////////////////////////////////////////////////////////////
+  //////Manejo del formulario RECETA/////////////////////////////////
+  ////////////////////////////////////////////////////////////
+  //////Funciones para hacer el formulario con imputs dinamicos
+  // Tu script para crear el formulario "receta" defini tu producto
+  ////////////////////////////////////////////////////////////
+    let contadore = 1;
+    let materiasPrimasDisponibles = [];
 
-    //----Agregar elementos----//
+    // Función para normalizar el texto
+    function normalizarTexto(texto) {
+      if (!texto) return "";
+      texto = texto.trim();
+      return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+    }
+
+    function cargarMateriasPrimasDesdeSheets() {
+        document.body.classList.add('cargando');
+        google.script.run
+        .withSuccessHandler(function(materiasPrimas) {
+            materiasPrimasDisponibles = materiasPrimas;
+            cargarMateriasPrimasEnSelects();
+            document.body.classList.remove('cargando');
+        })
+        .withFailureHandler(function(error) {
+            console.error("Error al cargar materias primas:", error);
+            alert("Error al cargar materias primas. Recargue la página.");
+            document.body.classList.remove('cargando');
+        })
+        .obtenerMateriasPrimasDeSheet();
+    }     
+
+    // Función para cargar en los selects
+    function cargarMateriasPrimasEnSelects() {
+      const selects = document.querySelectorAll('select[name="materiaPrima[]"]');
+      
+      selects.forEach(select => {
+        // Guardar selección actual
+        const selected = select.value;
+        
+        // Limpiar opciones (excepto la primera)
+        while (select.options.length > 1) {
+          select.remove(1);
+        }
+        
+        // Agregar materias primas ordenadas
+        materiasPrimasDisponibles.sort().forEach(mp => {
+          const option = new Option(mp, mp);
+          select.add(option);
+        });
+        
+        // Restaurar selección si existe
+        if (selected && materiasPrimasDisponibles.includes(selected)) {
+          select.value = selected;
+        }
+      });
+    }
+
+    function anadirNuevaMateriaPrima(event) {  // Añade el parámetro event
+        const input = document.getElementById("inputNuevaMateriaPrima");
+        const nuevaMp = normalizarTexto(input.value);
+
+        if (nuevaMp === "") {
+            alert("Por favor, ingrese un nombre para la materia prima.");
+            return;
+        }
+
+        // Verificar si ya existe localmente
+        const existe = materiasPrimasDisponibles.some(mp => normalizarTexto(mp) === nuevaMp);
+        if (existe) {
+            alert(`La materia prima "${nuevaMp}" ya existe en la lista.`);
+            return;
+        }
+
+        // Mostrar feedback al usuario
+        const button = event.target;
+        const originalText = button.textContent;
+        button.textContent = "Agregando...";
+        button.disabled = true;
+
+        google.script.run
+            .withSuccessHandler(function() {
+                cargarMateriasPrimasDesdeSheets();
+                input.value = "";
+                alert(`"${nuevaMp}" ha sido añadida correctamente.`);
+                button.textContent = originalText;
+                button.disabled = false;
+            })
+            .withFailureHandler(function(error) {
+                console.error("Error:", error);
+                alert("Error al agregar: " + error.message);
+                button.textContent = originalText;
+                button.disabled = false;
+            })
+            .agregarMPR(nuevaMp);
+    }
+
+    // Cargar las materias primas al cargar la página
+
+    //-----------------Agregar elementos (clonar fieldset)------------------//
     function agregarElemento(idFormulario) {
       const form = document.getElementById(idFormulario);
       const original = form.querySelector("fieldset");
@@ -404,6 +486,7 @@
       // Agregar clase para identificar que es un clon
       clon.classList.add("clonado");
 
+      //°°°°°°°Unicidad de IDs para correcto manejo de datos°°°°°°//
       // Limpiar los valores del clon y generar nuevos IDs únicos
       const inputs = clon.querySelectorAll("input, select, textarea");
       inputs.forEach((input) => {
@@ -411,7 +494,7 @@
 
         if (input.id) {
           const baseId = input.id.split("-")[0]; // id base sin sufijo
-          const nuevoId = baseId + "-" + contador;
+          const nuevoId = baseId + "-" + contadore;
           input.id = nuevoId;
 
           // Buscar el label asociado al id base y actualizar su atributo for
@@ -422,40 +505,74 @@
         }
       });
 
-      // Insertar antes del mensaje final (mantener botón al final)
+      // Recargar las opciones de materia prima en el nuevo select clonado
+      const newSelectMateriaPrima = clon.querySelector('select[name="materiaPrima[]"]');
+      if (newSelectMateriaPrima) {
+          // Limpiar opciones existentes (excepto la primera)
+          while (newSelectMateriaPrima.options.length > 1) {
+              newSelectMateriaPrima.remove(1);
+          }
+          // Añadir las opciones actualizadas
+          materiasPrimasDisponibles.sort().forEach(mp => {
+              const option = document.createElement("option");
+              option.value = mp;
+              option.textContent = mp;
+              newSelectMateriaPrima.appendChild(option);
+          });
+          newSelectMateriaPrima.value = ""; // Resetear la selección del clon
+      }
+
+
+      //°°°°°° Insertar antes del mensaje final (mantener botón al final)°°°°°°//
       const final = form.querySelector("p[id='msgFinal']");
       form.insertBefore(clon, final);
 
       // Incrementar contador
-      contador++;
+      contadore++;
 
-      // Hacer scroll hasta el nuevo clon
-      clon.scrollIntoView({ behavior: "smooth" });
+      //°°°°°°Hace el scroll automatico hasta el nuevo clon°°°°°//
+      //clon.scrollIntoView({ behavior: "smooth" }); // Descomentar si se desea el scroll
     }
 
-    //----Eliminar elementos----//
+    //---------------Eliminar elementos------------------//
     function eliminarElemento(idFormulario){
       const form = document.getElementById(idFormulario);
       const clones = form.querySelectorAll("fieldset.clonado");
       if (clones.length > 0) {
         form.removeChild(clones[clones.length - 1]);
-        contador--;
+        contadore--;
       }
     }
-    //----Enviar datos del formulario----//
-    form.addEventListener("submit", function (e) {
+
+    //-----------Enviar datos del formulario------------//
+    document.getElementById("form").addEventListener("submit", function (e) {
       e.preventDefault();
+      let datos = new FormData(e.target);
 
-      // procesar y guardar datos
+      const materiaPrima = datos.getAll("materiaPrima[]");
+      const cantidad = datos.getAll("cantidad[]");
+      const unidad = datos.getAll("unidad[]");
 
+      const receta = materiaPrima.map((mat, i) => ({
+        NombreMp: mat,
+        Cantidad: cantidad[i],
+        Tipos: unidad[i],
+      }));
+
+      google.script.run.guardarRecetaSheet(receta, datos.get("producto"), datos.get("user_message"));
 
       // limpiar dinámicos
-      const dinámicos = form.querySelectorAll("fieldset.clonado");
-      dinámicos.forEach(el => el.remove());
+      const dinamicos = document.querySelectorAll("fieldset.clonado");
+      dinamicos.forEach(el => el.remove());
       // opcional: resetear el formulario completo
-      form.reset();
+      document.getElementById("form").reset();
       // reiniciar contador
-      contador = 1;
+      contadore = 1;
+      // Recargar las materias primas para asegurar que el primer select esté limpio
+      cargarMateriasPrimasEnSelects(); 
     });
+
+    // Cargar las materias primas al cargar la página por primera vez
+    window.addEventListener('DOMContentLoaded', cargarMateriasPrimasDesdeSheets);
    
 </script>

@@ -7,19 +7,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
   <title>Portal de Gestión</title>
-
   <?!= include('estilos'); ?>
-
 </head>
-
 <body>
   
   <header>
-    <h2 onclick="mostrarPagina('definirProducto')" >DEFINE TU PRODUCTO</h2>
     <nav>
       <ul>
-        <li onclick="mostrarPagina('gestion')">Carga</li>
-        <li onclick="mostrarPagina('resultado')">Resultados</li>
+        <li class="liProducto" onclick="mostrarPagina('definirProducto', this)" >CREA TU PRODUCTO</li>
+        <li onclick="mostrarPagina('gestion', this)">Carga</li>
+        <li onclick="mostrarPagina('resultado', this)">Resultados</li>
         <li onclick="window.open('https://sites.google.com/view/guiausuariopge/guia-usuario' , '_blank')">Ayuda</li>
       </ul>
     </nav>
@@ -29,7 +26,7 @@
 
       <!-- ////// PÁGINA GESTION ////// -->
       <div id="gestion" class="contenido visible">
-        <div class="contenedorTarjetas">
+        <div class="container-card-Gestion">
           <!-- Bloquea el fondo -->
           <div id="overlayBloqueo" style="
             display: none;
@@ -57,38 +54,76 @@
           ">
             POR FAVOR ESPERE
           </div>
-
-      <!------------ CONTENIDO GESTION -------------->
+        <!------------ CONTENIDO GESTION -------------->
             <section class="tarjeta">
                 <img onclick="window.open('<?= fComprasUrl ?>', '_blank')"   
-                  src="https://github.com/SZ1011h/PortalGestionImages/blob/main/ComprasIcono.png?raw=true"
+                  src="https://i.imgur.com/tzCSZJ4.png"
                   alt="img-subGestion-Compras">  
                 <h2>Compras</h2>
-                <div class="posBotones">
+                <div class="posicionBotones">
+                  <!--
                   <button type="button" onclick="repetirCompras()" class="BotonRepetir">
                     Repetir Form Compras
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[0] ?>', '_blank')" id="e0">
-                    <?= nombresPrellenado[0] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[1] ?>', '_blank')" id="e1">
-                    <?= nombresPrellenado[1] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[2] ?>', '_blank')" id="e2">
-                    <?= nombresPrellenado[2] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[3] ?>', '_blank')" id="e3">
-                    <?= nombresPrellenado[3] ?>
-                  </button> 
+                  </button>
+                  --> 
+                  <button class="Btn" type="button" onclick="repetirCompras()">
+                    <div class="svgWrapper">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        viewBox="0 0 20 20"
+                        height="20"
+                        fill="none"
+                        class="svg-icon"
+                        >
+                        <g stroke-width="1.5" stroke-linecap="round" stroke="#ff342b">
+                          <path
+                            d="m3.33337 10.8333c0 3.6819 2.98477 6.6667 6.66663 6.6667 3.682 0 6.6667-2.9848 6.6667-6.6667 0-3.68188-2.9847-6.66664-6.6667-6.66664-1.29938 0-2.51191.37174-3.5371 1.01468"
+                          ></path>
+                          <path
+                            d="m7.69867 1.58163-1.44987 3.28435c-.18587.42104.00478.91303.42582 1.0989l3.28438 1.44986"
+                          ></path>
+                        </g>
+                      </svg>
+                      <div class="text">Repetir Formulario</div>
+                    </div>
+                  </button>
+                  <button class="Btn">
+                    <div class="svgWrapper">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 42 42"
+                        class="svgIcon"
+                      >
+                        <path
+                          stroke-width="5"
+                          stroke="#fff"
+                          d="M9.14073 2.5H32.8593C33.3608 2.5 33.8291 2.75065 34.1073 3.16795L39.0801 10.6271C39.3539 11.0378 39.5 11.5203 39.5 12.0139V21V37C39.5 38.3807 38.3807 39.5 37 39.5H5C3.61929 39.5 2.5 38.3807 2.5 37V21V12.0139C2.5 11.5203 2.6461 11.0378 2.91987 10.6271L7.89266 3.16795C8.17086 2.75065 8.63921 2.5 9.14073 2.5Z"
+                        ></path>
+                        <rect
+                          stroke-width="3"
+                          stroke="#fff"
+                          rx="2"
+                          height="4"
+                          width="11"
+                          y="18.5"
+                          x="15.5"
+                        ></rect>
+                        <path stroke-width="5" stroke="#fff" d="M1 12L41 12"></path>
+                      </svg>
+                      <div class="text">Formulario Prellenado</div>
+                    </div>
+                  </button>
                 </div>
             </section>
         
             <section class="tarjeta">
                 <img onclick="window.open('<?= fProduccionUrl ?>' , '_blank')" 
-                  src="https://github.com/SZ1011h/PortalGestionImages/blob/main/ProduccionIcono.png?raw=true"
+                  src="https://i.imgur.com/9S1cUa8.png"
                   alt="img-subGestion-Produccion">
                 <h2>Producción</h2>
-                <div class="posBotones">
+                <div class="posicionBotones">
                   <button type="button" onclick="repetirProduccion()" class="BotonRepetir">
                     Repetir Form Produccion
                   </button> 
@@ -109,10 +144,10 @@
         
             <section class="tarjeta">
                 <img onclick="window.open('<?= fVentasUrl ?>' , '_blank')" 
-                  src="https://github.com/SZ1011h/PortalGestionImages/blob/main/ventasIcon.png?raw=true"
+                  src="https://i.imgur.com/J82qmIy.png"
                   alt= "img-subGestion-Insumos">
                 <h2>Ventas</h2>
-                <div class="posBotones">
+                <div class="posicionBotones">
                   <button type="button" onclick="repetirVentas()" class="BotonRepetir">
                     Repetir Form Ventas
                   </button> 
@@ -133,10 +168,10 @@
 
             <section class="tarjeta">
                 <img onclick="window.open('<?= fCostoFijoUrl ?>' , '_blank')" 
-                  src="https://github.com/SZ1011h/PortalGestionImages/blob/main/CostoFijoIcono.png?raw=true"
+                  src="https://i.imgur.com/XE0Dzom.png"
                   alt= "img-subGestion-CostoFijo">
                 <h2>Costos Fijos</h2>
-                <div class="posBotones">
+                <div class="posicionBotones">
                   <button type="button" onclick="repetirCostoFijo()" class="BotonRepetir">
                     Repetir Form Costos Fijos
                   </button> 
@@ -169,8 +204,8 @@
             Asignar Form Costo Fijo
           </button>
         </section>
-
-        <!-- ////// Modal para asignar prellenados ////// -->
+        
+        <!-- --------Modal para asignar prellenado-------- -->
         <section id="modalOverlay" class="modal-prellenado">
           <div class="modal">
             <label for="entrada" >Escriba un nombre para un form <span id="textoSegunForm"></span></label><br>
@@ -185,7 +220,7 @@
 
             <button type="button" onclick="aceptarYguardarModal()">Aceptar y guardar</button>
             <button type="button"  onclick="cerrarModal()">Cerrar sin guardar</button>
-          </div>
+          </div>       
         </section>
       </div>
 
@@ -202,7 +237,7 @@
           <div id="balance_div"></div>
         </section>
           
-        <div class="tarjetasResultados">
+        <div class="container-cards-Resultado">
           <section class="tarjeta tarjetaGrafico">
             <button onclick="comprasGrafico()">
               Mostrar Compras
@@ -228,17 +263,17 @@
         </div>
 
         <h2>Carteras</h2>
-        <div class="tarjetasCartera">
+        <div class="container-cards-Resultado-carteras">
           <section class="tarjeta">
             <img  onclick="window.open('<?= urlClientes ?>' , '_blank')"  
-              src="https://github.com/SZ1011h/PortalGestionImages/blob/main/ClientesIcono.png?raw=true">                
+              src="https://i.imgur.com/NdORYu0.png">                
             <h2>Cartera Clientes</h2>
             <p>(Información de todos los clientes)</p>
           </section>
 
           <section class="tarjeta">
             <img  onclick="window.open('<?= urlProveedores ?>' , '_blank')"  
-              src="https://github.com/SZ1011h/PortalGestionImages/blob/main/ProveedorIcono.png?raw=true">               
+              src="https://i.imgur.com/06FMKtX.png">               
             <h2>Cartera Proveedores</h2>
             <p>(Información de todos los Proveedores)</p>
           </section>
@@ -248,52 +283,58 @@
 
       <!-- ////// PÁGINA PARA DEFINIR UNA RECETA ////// -->
       <div id="definirProducto" class="contenido">
-        <button id="agg" onclick="agregarElemento('form','contenedorElementos')"> + Agregar elemento </button>
-        <button id="supr" onclick="eliminarElemento('form')"> - Eliminar elemento </button>
-        <h2>Crea tu producto</h2>
-        <form action="ruta o url para obtener los datos" method="post" id="form">
-          <p class="element">
-              <label for="nombreProducto">Nombre del producto:</label>
-              <input type="text" id="nombreProducto" name="producto" required/>
-            </p>
-          <h2>Receta del producto</h2>
-          <fieldset id="contenedorElementos"> 
-            <p class="element">
-              <label for="nombreMateriaPrima">Materia Prima:</label>
-              <input type="text" id="nombreMateriaPrima" name="materiaPrima[]"/>
-            </p>
-            <p class="cant">
-              <label for="cantidad">Cantindad:</label>
-              <input type="number" id="cantidad" name="cantidad[]"/>
-            </p>
-            <p class="unit">
-              <label for="unidad">Unidad:</label>
-              <select name="unidad[]" id="unidad">
-                <option value="">--Por favor elige una opción--</option>
-                <option value="unidades">Unidades</option>
-                <option value="litros">Litros</option>
-                <option value="mililitro">Mililitros</option>
-                <option value="kilos">Kilos</option>
-                <option value="gramos">Gramos</option>
-                <option value="kilogramo">Kilogramos</option>
-                <option value="miligramo">Miligramos</option>
-                <option value="libra">Libras</option>
-              </select>
-            </p>
-          </fieldset>
-          <p id="msgFinal">
-            <label for="msg">Message:</label>
-            <textarea id="msg" name="user_message"></textarea>
-          </p>
-          <button type="submit">Enviar</button>
-        </form>
+      <div class="banner">
+        <img class="bannerImg" src="https://i.imgur.com/R1HeWsK.jpeg"/>
       </div>
-
-    
-    <?!= include('javascript'); ?>
-    <?!= include('javasegundo'); ?>
-  
+      <section class="seccionMateriaPrima">
+        <p class="element">
+          <label for="inputNuevaMateriaPrima">Agregar Nueva Materia Prima a la Lista:</label>
+          <input type="text" id="inputNuevaMateriaPrima" name="nuevaMateriaPrima" required/>
+        </p>
+        <button type="button" onclick="anadirNuevaMateriaPrima(event)">Añadir a la Lista</button>
+      </section>
+      <form action="ruta o url para obtener los datos" method="post" id="form">
+        <p class="element">
+          <label for="nombreProducto">Nombre del producto:</label>
+          <input type="text" id="nombreProducto" name="producto" required/>
+        </p>
+        <h2>Define la receta del producto</h2>
+        <button id="agg" type="button" onclick="agregarElemento('form')"> + Agregar materia prima</button>
+        <button id="supr" type="button" onclick="eliminarElemento('form')"> - Eliminar materia prima</button>
+        
+        <fieldset id="contenedorElementos"> 
+          <p class="element">
+            <label for="materiaPrima">Materia Prima:</label>
+            <select name="materiaPrima[]" id="materiaPrima">
+              <option value="">--Seleccione Materia Prima--</option>
+              </select>
+          </p>
+          <p class="cant">
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" id="cantidad" name="cantidad[]" min="0" step="any"/>
+          </p>
+          <p class="unit">
+            <label for="unidad">Unidad:</label>
+            <select name="unidad[]" id="unidad">
+              <option value="">--Por favor elige una opción--</option>
+              <option value="unidades">Unidades</option>
+              <option value="litros">Kg</option>
+              <option value="mililitro">Gr</option>
+              <option value="gramos">Lts</option>
+              <option value="kilogramo">Mlts</option>
+            </select>
+          </p>
+        </fieldset>
+        <p id="msgFinal">
+          <label for="msg">Descripcion adicional:</label>
+          <textarea id="msg" name="user_message"></textarea>
+        </p>
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
   </main>
-   
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>const idParaGraficoPrueba = "<?= idParaGraficoPrueba ?>";</script>
+  <?!= include('javascript'); ?>
 </body>
 </html>
