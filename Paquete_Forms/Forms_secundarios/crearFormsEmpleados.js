@@ -30,11 +30,11 @@ function empleado (){
 
   const preguntasEmpleados =  [
       {tipo: "text",titulo: "Nombre Completo y Apellido",requerido: true},
-      {tipo: "text",titulo: "CUIT/CUIL/DNI",requerido: true}, // VALIDACION SOLO NUMEROS
+      {tipo: "text",titulo: "CUIT/CUIL/DNI",requerido: true, textoAyuda:"sin puntos, coma o guiones"}, // VALIDACION SOLO NUMEROS
       {tipo: "date",titulo: "Fecha de ingreso",requerido: true},
       {tipo: "text",titulo: "telefono",requerido: true},   
       {tipo: "text",titulo: "Domicilio",requerido: true},      
-      {tipo: "text",titulo: "Contacto adicional"},
+      {tipo: "text",titulo: "Contacto de emergencia"},
       {tipo: "list",titulo: "Cargo/rol",opciones : opcionesCargo,requerido: true},
       {tipo: "list",titulo: "Condicion de contratacion",opciones: opcionesContratacion,requerido: true},
       {tipo: "list",titulo: "Tiempo de jornada",opciones: opcionesTiempoJornada}
@@ -78,7 +78,7 @@ function empleado (){
   });
 
     const formEmpleadosUrl = formularioEmpleados.getPublishedUrl();
-    Logger.log("Enlace a formulario: " + formEmpleadosUrl)
+    Logger.log("EMPLEADO " + formEmpleadosUrl)
     PropertiesService.getUserProperties().setProperty("formularioEmpleadosUrl", formEmpleadosUrl);
     PropertiesService.getUserProperties().setProperty("formularioProveedoresEditUrl", formularioEmpleados.getEditUrl());
     //Logger.log(formularioEmpleados.getEditUrl());

@@ -3,13 +3,18 @@
 ////////////////////////////////////////
 function compras (){
   try {
-    Logger.log("Iniciando creación del formulario de compras");
+    Logger.log("Creando formulario compras...");
 
     let formularioCompras = FormApp.create("Compras");
     let formularioComprasID = formularioCompras.getId();
     PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioComprasID);
 
     formularioCompras.setDescription("Completa este formulario con todos los egresos de dinero que no constituyen gastos fijos");
+
+    formularioCompras.addDateItem()
+      .setTitle("Elegí la fecha de la compra")
+      .setRequired(true);
+
 
     let preguntaInicial = formularioCompras.addMultipleChoiceItem()
       .setTitle("Elija el tipo de compra que va a registrar")
@@ -21,7 +26,7 @@ function compras (){
 
     preguntaInicial.setChoices([
       preguntaInicial.createChoice("Materias Primas o Insumos", seccionMP),
-      preguntaInicial.createChoice("Articulos", seccionArticulos),
+      preguntaInicial.createChoice("Herramientas o Maquinaria", seccionArticulos),
       preguntaInicial.createChoice("Servicios", seccionServicios),
     ]);
 
@@ -30,12 +35,15 @@ function compras (){
     seccionServicios.setGoToPage(FormApp.PageNavigationType.SUBMIT);
  
     const formComprasUrl = formularioCompras.getPublishedUrl();
-    Logger.log("Enlace a formulario: " + formComprasUrl)
+    Logger.log("||||||||||||||||||")
+    Logger.log("COMPRAS")
+    Logger.log(formComprasUrl)
+    Logger.log("||||||||||||||||||")
     PropertiesService.getUserProperties().setProperty("formularioComprasUrl", formComprasUrl);
     PropertiesService.getUserProperties().setProperty("formularioComprasEditUrl", formularioCompras.getEditUrl());
-    Logger.log(formularioCompras.getEditUrl());
+    //Logger.log(formularioCompras.getEditUrl());
 
-    Logger.log("Formulario de compras creado con ID: " + formularioCompras.getId());
+    //Logger.log("Formulario de compras creado con ID: " + formularioCompras.getId());
 
     return formularioCompras;
 
@@ -58,8 +66,8 @@ function seccionCompraMP(formulario) {
 
     let opcionesProveedor = [" "]
     let opcionesMP = [" "]
-    let opcionesUnidadCompra  = ["Unidad","Kg","Lts","mts","m2"]
-    const TITULO_CANTIDAD = "Cantidad"
+    let opcionesUnidadCompra  = ["Unidad","Kg","Litros","Metros"]
+    const TITULO_CANTIDAD = "Cantidad comprada"
     const PECIO_COMPRA_IVA = "Precio de compra(con IVA)"
 
     const preguntasCompraMP = [
@@ -68,8 +76,7 @@ function seccionCompraMP(formulario) {
       { tipo: "text", titulo: "Cantidad comprada", requerido: true,},//VALIDACION NUMERICA
       { tipo: "list", titulo: "Unidad de compra", opciones: opcionesUnidadCompra, requerido: true, textoAyuda : "Seleccione la unidad de compra"}, //
       { tipo: "text", titulo: "Precio de compra(con IVA)", requerido: true}, // VALIDACION NUMERIC
-      { tipo: "list", titulo: "Proveedor", opciones: opcionesProveedor, requerido: true}, // 
-      { tipo: "date", titulo: "Fecha de compra", requerido: true},
+      { tipo: "list", titulo: "Proveedor", opciones: opcionesProveedor}, // 
       { tipo: "list", titulo: "Tipo de comprobante", opciones: opcionesTipoComprobanteCompras},
       //{ tipo: "text", titulo: "Número de comprobante", textoAyuda: "Ingrese número de comprobante" }, // VALIDACION NUMERICA
     ];
@@ -96,7 +103,6 @@ function seccionCompraMP(formulario) {
           if (p.titulo === PECIO_COMPRA_IVA) {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()
-              .requireNumberGreaterThan(0)
               .build();
             pregunta.setValidation(val);
           }
@@ -137,18 +143,17 @@ function seccionCompraArticulos(formulario) {
 
 
     let nuevaSeccion = formulario.addPageBreakItem()
-      .setTitle("Articulos")
-      .setHelpText("Ingrese los detalles de la compra de articulos,herramientas,maquinaria");
+      .setTitle("Herramientas o Maquinaria")
+      .setHelpText("Ingrese los detalles de la compra de herramientas o maquinaria");
 
-    let opcionesTipoComprobanteVentas = ["Factura 'A'", "Factura 'B'", "Factura 'C'","Factura E","Factura M","Nota de crédito"];
+    let opcionesTipoComprobanteVentas = ["Factura 'A'", "Factura 'B'", "Factura 'C'","Factura E","Factura M","Nota de crédito","Sin comprobante"];
     let opcionesArticulo = [" "]
     const PRECIO_Compra_Articulo = "Precio de compra (con IVA)"
 
     const preguntasCompraArticulo = [
-      { tipo: "list", titulo: "Articulo", opciones: opcionesArticulo, requerido: true},
+      { tipo: "list", titulo: "Herramientas o Maquinaria", opciones: opcionesArticulo, requerido: true},
       { tipo: "text", titulo: "Cantidad", requerido: true},//VALIDACION NUMERICA
       { tipo: "text", titulo: "Precio de compra (con IVA)"}, // VALIDACION NUMERICA
-      { tipo: "date", titulo: "Fecha de compra", requerido: true},      
       { tipo: "list", titulo: "Tipo de comprobante", opciones: opcionesTipoComprobanteVentas}, // ARCHIVO PDF?
       //{ tipo: "text", titulo: "Número de comprobante", requerido: true, textoAyuda: "Ingrese número de comprobante" }, // VALIDACION NUMERICA
 
@@ -168,7 +173,6 @@ function seccionCompraArticulos(formulario) {
           if (p.titulo === PRECIO_Compra_Articulo) {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()
-              .requireNumberGreaterThan(0)
               .build();
             pregunta.setValidation(val);
           }
@@ -212,14 +216,15 @@ function seccionCompraServicios(formulario) {
       .setTitle("Servicio")
       .setHelpText("Ingrese los detalles del servicio contratado");
 
-    let opcionesTiposComprobante = ["Factura 'A'", "Factura 'B'", "Factura 'C'","Factura E","Factura M","Nota de crédito"];
+    let opcionesTiposComprobante = ["Factura 'A'", "Factura 'B'", "Factura 'C'","Factura E","Factura M","Nota de crédito","Sin comprobante"];
+    let opcionesProveed = [" "]
 
     const PRECIO_Compra_Servicio = "Precio de compra (con IVA)"
 
     const preguntasCompraServicios = [
       { tipo: "text", titulo: "Nombre del servicio", requerido: true},//VALIDACION NUMERICA
       { tipo: "text", titulo: "Precio de compra (con IVA)", requerido: true,}, // VALIDACION NUMERICA
-      { tipo: "date", titulo: "Fecha de compra", requerido: true},
+      { tipo: "list", titulo: "Proveedor", opciones: opcionesProveed},
       { tipo: "list", titulo: "Tipo de comprobante", opciones: opcionesTiposComprobante,},
       //{ tipo: "text", titulo: "Número de comprobante", requerido: true, textoAyuda: "Ingrese número de comprobante" }, // VALIDACION NUMERICA
 
@@ -239,7 +244,6 @@ function seccionCompraServicios(formulario) {
           if (p.titulo === PRECIO_Compra_Servicio) {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()
-              .requireNumberGreaterThan(0)
               .build();
             pregunta.setValidation(val);
           }
@@ -269,11 +273,3 @@ function seccionCompraServicios(formulario) {
     return { nuevaSeccion: null };
   }
 }
-
-
-
-
-
-
-
-

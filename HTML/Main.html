@@ -10,25 +10,155 @@
   <?!= include('estilos'); ?>
 </head>
 <body>
-  
-  <header>
+ <header>
     <nav>
       <ul>
         <li class="liProducto" onclick="mostrarPagina('definirProducto', this)" >CREA TU PRODUCTO</li>
-        <li onclick="mostrarPagina('gestion', this)">Carga</li>
+        <li onclick="mostrarPagina('gestion', this)">Carga de Datos</li>
         <li onclick="mostrarPagina('resultado', this)">Resultados</li>
-        <li onclick="window.open('https://sites.google.com/view/guiausuariopge/guia-usuario' , '_blank')">Ayuda</li>
+        <li>
+          <div>
+            <input type="checkbox" id="toggle-configuracion">
+            <!-- Botón principal -->
+            <label for="toggle-configuracion">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-user-question" data-darkreader-inline-stroke="" style="--darkreader-inline-stroke: currentColor;"><path stroke="none" d="M0 0h24v24H0z" fill="none" data-darkreader-inline-stroke="" style="--darkreader-inline-stroke: none;"></path><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path><path d="M6 21v-2a4 4 0 0 1 4 -4h3.5"></path><path d="M19 22v.01"></path><path d="M19 19a2.003 2.003 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483"></path>
+            </svg>
+            </label>
+            <!-- Contenedor de botones ocultos -->
+            <div class="opction-configuration">
+              <button type="button" onclick="window.open('https://sites.google.com/view/guiausuariopge/guia-usuario' , '_blank')">Guía de usuario</button>
+              <button id="delete-btn" type="button">Reiniciar Herramienta</button>
+            </div>
+          </div>
+        </li>
       </ul>
     </nav>
   </header>
-
-  <main>
-
+  <main>    
       <!-- ////// PÁGINA GESTION ////// -->
       <div id="gestion" class="contenido visible">
-        <div class="container-card-Gestion">
-          <!-- Bloquea el fondo -->
-          <div id="overlayBloqueo" style="
+        <div class="container containerCards-Gestion">
+            <section class="card card-gestion">
+              <div class="card" onclick="window.open('<?= fComprasUrl ?>', '_blank')">
+                  <img src="https://i.imgur.com/T73XpyE.jpeg"
+                        alt="icono-hacia-el-formulario-compra">  
+              </div>
+              <div class="card">
+                  <button type="button" onclick="repetirCompras()" class="BotonRepetir">
+                    Repetir Formulario Compra
+                  </button>
+                  <div>
+                    <!-- Checkbox para el toggle -->
+                    <input type="checkbox" id="toggle-compra">
+                    <!-- Botón principal -->
+                    <label class="toggle-label" for="toggle-compra">
+                      Formularios Predefinidos
+                      <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
+                    </label>
+                    <!-- Contenedor de botones ocultos -->
+                    <div class="buttons-container">
+                      <button type="button" onclick="abrirModal(10)">
+                        Asignar Form Compras
+                      </button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[0] ?>', '_blank')" id="e0"><?= nombresPrellenado[0] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[1] ?>', '_blank')" id="e1"><?= nombresPrellenado[1] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[2] ?>', '_blank')" id="e2"><?= nombresPrellenado[2] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[3] ?>', '_blank')" id="e3"><?= nombresPrellenado[3] ?></button>
+                      <button type="button">Opción 5</button>
+                    </div>
+                  </div>
+              </div>
+            </section>
+            <section class="card card-gestion">
+              <div class="card" onclick="window.open('<?= fProduccionUrl ?>' , '_blank')">
+                  <img  src="https://i.imgur.com/hA9f6TD.jpeg"
+                        alt="icono-hacia-el-formulario-produccion">
+              </div>
+              <div class="card">
+                  <div>
+                    <!-- Checkbox para el toggle -->
+                    <input type="checkbox" id="toggle-produccion">
+                    <!-- Botón principal -->
+                    <label class="toggle-label" for="toggle-produccion">
+                      Formularios Predefinidos
+                      <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
+                    </label>
+                    <!-- Contenedor de botones ocultos -->
+                    <div class="buttons-container">
+                      <button type="button" onclick="abrirModal(20)">
+                        Asignar Form Producción
+                      </button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[4] ?>', '_blank')" id="e4"><?= nombresPrellenado[4] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[5] ?>', '_blank')" id="e5"><?= nombresPrellenado[5] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[6] ?>', '_blank')" id="e6"><?= nombresPrellenado[6] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[7] ?>', '_blank')" id="e7"><?= nombresPrellenado[7] ?></button>
+                      <button type="button">Opción 5</button>
+                    </div>
+                  </div>
+              </div>
+            </section>
+            <section class="card card-gestion">
+              <div class="card" onclick="window.open('<?= fVentasUrl ?>' , '_blank')">
+                  <img  src="https://i.imgur.com/1gef2ig.jpeg"
+                        alt= "icono-hacia-el-formulario-venta">
+              </div>
+              <div class="card">
+                  <div>
+                    <!-- Checkbox para el toggle -->
+                    <input type="checkbox" id="toggle-venta">
+                    <!-- Botón principal -->
+                    <label class="toggle-label" for="toggle-venta">
+                      Formularios Predefinidos
+                      <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
+                    </label>
+                    <!-- Contenedor de botones ocultos -->
+                    <div class="buttons-container">
+                      <button type="button" onclick="abrirModal(30)">
+                        Asignar Form Ventas
+                      </button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[8] ?>', '_blank')" id="e8"><?= nombresPrellenado[8] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[9] ?>', '_blank')" id="e9"><?= nombresPrellenado[9] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[10] ?>', '_blank')" id="e10"><?= nombresPrellenado[10] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[11] ?>', '_blank')" id="e11"><?= nombresPrellenado[11] ?></button>
+                      <button type="button">Opción 5</button>
+                    </div>
+                  </div> 
+              </div>
+            </section>
+            <section class="card card-gestion">
+              <div class="card" onclick="window.open('<?= fCostoFijoUrl ?>' , '_blank')">
+                  <img  src="https://i.imgur.com/o17IxF9.jpeg"
+                        alt="icono-hacia-el-formulario-costo-fijo">
+              </div>
+              <div class="card">
+                  <button type="button" onclick="repetirCostoFijo()" class="BotonRepetir">
+                    Repetir Formulario Costos Fijos
+                  </button> 
+                  <div>
+                    <!-- Checkbox para el toggle -->
+                    <input type="checkbox" id="toggle-costoFijo">
+                    <!-- Botón principal -->
+                    <label class="toggle-label" for="toggle-costoFijo">
+                      Formularios Predefinidos
+                      <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
+                    </label>
+                    <!-- Contenedor de botones ocultos -->
+                    <div class="buttons-container">
+                      <button type="button" onclick="abrirModal(40)">
+                        Asignar Form Costo Fijo
+                      </button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[12] ?>', '_blank')" id="e12"><?= nombresPrellenado[12] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[13] ?>', '_blank')" id="e13"><?= nombresPrellenado[13] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[14] ?>', '_blank')" id="e14"><?= nombresPrellenado[14] ?></button>
+                      <button type="button" onclick="window.open('<?= enlacesPrellenado[15] ?>', '_blank')" id="e15"><?= nombresPrellenado[15] ?></button>
+                      <button type="button">Opción 5</button>
+                    </div>
+                  </div>   
+              </div>
+            </section> 
+        </div>
+        <!-- Bloquea el fondo -->
+        <div id="overlayBloqueo" style="
             display: none;
             position: fixed;
             top: 0; left: 0;
@@ -36,10 +166,9 @@
             height: 100vh;
             background-color: rgba(0, 0, 0, 0.3); /* fondo semitransparente */
             z-index: 9998;
-          "></div>
-
-          <!-- Alerta flotante -->
-          <div id="alertaTemporal" style="
+        "></div>
+        <!-- Alerta flotante -->
+        <div id="alertaTemporal" style="
             display: none;
             position: fixed;
             top: 30%;
@@ -53,164 +182,12 @@
             box-shadow: 0 0 10px gray;
           ">
             POR FAVOR ESPERE
-          </div>
-        <!------------ CONTENIDO GESTION -------------->
-            <section class="tarjeta">
-                <img onclick="window.open('<?= fComprasUrl ?>', '_blank')"   
-                  src="https://i.imgur.com/tzCSZJ4.png"
-                  alt="img-subGestion-Compras">  
-                <h2>Compras</h2>
-                <div class="posicionBotones">
-                  <!--
-                  <button type="button" onclick="repetirCompras()" class="BotonRepetir">
-                    Repetir Form Compras
-                  </button>
-                  --> 
-                  <button class="Btn" type="button" onclick="repetirCompras()">
-                    <div class="svgWrapper">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        viewBox="0 0 20 20"
-                        height="20"
-                        fill="none"
-                        class="svg-icon"
-                        >
-                        <g stroke-width="1.5" stroke-linecap="round" stroke="#ff342b">
-                          <path
-                            d="m3.33337 10.8333c0 3.6819 2.98477 6.6667 6.66663 6.6667 3.682 0 6.6667-2.9848 6.6667-6.6667 0-3.68188-2.9847-6.66664-6.6667-6.66664-1.29938 0-2.51191.37174-3.5371 1.01468"
-                          ></path>
-                          <path
-                            d="m7.69867 1.58163-1.44987 3.28435c-.18587.42104.00478.91303.42582 1.0989l3.28438 1.44986"
-                          ></path>
-                        </g>
-                      </svg>
-                      <div class="text">Repetir Formulario</div>
-                    </div>
-                  </button>
-                  <button class="Btn">
-                    <div class="svgWrapper">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 42 42"
-                        class="svgIcon"
-                      >
-                        <path
-                          stroke-width="5"
-                          stroke="#fff"
-                          d="M9.14073 2.5H32.8593C33.3608 2.5 33.8291 2.75065 34.1073 3.16795L39.0801 10.6271C39.3539 11.0378 39.5 11.5203 39.5 12.0139V21V37C39.5 38.3807 38.3807 39.5 37 39.5H5C3.61929 39.5 2.5 38.3807 2.5 37V21V12.0139C2.5 11.5203 2.6461 11.0378 2.91987 10.6271L7.89266 3.16795C8.17086 2.75065 8.63921 2.5 9.14073 2.5Z"
-                        ></path>
-                        <rect
-                          stroke-width="3"
-                          stroke="#fff"
-                          rx="2"
-                          height="4"
-                          width="11"
-                          y="18.5"
-                          x="15.5"
-                        ></rect>
-                        <path stroke-width="5" stroke="#fff" d="M1 12L41 12"></path>
-                      </svg>
-                      <div class="text">Formulario Prellenado</div>
-                    </div>
-                  </button>
-                </div>
-            </section>
-        
-            <section class="tarjeta">
-                <img onclick="window.open('<?= fProduccionUrl ?>' , '_blank')" 
-                  src="https://i.imgur.com/9S1cUa8.png"
-                  alt="img-subGestion-Produccion">
-                <h2>Producción</h2>
-                <div class="posicionBotones">
-                  <button type="button" onclick="repetirProduccion()" class="BotonRepetir">
-                    Repetir Form Produccion
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[4] ?>', '_blank')" id="e4">
-                    <?= nombresPrellenado[4] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[5] ?>', '_blank')" id="e5">
-                    <?= nombresPrellenado[5] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[6] ?>', '_blank')" id="e6">
-                    <?= nombresPrellenado[6] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[7] ?>', '_blank')" id="e7">
-                    <?= nombresPrellenado[7] ?>
-                  </button>  
-                </div>
-            </section>
-        
-            <section class="tarjeta">
-                <img onclick="window.open('<?= fVentasUrl ?>' , '_blank')" 
-                  src="https://i.imgur.com/J82qmIy.png"
-                  alt= "img-subGestion-Insumos">
-                <h2>Ventas</h2>
-                <div class="posicionBotones">
-                  <button type="button" onclick="repetirVentas()" class="BotonRepetir">
-                    Repetir Form Ventas
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[8] ?>', '_blank')" id="e8">
-                    <?= nombresPrellenado[8] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[9] ?>', '_blank')" id="e9">
-                    <?= nombresPrellenado[9] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[10] ?>', '_blank')" id="e10">
-                    <?= nombresPrellenado[10] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[11] ?>', '_blank')" id="e11">
-                    <?= nombresPrellenado[11] ?>
-                  </button>  
-                </div>
-            </section>
-
-            <section class="tarjeta">
-                <img onclick="window.open('<?= fCostoFijoUrl ?>' , '_blank')" 
-                  src="https://i.imgur.com/XE0Dzom.png"
-                  alt= "img-subGestion-CostoFijo">
-                <h2>Costos Fijos</h2>
-                <div class="posicionBotones">
-                  <button type="button" onclick="repetirCostoFijo()" class="BotonRepetir">
-                    Repetir Form Costos Fijos
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[12] ?>', '_blank')" id="e12">
-                    <?= nombresPrellenado[12] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[13] ?>', '_blank')" id="e13">
-                    <?= nombresPrellenado[13] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[14] ?>', '_blank')" id="e14">
-                    <?= nombresPrellenado[14] ?>
-                  </button> 
-                  <button type="button" onclick="window.open('<?= enlacesPrellenado[15] ?>', '_blank')" id="e15">
-                    <?= nombresPrellenado[15] ?>
-                  </button>  
-                </div>
-            </section> 
-        </div> 
-       <section class="FuncionesAdicionales"> 
-          <button type="button" onclick="abrirModal(10)">
-            Asignar Form Compras
-          </button>
-          <button type="button" onclick="abrirModal(20)">
-            Asignar Form Producción
-          </button>
-          <button type="button" onclick="abrirModal(30)">
-            Asignar Form Ventas
-          </button>
-          <button type="button" onclick="abrirModal(40)">
-            Asignar Form Costo Fijo
-          </button>
-        </section>
-        
-        <!-- --------Modal para asignar prellenado-------- -->
+        </div>
+        <!-- Modal para asignar prellenado -->
         <section id="modalOverlay" class="modal-prellenado">
           <div class="modal">
             <label for="entrada" >Escriba un nombre para un form <span id="textoSegunForm"></span></label><br>
             <input type="text" id="entrada" placeholder="Nombre:"> <br><br>
-
             <div class="selector">
               <button type="button" id="a1" onclick="seleccionarBotonPrellenado(this)">1</button>
               <button type="button" id="a2" onclick="seleccionarBotonPrellenado(this)">2</button>
@@ -222,119 +199,225 @@
             <button type="button"  onclick="cerrarModal()">Cerrar sin guardar</button>
           </div>       
         </section>
-      </div>
-
+      </div>      
       <!-- ////// PÁGINA RESULTADOS ////// -->
       <div id="resultado" class="contenido">
-          
-        <input type="date" id="fechaInicio" name="fecha">
-        <input type="date" id="fechaFin" name="fecha">
         
-        <section class="tarjeta">
-          <button onclick="obtenerBalance()">
-             Mostrar Balance
-          </button>
-          <div id="balance_div"></div>
-        </section>
-          
-        <div class="container-cards-Resultado">
-          <section class="tarjeta tarjetaGrafico">
-            <button onclick="comprasGrafico()">
-              Mostrar Compras
-            </button>
-            <div id="comprasChart_div" style="width: 600px; height: 400px; margin:0px;"></div>
-          </section>
+        <div class="container containerCards-Resultados1">
+            <section class="card cardGrafica cardResultado1 cardTexResultados">
+              <p>Seleccioná el periodo de tiempo para visualizar tus gráficos de dinero</p>
+              <p>
+                <label for="fechaInicio">Desde:</label>
+                <input type="date" id="fechaInicio" name="fecha">  
+              </p>
+              <p>
+                <label for="fechaFin">Hasta:</label>
+                <input type="date" id="fechaFin" name="fecha">
+              </p>
+            </section>
+            <section class="card cardGrafica cardResultado1 cardTexResultados">
+              <section class="tarjeta tarjetaGrafico">
+                <button onclick="obtenerBalance()">
+                  Mostrar Balance 
+                </button>
+                <div id="balance_div"></div>
+              </section>
 
-          <section class="tarjeta tarjetaGrafico">
-            <button onclick="ventasGrafico()">
-              Mostrar Ventas
-            </button>
-            <div id="ventasChart_div" style="width: 600px; height: 400px; margin:0px;"></div>
-          </section>
-          
-          <section class="tarjeta tarjetaGrafico">
-            <button onclick="stockChart()">
-              Mostrar Stock
-            </button>
-            <div style="overflow-x: auto; width: 100%; max-width: 1000px; border: 1px solid #ccc; margin: auto;">
-              <div id="stock_divT" style="width: 1600px; height: 400px;"></div>
-            </div>
-          </section>
+              <button onclick="mostrarIndicador()">
+                Mostrar producto mas vendido
+              </button>
+              <div>
+                <p>Producto más vendido:</p>
+                <div id="productoMax_div"></div>
+              </div>
+              <div>
+                <p>Ventas y compras totales historicas o por periodo seleccionado:</p>
+                <div id="comprasVentasTotales_div"></div>
+              </div>
+            </section>
+
+            <section class="card cardGrafica cardResultado1">
+              <button onclick="stockChart()">
+                Stock de Productos
+              </button>
+              <div class="containerGrafico-Stok">
+                <div id="stockChart_div"></div>
+              </div>
+            </section>
+            <section class="card cardGrafica cardResultado1">
+              <button onclick="materiasPrimasChart()">
+                Stock Materias Primas
+              </button>
+              <div class="containerGrafico-Stok">
+                <div id="mpChart_div"></div>
+              </div>
+            </section>
+
+            <section class="card cardGrafica cardResultado1">
+              <button onclick="ventasGrafico()">
+                Mostrar Ventas
+              </button>
+              <div class="containerGrafico-Compra-Venta">
+                <div id="ventasChart_div" ></div>
+              </div>
+            </section>
+            <section class="card cardGrafica cardResultado1">
+              <button onclick="comprasGrafico()">
+                Mostrar Gastos
+              </button>
+              <div class="containerGrafico-Compra-Venta">
+                <div id="comprasChart_div"></div>
+              </div>
+            </section>
         </div>
 
-        <h2>Carteras</h2>
-        <div class="container-cards-Resultado-carteras">
-          <section class="tarjeta">
-            <img  onclick="window.open('<?= urlClientes ?>' , '_blank')"  
-              src="https://i.imgur.com/NdORYu0.png">                
-            <h2>Cartera Clientes</h2>
-            <p>(Información de todos los clientes)</p>
-          </section>
+        <div class="container containerCards-Resultados2">
+            <section class="card cardGrafica cardResultado2">
+              <button onclick="crearGraficoDispersion()">
+                Punto de equilibrio
+              </button>
+              <div class="containerGrafico-PuntoDeEquilibrio">
+                <div id="puntoEQ_chart"></div>
+              </div>
+            </section>
+            <section class="card cardGrafica cardResultado2">
+              <button onclick="indicadoresClaveChart()">
+                Indicadores Punto Eq.
+              </button>
+              <div class="containerGrafico-TabladeDeIndicadores">
+                <div id="precioUnitarioChart_div"></div>
+              </div>
+            </section>
+        </div>
 
-          <section class="tarjeta">
+        <h2>Hoja de Resultados</h2>
+        <div class="containerCards-Resultados3">
+          <section class="card">
+            <img  onclick="window.open('<?= urlClientes ?>' , '_blank')"  
+              src="https://i.imgur.com/Z8fl8xm.png"
+              alt="icono-hacia-hoja-del-excel-de-Cliente">                
+          </section>
+          <section class="card">
             <img  onclick="window.open('<?= urlProveedores ?>' , '_blank')"  
-              src="https://i.imgur.com/06FMKtX.png">               
-            <h2>Cartera Proveedores</h2>
-            <p>(Información de todos los Proveedores)</p>
+              src="https://i.imgur.com/zQ4rmhU.png"
+              alt="icono-hacia-hoja-del-excel-de-Provedor">
+          </section>
+          <section class="card">
+            <img  onclick="window.open('<?= urlEmpleados?>' , '_blank')"  
+              src="https://i.imgur.com/KocQJGG.png"
+              alt="icono-hacia-hoja-del-excel-de-Empleados">               
+          </section>
+          <section class="card">
+            <img  onclick="window.open('<?= urlProductos ?>' , '_blank')"  
+              src="https://i.imgur.com/hohC93F.png"
+              alt="icono-hacia-hoja-del-excel-de-Productos">               
           </section>
         </div>
         
       </div>
-
       <!-- ////// PÁGINA PARA DEFINIR UNA RECETA ////// -->
       <div id="definirProducto" class="contenido">
-      <div class="banner">
-        <img class="bannerImg" src="https://i.imgur.com/R1HeWsK.jpeg"/>
-      </div>
-      <section class="seccionMateriaPrima">
-        <p class="element">
-          <label for="inputNuevaMateriaPrima">Agregar Nueva Materia Prima a la Lista:</label>
-          <input type="text" id="inputNuevaMateriaPrima" name="nuevaMateriaPrima" required/>
-        </p>
-        <button type="button" onclick="anadirNuevaMateriaPrima(event)">Añadir a la Lista</button>
-      </section>
-      <form action="ruta o url para obtener los datos" method="post" id="form">
-        <p class="element">
-          <label for="nombreProducto">Nombre del producto:</label>
-          <input type="text" id="nombreProducto" name="producto" required/>
-        </p>
-        <h2>Define la receta del producto</h2>
-        <button id="agg" type="button" onclick="agregarElemento('form')"> + Agregar materia prima</button>
-        <button id="supr" type="button" onclick="eliminarElemento('form')"> - Eliminar materia prima</button>
-        
-        <fieldset id="contenedorElementos"> 
-          <p class="element">
-            <label for="materiaPrima">Materia Prima:</label>
-            <select name="materiaPrima[]" id="materiaPrima">
-              <option value="">--Seleccione Materia Prima--</option>
+        <form method="post" id="form">
+          <h1 class="tituloFormulario">Definí tu receta productiva</h1>
+          <p>¿Qué necesitas para crear lo que ofrecés y cómo lo ofrecés?</p>
+          <section>
+            <p>Tené en cuenta que no solo las materias primas constituyen tu receta productiva, también tenés que incluir tus envoltorios, cajas, palets, etiquetas, etc.</p>
+          </section>
+          <p class="sectionImput producto">
+              <label for="nombreProducto">Nombre de tu producto (unidad comercial):</label>
+              <input type="text" id="nombreProducto" name="producto" required/>
+          </p>
+
+          <div class="seccionMaterias" id="clonMaterias">
+            <h2>Materias Primas, empaques y etiquetado</h2>
+            <div>
+              <section class="seccionMateriaPrima">
+                  <p class="element">
+                    <label for="inputNuevaMateriaPrima">Actualizá listas desplegables:</label>
+                    <input type="text" id="inputNuevaMateriaPrima" name="materiaPrima"/>
+                  </p>
+                  <button id="agg" type="button" onclick="anadirNuevaMateriaPrima(event)"> + Añadir Materia Prima a la lista</button>
+              </section>
+            </div>
+            <div class="BotonesAggSuprMateria">
+              <button id="agg" type="button" onclick="agregarElemento('clonMaterias')"> + Añadir Materia Prima a la receta</button>
+              <button id="supr" type="button" onclick="eliminarElemento('clonMaterias')"> - Quitar Materia Prima de la receta</button>
+            </div>
+
+            <fieldset id="contenedorElementos">
+              <p class="element">
+                <label for="materiaPrima">Lista de Materias Primas:</label>
+                <select name="materiaPrima[]" id="materiaPrima" required>
+                  <option value="">--Seleccioná una Materia Prima--</option>
+                </select>
+              </p>
+              <p class="cant">
+                <label for="cantidad">Cantidad asociada a la receta:</label>
+                <input type="number" id="cantidad" name="cantidad[]" min="0" step="any" required/>
+              </p>
+              <p class="unit">
+              <label for="unidad">Unidad:</label>
+                <select name="unidad[]" id="unidad" required>
+                  <option value="">--Elegí la unidad asociada--</option>
+                  <option value="unidades">Unidad</option>
+                  <option value="litros">Litros</option>
+                  <option value="mililitro">Mililitros</option>
+                  <option value="gramos">Gramos</option>
+                  <option value="kilogramo">Kg</option>
+                  <option value="metro">Metros</option>
+                </select>
+              </p>
+            </fieldset>
+          </div>
+          <p id="msgFinal">
+              <label for="msg">Rendimiento Asociado a tu receta:</label>
+              <input type="number" id="msg" name="user_message" min="0" step="any" required/>
+          </p>
+          <button class="botonEnviar" type="submit">Enviar</button>
+        </form>
+
+        <div class="containerCard-CreaProducto">
+          <section class="borrar-MateriaPrima card">
+            <h2>Eliminar Materia Prima</h2>
+            <p class="suprMateriaPrima">
+              <label for="eliminarMateriaPrima">Materia Prima a eliminar:</label>
+              <select id="eliminarMateriaPrima" name="materiaPrima" required>
+                <option value="">--Seleccione Materia Prima--</option>
               </select>
-          </p>
-          <p class="cant">
-            <label for="cantidad">Cantidad:</label>
-            <input type="number" id="cantidad" name="cantidad[]" min="0" step="any"/>
-          </p>
-          <p class="unit">
-            <label for="unidad">Unidad:</label>
-            <select name="unidad[]" id="unidad">
-              <option value="">--Por favor elige una opción--</option>
-              <option value="unidades">Unidades</option>
-              <option value="litros">Kg</option>
-              <option value="mililitro">Gr</option>
-              <option value="gramos">Lts</option>
-              <option value="kilogramo">Mlts</option>
-            </select>
-          </p>
-        </fieldset>
-        <p id="msgFinal">
-          <label for="msg">Descripcion adicional:</label>
-          <textarea id="msg" name="user_message"></textarea>
-        </p>
-        <button type="submit">Enviar</button>
-      </form>
-    </div>
+            </p>
+            <button id="supr" type="button" onclick="eliminarMateriaPrimaSelec(event)">
+              Eliminar Materia Prima
+            </button>
+          </section>
+          <section class="borrar-Receta card">
+            <h2>Eliminar Producto existente</h2>
+            <p class="suprProducto">
+              <label for="eliminarProducto">Producto a eliminar:</label>
+              <select id="eliminarProducto" name="Producto" required>
+                <option value="">--Seleccione Producto--</option>
+              </select>
+            </p>
+            <button id="supr" type="button" onclick="eliminarRecetaPorNombre(event)"> 
+              Eliminar Producto
+            </button>
+          </section>
+        </div>
+
+        <div class="banner">
+          <img src="https://i.imgur.com/2DavDyU.jpeg"
+                          alt="img-Banner-Escuela-Productiva-Bonaerense"> 
+        </div>
+      </div>
   </main>
-  <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script>const idParaGraficoPrueba = "<?= idParaGraficoPrueba ?>";</script>
-  <?!= include('javascript'); ?>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>const idParaGraficoPrueba = "<?= idParaGraficoPrueba ?>";
+            const idParaHojaMensual = "<?= idHojaMensuales ?>"
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?!= include('javascript'); ?>
+    <?!= include('javascriptReceta'); ?>
+    <?!= include('javascriptGraficos'); ?>
 </body>
 </html>

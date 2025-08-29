@@ -1,0 +1,315 @@
+<script>
+
+/// Manejo del formulario RECETA ///
+
+let productosDisponibles = [];
+let materiasPrimasDisponibles = [];
+// --- Función para normalizar el texto ---
+function normalizarTexto(texto) {
+  if (!texto) return "";
+  // Quitar espacios y punto final
+  texto = texto.trim().replace(/\.+$/, "");
+  // Quitar espacios múltiples internos
+  texto = texto.replace(/\s+/g, " ");
+  // Primera letra mayúscula, resto minúscula
+  return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+}
+
+//--- Añadir materia prima ---//
+function anadirNuevaMateriaPrima(event) {
+  const input = document.getElementById("inputNuevaMateriaPrima");
+  const nuevaMp = normalizarTexto(input.value);
+
+  if (!nuevaMp) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Dato incompleto',
+      text: 'Por favor, ingrese un nombre para la materia prima.',
+      confirmButtonText: 'Aceptar',
+      allowOutsideClick: false
+    });
+    return;
+  }
+
+  if (materiasPrimasDisponibles.some(mp => normalizarTexto(mp) === nuevaMp)) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Duplicado detectado',
+      text: `La materia prima "${nuevaMp}" ya existe.`,
+      confirmButtonText: 'Aceptar',
+      allowOutsideClick: false
+    });
+    return;
+  }
+
+  //  Desactivar todos los botones y guardar texto original
+  const botonesAgg = document.querySelectorAll("#agg");
+  botonesAgg.forEach(b => {
+    if (!b.dataset.originalText) {
+      b.dataset.originalText = b.textContent; // guardamos texto original
+    }
+    b.textContent = "Agregando...";
+    b.disabled = true;
+  });
+
+  google.script.run
+    .withSuccessHandler(function(exito) {
+      if (exito) {
+        materiasPrimasDisponibles.push(nuevaMp);
+        materiasPrimasDisponibles.sort();
+        cargarMateriasPrimasEnSelects();
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Duplicado detectado en la hoja',
+          text: `La materia prima "${nuevaMp}" ya existe en la hoja.`,
+          confirmButtonText: 'Aceptar',
+          allowOutsideClick: false
+        });
+      }
+      input.value = "";
+
+      //  Restaurar todos los botones
+      botonesAgg.forEach(b => {
+        b.textContent = b.dataset.originalText;
+        b.disabled = false;
+      });
+    })
+    .withFailureHandler(function(error) {
+      console.error(error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al agregar',
+        text: error.message || 'Ocurrió un error desconocido.',
+        confirmButtonText: 'Aceptar'
+      });
+
+      // Restaurar todos los botones
+      botonesAgg.forEach(b => {
+        b.textContent = b.dataset.originalText;
+        b.disabled = false;
+      });
+    })
+    .agregarMPR(nuevaMp);
+}
+
+
+//--- Cargar materias primas desde Sheets ---//
+async function cargarMateriasPrimasDesdeSheets() {
+    document.body.classList.add('cargando');
+    const materiasPrimasFetch = await fetchSheetData("Stock", "SELECT E WHERE E IS NOT NULL");
+    const materiasPrimasTable = materiasPrimasFetch.getDataTable();
+    const data = Array.from(
+      { length: materiasPrimasTable.getNumberOfRows() },
+      (_, i) => materiasPrimasTable.getValue(i, 0).toString().trim()
+    ).filter(v => v !== "").slice(1);
+    materiasPrimasDisponibles = data;
+    cargarMateriasPrimasEnSelects();
+    document.body.classList.remove('cargando');
+  }
+
+//--- Poblar listas desplegables de materias primas Y empaques ---//
+function cargarMateriasPrimasEnSelects() {
+  // Seleccionar todos los elementos select que necesitan ser actualizados
+  const selectsMateriaPrima = [
+    document.getElementById("materiaPrima"),
+    document.getElementById("eliminarMateriaPrima")
+  ];
+  // Actualizar selects de materia prima
+  selectsMateriaPrima.forEach(select => {
+    if (select) {
+      select.innerHTML = '<option value="">--Seleccione una Materia Prima--</option>';
+      materiasPrimasDisponibles.forEach(mp => {
+        const option = document.createElement("option");
+        option.value = mp;
+        option.textContent = mp;
+        select.appendChild(option);
+      });
+    }
+  });
+}
+
+// --- Eliminar materia prima ---
+function eliminarMateriaPrimaSelec(event) {
+  const select = document.getElementById("eliminarMateriaPrima");
+  const mpSeleccionada = select.value;
+  if (!mpSeleccionada) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Dato requerido',
+      text: 'Seleccione una materia prima para eliminar.',
+      confirmButtonText: 'Aceptar',
+      allowOutsideClick: false
+    });
+  return; }
+  Swal.fire({
+    title: `¿Eliminar "${mpSeleccionada}"?`,
+    text: "Esta acción no se podrá deshacer.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Cambiar texto del botón mientras se ejecuta
+      const button = event.target; // Este es el botón que se clickeó
+      const originalText = button.textContent;
+      button.textContent = "Eliminando...";
+      button.disabled = true;
+
+      google.script.run
+        .withSuccessHandler(function(exito) {
+          if (exito) {
+            materiasPrimasDisponibles = materiasPrimasDisponibles.filter(mp => mp !== mpSeleccionada);
+            cargarMateriasPrimasEnSelects();
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: `"${mpSeleccionada}" eliminada correctamente.`,
+              confirmButtonText: 'Aceptar'
+            });
+            // Restaurar botón
+            button.textContent = originalText;
+            button.disabled = false;
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'No encontrado',
+              text: `"${mpSeleccionada}" no se encontró en la hoja.`,
+              confirmButtonText: 'Aceptar'
+            });
+          }
+        })
+        .withFailureHandler(function(error) {
+          console.error(error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: "Error al eliminar: " + error.message,
+            confirmButtonText: 'Aceptar'
+          });
+        })
+        .eliminarMateriaPrimaSeleccionada(mpSeleccionada); // llamado a app script
+    }
+  });
+}
+
+ 
+  async function cargarProductosDesdeSheets() {
+    document.body.classList.add('cargando');
+    const productosFetch = await fetchSheetData("Stock", "SELECT   B WHERE B IS NOT NULL");
+    const productosTable = productosFetch.getDataTable();
+    const productos = Array.from(
+      { length: productosTable.getNumberOfRows() },
+      (_, i) => productosTable.getValue(i, 0).toString().trim()
+    ).filter(v => v !== "").slice(1);
+    const select = document.getElementById("eliminarProducto");
+    select.innerHTML = ""; 
+
+    const defaultOpt = document.createElement("option");
+    defaultOpt.value = "";
+    defaultOpt.textContent = "--Seleccione Producto--";
+    select.appendChild(defaultOpt);
+    productos.forEach(prod => {
+      const opt = document.createElement("option");
+      opt.value = prod;
+      opt.textContent = prod;
+      select.appendChild(opt);
+    });
+
+    document.body.classList.remove('cargando');
+  }
+
+
+//--- Guardar receta y refrescar lista ---//
+function enviarRecetaAlServidor(listaMateriasP, nombreR, comentarioR) {
+  google.script.run
+    .withSuccessHandler(function(exito) {
+      if (exito) {
+
+        cargarProductosDesdeSheets(); // refresca lista sin recargar página
+      } else {
+        alert("Error al guardar la receta");
+      }
+    })
+    .withFailureHandler(function(error) {
+      console.error(error);
+      alert("Error: " + error.message);
+    })
+    .guardarRecetaSheet(listaMateriasP, nombreR, comentarioR); // llamada a app script
+}
+
+// --- Eliminar receta y refrescar lista ---
+function eliminarRecetaPorNombre(event) {
+  const select = document.getElementById("eliminarProducto");
+  const nombre = select.value;
+  if (!nombre) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Dato requerido',
+      text: 'Seleccione un producto para eliminar.',
+      confirmButtonText: 'Aceptar',
+      allowOutsideClick: false
+    });
+    return;
+  }
+   Swal.fire({
+    icon: 'question',
+    title: 'Confirmar eliminación',
+    text: `¿Está seguro que desea eliminar "${nombre}"?`,
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    allowOutsideClick: false
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const button = event.target;
+      const originalText = button.textContent;
+      button.textContent = "Eliminando...";
+      button.disabled = true;
+
+      google.script.run
+        .withSuccessHandler(function(exito) {
+          if (exito) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: `El producto "${nombre}" fue eliminado correctamente.`,
+              confirmButtonText: 'Aceptar',
+              allowOutsideClick: false
+            }).then(() => {
+              button.textContent = originalText;
+              button.disabled = false;
+
+              cargarProductosDesdeSheets(); // refresca lista
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Error al eliminar el producto.',
+              confirmButtonText: 'Aceptar',
+              allowOutsideClick: false
+            });
+          }
+        })
+        .withFailureHandler(function(error) {
+          console.error(error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: "Error: " + error.message,
+            confirmButtonText: 'Aceptar',
+            allowOutsideClick: false
+          });
+        })
+        .eliminarReceta(nombre); // LLAMADO A APP SCRIPT
+    }
+  });
+}
+
+</script>

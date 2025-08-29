@@ -1,3 +1,8 @@
+
+
+
+
+
 ///////////////////////////////////////////////////////////////
 ////AÑADIR UNA NUEVA OPCION A UN FORMULARIO /////////////////////////////////
 ///////////////////////////////////////////////////////////////
@@ -107,40 +112,4 @@ function eliminarOpcionDeFormulario(opcionAEliminar, fId, nombreItem) {
   } else {
     throw new Error('No se ha encontrado el ID del formulario.');
   }
-}
-
-
-
-
-
-///////////////////////////////////////////////////
-////// insertar url de form prov,client o emp///////
-//////////////////////////////////////////////////////
-
-
-
-function insertarPublishedUrl (editForm,unaUrl,palabraClave){
-  //SE PUEDE HACER MAS EFICIENTE CON ACCESO DIRECTO POR INDICE
-  // LINK FORM EMPLEADOS DENTRO DE COSTOS FIJOS SECCION SUELDOS
-  const formGeneral = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty(editForm));
-  const url = PropertiesService.getUserProperties().getProperty(unaUrl); 
-  const items = formGeneral.getItems();
-  items.forEach(function(item,index){
-    if(item.getTitle() == palabraClave){
-      item.setHelpText("Seleccione uno para llevar registro o agregue uno => " + url)
-    }
-  })
-}
-
-
-
-function pruebaInsert (editForm,unaUrl,palabraClave){
-  //SE PUEDE HACER MAS EFICIENTE CON ACCESO DIRECTO POR INDICE
-  // LINK FORM EMPLEADOS DENTRO DE COSTOS FIJOS SECCION SUELDOS
-  const formGeneral = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty(editForm));
-  const url = PropertiesService.getUserProperties().getProperty(unaUrl); 
-  const items = formGeneral.getItems();
-  items.forEach(function(item,index){
-    Logger.log("Índice: " + index + " | Título: " + item.getTitle());
-  })
 }

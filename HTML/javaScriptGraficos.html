@@ -1,0 +1,724 @@
+<script>
+
+  google.charts.load('current', { packages: ['corechart'] });   
+  google.charts.setOnLoadCallback(funcionesInicialesSelects);
+
+  function funcionesInicialesSelects() {
+    cargarMateriasPrimasDesdeSheets();
+    cargarProductosDesdeSheets();
+  }
+  let chart;
+  const spreadsheetId = '<?= idParaGraficoPrueba ?>';
+
+
+  
+  //---------------------------------------------//
+  //--------------GRAFICOS-----------------------//
+  //---------------------------------------------//
+
+  ////////////////GRAFICO COMPRAS/////////////////
+    
+
+  async function comprasChart() {
+      let fechaInicio = document.getElementById("fechaInicio").value;
+      let fechaFin = document.getElementById("fechaFin").value;
+      let cMateriasPrimas,cArticulos,cServicio, costoEmpleado, costoServicio, costoImpuesto;
+      if (!fechaInicio || !fechaFin) {
+        [cMateriasPrimas,cArticulos,cServicio, costoEmpleado, costoServicio, costoImpuesto] = await Promise.all([
+        fetchSheetData('Compras', `SELECT G WHERE G IS NOT NULL`),
+        fetchSheetData('Compras', `SELECT L WHERE L IS NOT NULL`),
+        fetchSheetData('Compras', `SELECT O WHERE O IS NOT NULL`),
+        fetchSheetData('Costos fijos', `SELECT E WHERE E IS NOT NULL `),
+        fetchSheetData('Costos fijos', `SELECT H WHERE H IS NOT NULL `),
+        fetchSheetData('Costos fijos', `SELECT L WHERE L IS NOT NULL `)
+      ]);
+      Swal.fire({
+        icon: 'info',
+        title: 'Aviso',
+        text: 'No hay fechas, se mostrará un histórico.',
+        confirmButtonText: 'Aceptar',
+        allowOutsideClick: false
+      })
+      }else{
+          //Para que contemple el ultimo dia
+        let finDate = new Date(fechaFin);
+        finDate.setDate(finDate.getDate() + 1);
+        const fechaFinAjustada = finDate.toISOString().split("T")[0]; // yyyy-mm-dd
+
+        [cMateriasPrimas,cArticulos,cServicio, costoEmpleado, costoServicio, costoImpuesto] = await Promise.all([
+          fetchSheetData('Compras', `SELECT G WHERE G IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`),
+          fetchSheetData('Compras', `SELECT L WHERE L IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`),
+          fetchSheetData('Compras', `SELECT O WHERE O IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`),
+          fetchSheetData('Costos fijos', `SELECT E WHERE E IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`),
+          fetchSheetData('Costos fijos', `SELECT H WHERE H IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`),
+          fetchSheetData('Costos fijos', `SELECT L WHERE L IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`)
+        ]);
+      }
+      
+
+      const totals = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+
+      [cMateriasPrimas,cArticulos,cServicio, costoEmpleado, costoServicio, costoImpuesto].forEach((data, index) => {
+        const rows = data.getDataTable().getFilteredRows([{ column: 0, minValue: 0 }])
+           // Excluye la fila 0 (encabezado)
+        rows.forEach(rowIndex => {
+          let valor = data.getDataTable().getValue(rowIndex, 0);
+          valor = (typeof valor === 'number' && !isNaN(valor)) ? valor : 0;
+          totals[index] += valor;
+        });
+      });
+
+      let montoTotal = totals[0] + totals[1] + totals[2] + totals[3] + totals[4] + totals[5];
+      const dataTable = new google.visualization.DataTable();
+      dataTable.addColumn('string', 'Categoría');
+      dataTable.addColumn('number', 'Monto');
+      dataTable.addRows([
+        ['Materias primas - $'+totals[0], totals[0]],
+        ['Articulos - $'+totals[1], totals[1]],
+        ['Servicios - $'+totals[2], totals[2]],
+        ['Empleado - $'+totals[3], totals[3]],
+        ['ServicioCF - $'+totals[4], totals[4]],
+        ['Impuestos - $'+totals[5], totals[5]]
+      ]);
+      const chartWidth = 1000;
+        const chartDiv = document.getElementById('comprasChart_div');
+        const chartHeight = "100%"
+        chartDiv.style.width = chartWidth + 'px';
+        chartDiv.style.height = chartHeight;
+
+      const options = {
+        title: `Monto total de compras realizadas ::${montoTotal}`,
+        pieHole: 0.4,
+        legend: { position: 'right' }
+      };
+
+      chart = new google.visualization.ColumnChart(document.getElementById('comprasChart_div'));
+      chart.draw(dataTable, options);
+      const muestraIndicadores = document.getElementById("comprasVentasTotales_div");
+      let textoActual = muestraIndicadores.textContent;
+      const regexCompras = /\s*\|\s*Gastos totales:.*$/;
+      ///////////
+      if (regexCompras.test(textoActual)) {
+        textoActual = textoActual.replace(
+          regexCompras,
+          ` | Gastos totales: <span style="color: red; font-weight: bold;">$${formatearNumero(montoTotal)}</span>`
+        );
+      } else {
+        textoActual += ` | Gastos totales: <span style="color: red; font-weight: bold;">$${formatearNumero(montoTotal)}</span>`;
+        
+      }
+      //////
+      muestraIndicadores.innerHTML = textoActual;
+      return montoTotal;
+    }
+    ////FUNCION FORMATEAR NUMERO PARA MOSTRARLO CON SIGNO PESOS,PUNTOS Y COMAS////
+    // Formatear con separador de miles y coma decimal SOLO si hay decimales
+    function formatearNumero(num) {
+      return new Intl.NumberFormat("es-ES", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2 // hasta 2 decimales si existen
+      }).format(num);
+    }
+
+     //---------------------------------------------//
+    //--------------GRAFICO ventas------------------//
+    //---------------------------------------------//
+  /////////////////////GRAFICO VENTAS////////////////////////
+    async function ventasChart() {
+        let fechaInicio = document.getElementById("fechaInicio").value;
+        let fechaFin = document.getElementById("fechaFin").value;
+        let productoResponse, montoResponse;
+        if (!fechaInicio || !fechaFin) {
+        [productoResponse, montoResponse] = await Promise.all([
+          fetchSheetData('Ventas', "SELECT B WHERE B IS NOT NULL"),
+          fetchSheetData('Ventas', "SELECT D WHERE D IS NOT NULL"),
+        ]);
+        Swal.fire({
+            icon: 'info',
+            title: 'Aviso',
+            text: 'No hay fechas, se mostrará un histórico.',
+            confirmButtonText: 'Aceptar',
+            allowOutsideClick: false
+        })
+        }else{
+          let finDate = new Date(fechaFin);
+          finDate.setDate(finDate.getDate() + 1);
+          const fechaFinAjustada = finDate.toISOString().split("T")[0];
+          [productoResponse, montoResponse] = await Promise.all([
+          fetchSheetData('Ventas', `SELECT B WHERE B IS NOT NULL AND F >= date '${fechaInicio}' AND F < date '${fechaFinAjustada}'`),
+          fetchSheetData('Ventas', `SELECT D WHERE D IS NOT NULL AND F >= date '${fechaInicio}' AND F < date '${fechaFinAjustada}'`)
+        ]);
+        }
+        
+        const productoTable = productoResponse.getDataTable();
+        const montoTable = montoResponse.getDataTable();
+        let montoTotal = 0;
+        const rowsReal = Math.min(productoTable.getNumberOfRows() ,montoTable.getNumberOfRows());
+        const totales = {};
+        for (let i = 0; i < rowsReal; i++) {
+          let nombre = productoTable.getValue(i, 0);
+          nombre = nombre.split('|')[0].trim();
+          let monto = montoTable.getValue(i, 0);
+          if (totales[nombre]) {
+            totales[nombre] += monto;
+          } else {
+            totales[nombre] = monto;
+          }
+          montoTotal += monto;
+          console.log(montoTotal);
+        }
+
+        const chartDataArray = [["Nombre", "Monto"]];
+        for (let nombre in totales) {
+          chartDataArray.push([nombre, totales[nombre]]);
+        }
+        const data = google.visualization.arrayToDataTable(chartDataArray);
+        // encabezados para Google Charts
+        // Ajustar el ancho del gráfico según la cantidad de productos
+        const chartWidth = Math.max(600, chartDataArray.length * 80);
+        const chartDiv = document.getElementById('ventasChart_div');
+        chartDiv.style.width = chartWidth + 'px';
+
+
+        const options = {
+          title: 'Lista de productos vendidos',
+          legend: { position: 'right' },
+          annotations: { alwaysOutside: true }
+        };
+
+        const chart = new google.visualization.ColumnChart(chartDiv);
+        chart.draw(data, options);
+        const muestraIndicadores = document.getElementById("comprasVentasTotales_div");
+        let textoActual = muestraIndicadores.textContent;
+        const regexVentas = /\s*\|\s*Total de dinero por Ventas:.*$/;
+        ////////
+        if (regexVentas.test(textoActual)) {
+          textoActual = textoActual.replace(
+            regexVentas,
+            ` | Total de dinero por Ventas: <span style="color: green; font-weight: bold;">$${formatearNumero(montoTotal)}</span>`
+          );
+        } else {
+          textoActual += ` | Total de dinero por Ventas: <span style="color: green; font-weight: bold;">$${formatearNumero(montoTotal)}</span>`;
+          
+        }
+        /////////
+        muestraIndicadores.innerHTML = textoActual;
+        return montoTotal;
+      }
+
+
+    //---------------------------------------------//
+    //--------------GRAFICO STOCK------------------//
+    //---------------------------------------------//
+    //////////////GRAFICO STOCK////////////////////
+      async function stockChart() {
+        const [productoResponse, cantidadResponse,tipoUnidadResponse] = await Promise.all([
+          fetchSheetData('Stock', "SELECT B"),
+          fetchSheetData('Stock', "SELECT C"),
+          fetchSheetData('Stock', "SELECT D")
+        ]);
+        
+        const productoTable = productoResponse.getDataTable();
+        const cantidadTable = cantidadResponse.getDataTable();
+        const tipoUnidadTable = tipoUnidadResponse.getDataTable();
+        const numRows = Math.min(productoTable.getNumberOfRows(), cantidadTable.getNumberOfRows());
+        const rowssReal = Math.min( numRows,tipoUnidadTable.getNumberOfRows());
+        const chartDataArray = [['Producto', 'Cantidad', { role: 'style' }]];
+        console.log(productoTable.getNumberOfRows() + " " +cantidadTable.getNumberOfRows())
+        for (let i = 1; i < numRows; i++) {
+          let nombre = productoTable.getValue(i, 0);
+          if(!nombre){
+            break;
+          }
+          if(tipoUnidadTable.getValue(i,0)){
+            nombre += " | "+tipoUnidadTable.getValue(i,0)  ;
+          }else{
+            nombre += " | Und. indefinida";
+          }
+          let valor = cantidadTable.getValue(i, 0);
+          let color = valor < 0 ? 'color: red' : 'color: blue';
+          chartDataArray.push([nombre, valor, color]);
+        }
+
+        // Ajustar el ancho del gráfico según la cantidad de productos
+        const chartWidth = Math.max(600, chartDataArray.length * 80);
+        const chartDiv = document.getElementById('stockChart_div');
+        const chartHeight = "100%"
+        chartDiv.style.width = chartWidth + 'px';
+        chartDiv.style.height = chartHeight;
+
+        const data = google.visualization.arrayToDataTable(chartDataArray);
+
+        const options = {
+          title: 'Cantidad total de productos terminados disponibles',
+          legend: { position: 'right' },
+          annotations: { alwaysOutside: true }
+        };
+
+        const chart = new google.visualization.ColumnChart(chartDiv);
+        chart.draw(data, options);
+
+        // INSTALAR EL LISTENER PARA CREAR UN NUEVO GRAFICO
+
+        google.visualization.events.addListener(chart, 'select', function() {
+          const sel = chart.getSelection();
+          if (!sel.length) return; // nada seleccionado
+          const col = sel[0].column; 
+          if (col == null) return; // puede ser null si clickeaste en el eje o título
+          const row = sel[0].row;
+          const producto = data.getValue(row, 0);   // columna 0: producto
+          const nombreColumna = data.getColumnLabel(col);
+          chartInternoProductoStockLote(producto.split('|')[0].trim())
+        });
+      }
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+      async function chartInternoProductoStockLote(nombrePt){
+        const productoResponse = await fetchSheetData('Stock', "SELECT J WHERE J IS NOT NULL");
+        const productoTable = productoResponse.getDataTable();
+        const chartDataArray = [['Lote', 'Cantidad']];
+       
+        for (let i = 1; i < productoTable.getNumberOfRows(); i++) {
+          let nombre = productoTable.getValue(i, 0);
+          const nombreExtraido = nombre.split('|')[0].trim();
+          console.log("nombre Extraido:" + nombreExtraido + " Nombre comparador:  " + nombrePt);
+          const resto = nombre.split('|')[1].trim();
+          if(nombrePt === nombreExtraido){
+            const regex = /lote:\s*([^-\s]+)-\s*stock:\s*(\d+)/i;
+            const match = resto.match(regex);
+            console.log("Entramos al if"+ match);
+            let lote;
+            let stock;
+            if (match) {
+              lote = match[1];
+              console.log("Lote:"+ lote);  
+              stock = Number(match[2]);  
+            }
+            chartDataArray.push([lote,stock]);
+          }
+        }
+
+        // Ajustar el ancho del gráfico según la cantidad de productos
+        const chartWidth = Math.max(600, chartDataArray.length * 80);
+        const chartDiv = document.getElementById('stockChart_div');
+        const chartHeight = "100%"
+        chartDiv.style.width = chartWidth + 'px';
+        chartDiv.style.height = chartHeight;
+
+        const data = google.visualization.arrayToDataTable(chartDataArray);
+
+        const options = {
+          title:`Stock de los lotes del producto: ${nombrePt}` ,
+          legend: { position: 'right' },
+          annotations: { alwaysOutside: true }
+        };
+
+        const chart = new google.visualization.ColumnChart(chartDiv);
+        chart.draw(data, options);
+      }
+    //--------------GRAFICO PRECIO UNITARIO--------//
+    //---------------------------------------------//
+    /* NO ANDA TEMPORALIDAD DE ESTE GRAFICO*/
+    //////////GRAFICO precio unitario///////////////
+
+      async function precioUnitarioChart() {
+        let mpResponse, precioResponse;
+        let fechaInicio = document.getElementById("fechaInicio").value;
+        let fechaFin = document.getElementById("fechaFin").value;
+        if(!fechaInicio || !fechaFin){
+          [mpResponse, precioResponse] = await Promise.all([
+          fetchSheetData('Stock', "SELECT E"),
+          fetchSheetData('Stock', "SELECT G")
+        ]);
+        alert("No hay fechas seleccionadas, se mostrará un historico")
+        }else{
+          let finDate = new Date(fechaFin);
+          finDate.setDate(finDate.getDate() + 1);
+          const fechaFinAjustada = finDate.toISOString().split("T")[0];
+          [mpResponse, precioResponse] = await Promise.all([
+          fetchSheetData('Stock', `SELECT E AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`),
+          fetchSheetData('Stock', `SELECT G AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`)
+        ]);
+        }
+        
+        
+        const mpTable = mpResponse.getDataTable();
+        const precioTable = precioResponse.getDataTable();
+        const rowsReal = Math.min(mpTable.getNumberOfRows(), precioTable.getNumberOfRows());
+        const chartDataArray = [['Materia Prima', 'Precio Unitario']];
+
+        for (let i = 1; i < rowsReal; i++) {
+          let nombre = mpTable.getValue(i, 0);
+          if(!nombre){
+            break;
+          }
+          let valor = precioTable.getValue(i, 0);
+          chartDataArray.push([nombre, valor]);
+        }
+
+        // Ajustar el ancho del gráfico según la cantidad de productos
+        const chartWidth = Math.max(600, chartDataArray.length * 80);
+        const chartDiv = document.getElementById('precioUnitarioChart_div');
+        chartDiv.style.width = chartWidth + 'px';
+        const chartHeight = "100%";
+        chartDiv.style.height = chartHeight;
+
+        const data = google.visualization.arrayToDataTable(chartDataArray);
+
+        const options = {
+          title: 'Cantidad total de productos terminados disponibles',
+          legend: { position: 'right' },
+          annotations: { alwaysOutside: true }
+        };
+
+        const chart = new google.visualization.ColumnChart(chartDiv);
+        chart.draw(data, options);
+      }
+    //-------------------------------------//
+    //----GRAFICO STOCK MATERIAS PRIMAS----//
+    //-------------------------------------//
+    ///////// MATERIAS PRIMAS STOCK /////////
+
+    async function materiasPrimasChart() {
+        const [productoResponse, cantidadResponse,tipoUnidadResponse] = await Promise.all([
+          fetchSheetData('Stock', "SELECT E"),
+          fetchSheetData('Stock', "SELECT F"),
+          fetchSheetData('Stock', "SELECT H")
+        ]);
+        
+        const productoTable = productoResponse.getDataTable();
+        const cantidadTable = cantidadResponse.getDataTable();
+        const tipoUnidadTable = tipoUnidadResponse.getDataTable();
+        const numRows = Math.min(productoTable.getNumberOfRows(), cantidadTable.getNumberOfRows());
+        const rowssReal = Math.min( numRows,tipoUnidadTable.getNumberOfRows());
+        const chartDataArray = [['Producto', 'Cantidad']];
+        console.log(productoTable.getNumberOfRows() + " " +cantidadTable.getNumberOfRows())
+        for (let i = 1; i < numRows; i++) {
+          let nombre = productoTable.getValue(i, 0);
+          if(!nombre){
+            break;
+          }
+          if(tipoUnidadTable.getValue(i,0)) nombre += " "+tipoUnidadTable.getValue(i,0);
+          else nombre += " Und. Indefinida";
+          let valor = cantidadTable.getValue(i, 0);
+          chartDataArray.push([nombre, valor]);
+          console.log(nombre + " " +valor)
+        }
+
+        // Ajustar el ancho del gráfico según la cantidad de productos
+        const chartWidth = Math.max(600, chartDataArray.length * 80);
+        const chartDiv = document.getElementById('mpChart_div');
+        const chartHeight = "100%"
+        chartDiv.style.width = chartWidth + 'px';
+        chartDiv.style.height = chartHeight;
+
+        const data = google.visualization.arrayToDataTable(chartDataArray);
+
+        const options = {
+          title: 'Cantidad total de materias primas disponibles',
+          legend: { position: 'right' },
+          annotations: { alwaysOutside: true }
+        };
+
+        const chart = new google.visualization.ColumnChart(chartDiv);
+        chart.draw(data, options);
+      }
+
+      function mostrarIndicador(){
+        productoMasVendido();
+      }
+
+    //-------------------------------------------//
+    //----DATO PRODUCTO MAYOR CANTIDAD VENTAS----//
+    //-------------------------------------------//
+    ///////FUNCION BUSCAR PRODUCTO MS VENDIDO//////
+      async function productoMasVendido(){
+        let divDispuesto = document.getElementById("productoMax_div");
+        let productoResponse, cantidadResponse;
+        let fechaInicio = document.getElementById("fechaInicio").value;
+        let fechaFin = document.getElementById("fechaFin").value;
+        if(!fechaInicio || !fechaFin){
+        [productoResponse, cantidadResponse] = await Promise.all([
+          fetchSheetData('Ventas', "SELECT B WHERE B IS NOT NULL"),
+          fetchSheetData('Ventas', "SELECT C WHERE C IS NOT NULL"),
+        ]);
+        Swal.fire({
+          icon: 'info',
+          title: 'Aviso',
+          text: 'No hay fechas, se mostrará un histórico.',
+          confirmButtonText: 'Aceptar',
+          allowOutsideClick: false
+        })
+        }else{
+          const finDate = new Date(fechaFin);
+          finDate.setDate(finDate.getDate() + 1);
+          const fechaFinAjustada = finDate.toISOString().split("T")[0];
+          [productoResponse, cantidadResponse] = await Promise.all([
+          fetchSheetData('Stock', `SELECT B WHERE B IS NOT NULL AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`),
+          fetchSheetData('Stock', `SELECT C WHERE C IS NOT NULL AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`)
+        ]);
+        }
+        const productoTable = productoResponse.getDataTable();
+        const cantidadTable = cantidadResponse.getDataTable();
+
+        const rowsReal = Math.min(productoTable.getNumberOfRows() ,cantidadTable.getNumberOfRows());
+        const maximos = {
+          nombreMax : "",
+          montoMax : -1
+        }
+        let totales = {};
+        for (let i = 0; i < rowsReal; i++) {
+          let nombre = productoTable.getValue(i, 0);
+          nombre = nombre.split('|')[0].trim();
+          let monto = cantidadTable.getValue(i, 0);
+          if (totales[nombre]) {
+            totales[nombre] += monto;
+          }else{
+            totales[nombre] = monto;
+          }
+          if(totales[nombre] > maximos.montoMax){
+              maximos.montoMax = totales[nombre];
+              maximos.nombreMax = nombre;
+            }
+        }
+        divDispuesto.textContent = `El producto ${maximos.nombreMax} fue el mas vendido, se vendieron: ${maximos.montoMax}`
+      }
+
+  //Grafico de Punto de Equilibrio//
+  async function crearGraficoDispersion() {
+    let fechaInicio = document.getElementById("fechaInicio").value;   
+  try {     
+    // PASO 1: Obtener las 7 columnas     
+    const [col1, col2, col3, col4, col5, col6, col7] = await Promise.all([       
+            
+      fetchSheetData('Punto Eq', "SELECT U WHERE U IS NOT NULL"), // Columna 2       
+      fetchSheetData('Punto Eq', "SELECT V WHERE V IS NOT NULL"), // Columna 3       
+      fetchSheetData('Punto Eq', "SELECT W WHERE W IS NOT NULL"), // Columna 4       
+      fetchSheetData('Punto Eq', "SELECT X WHERE X IS NOT NULL"), // Columna 5       
+      fetchSheetData('Punto Eq', "SELECT Y WHERE Y IS NOT NULL"), // Columna 6       
+      fetchSheetData('Punto Eq', "SELECT Z WHERE Z IS NOT NULL")  // Columna 7     
+    ]);      
+
+    // PASO 2: Obtener DataTables     
+    const tables = [       
+      col1.getDataTable(),       
+      col2.getDataTable(),       
+      col3.getDataTable(),       
+      col4.getDataTable(),       
+      col5.getDataTable(),       
+      col6.getDataTable()          
+    ];     
+
+    // PASO 3: Extraer encabezados (primera fila de cada columna)     
+    const headers = tables.map(table => table.getColumnLabel(0));
+    console.log('Encabezados detectados:', headers); 
+
+    // PASO 4: Crear el DataTable combinado     
+    const scatterData = new google.visualization.DataTable();
+    // Agregar TODAS las columnas como números (para gráfico de dispersión)     
+    headers.forEach((header, index) => {       
+      scatterData.addColumn('number', header);     
+    });      
+
+    // PASO 5: Obtener el número de filas de datos (excluyendo encabezado)     
+    const maxRows = Math.max(...tables.map(table => table.getNumberOfRows())) - 1;
+    console.log('Número de filas de datos a procesar:', maxRows);
+
+    // PASO 6: Agregar los datos (saltando la primera fila que es encabezado)     
+    const rows = [];     
+    for (let i = 1; i < tables[0].getNumberOfRows(); i++) { // Cambio aquí: usar < en lugar de <=
+      const row = [];               
+      tables.forEach((table, colIndex) => {         
+        if (i < table.getNumberOfRows()) {           
+          let value = table.getValue(i, 0);                      
+          // Convertir TODAS las columnas a números           
+          if (value !== null && value !== '' && value !== undefined) {             
+            value = parseFloat(value) || 0;           
+          } else {             
+            value = null; // Usar null en lugar de 0 para valores vacíos           
+          }       
+          row.push(value);         
+        } else {           
+          // Si no hay datos, agregar null           
+          row.push(null);         
+        }       
+      });
+      // Solo agregar la fila si tiene al menos algunos datos válidos
+      if (row.some(val => val !== null && val !== undefined)) {
+        rows.push(row);
+      }
+    }      
+    scatterData.addRows(rows);      
+    console.log('DataTable creado con', scatterData.getNumberOfRows(), 'filas de datos y', scatterData.getNumberOfColumns(), 'columnas');
+    console.log('Primera fila de datos:', rows[0]); // Para verificar
+
+    // PASO 7: Configurar y dibujar el gráfico     
+    const options = {       
+      title: 'Gráfico de Dispersión - 7 Columnas',       
+      hAxis: {          
+        title: headers[1] || 'Eje X', // Segunda columna como X         
+        format: 'decimal'       
+      },       
+      vAxis: {          
+        title: headers[2] || 'Eje Y', // Tercera columna como Y         
+        format: 'decimal'       
+      },       
+      legend: { position: 'bottom' },       
+      pointSize: 5,       
+      width: 800,       
+      height: 500,       
+      series: {         
+        // Configurar diferentes series si usas más columnas         
+        0: { color: '#1f77b4' },         
+        1: { color: '#ff7f0e' },         
+        2: { color: '#2ca02c' },         
+        3: { color: '#d62728' },         
+        4: { color: '#9467bd' },         
+        5: { color: '#8c564b' }       
+      }     
+    };      
+    // Dibujar el gráfico     
+    const chart = new google.visualization.ScatterChart(document.getElementById("puntoEQ_chart"));     
+    chart.draw(scatterData, options);      
+    return scatterData; // Por si necesitas usarlo después    
+  } catch (error) {     
+    console.error('Error al crear gráfico de dispersión:', error);   
+  } 
+}
+    //////////////TABLA INDICADORES CLAVE////////////////////
+    async function indicadoresClaveChart() {
+    try {
+        // Cargar la librería si no está disponible
+        if (!google.visualization || !google.visualization.Table) {
+            await new Promise(resolve => {
+                google.charts.load('current', {
+                    packages: ['table'],
+                    callback: resolve
+                });
+            });
+        }
+
+        // Traer todas las filas con las columnas necesarias
+        const response = await fetchSheetData('Punto Eq', "SELECT G, H, I, K, M, N");
+        const dataTableOriginal = response.getDataTable();
+
+        // Nuevo DataTable filtrado
+        const dataTable = new google.visualization.DataTable();
+        dataTable.addColumn('string', 'Nombre Producto');                 // G
+        dataTable.addColumn('number', 'Costo Variable Unitario');         // H
+        dataTable.addColumn('number', 'Precio Venta Unitario');           // I
+        dataTable.addColumn('number', 'Cantidad Vendida');                // K
+        dataTable.addColumn('number', 'Participación %');                 // M (base 100)
+        dataTable.addColumn('number', 'Contribución Marg Prom Ponderada');// N (base 100)
+
+        const rowsCount = dataTableOriginal.getNumberOfRows();
+
+        for (let i = 0; i < rowsCount; i++) {
+            const nombre = dataTableOriginal.getValue(i, 0);
+            const costoVarUnit = dataTableOriginal.getValue(i, 1);
+            const precioVentaUnit = dataTableOriginal.getValue(i, 2);
+            const cantidad = dataTableOriginal.getValue(i, 3);
+
+            // ---- normalizar porcentajes M y N a base 100 ----
+            let participacion = dataTableOriginal.getValue(i, 4);
+            let contribucion = dataTableOriginal.getValue(i, 5);
+
+            // Participación
+            if (typeof participacion === 'number') {
+                if (participacion > 0 && participacion <= 1) participacion *= 100;
+            } else if (typeof participacion === 'string' && participacion.trim() !== '') {
+                const p = parseFloat(participacion.replace(',', '.'));
+                participacion = isNaN(p) ? null : (p > 0 && p <= 1 ? p * 100 : p);
+            } else {
+                participacion = null;
+            }
+
+            // Contribución
+            if (typeof contribucion === 'number') {
+                if (contribucion > 0 && contribucion <= 1) contribucion *= 100;
+            } else if (typeof contribucion === 'string' && contribucion.trim() !== '') {
+                const c = parseFloat(contribucion.replace(',', '.'));
+                contribucion = isNaN(c) ? null : (c > 0 && c <= 1 ? c * 100 : c);
+            } else {
+                contribucion = null;
+            }
+
+            // Filtro: no mostrar filas con participación 0, nula o no numérica
+            if (typeof participacion === 'number' && participacion > 0) {
+                dataTable.addRow([
+                    nombre,
+                    costoVarUnit,
+                    precioVentaUnit,
+                    cantidad,
+                    participacion,
+                    contribucion
+                ]);
+            }
+        }
+
+        // --- FORMATTERS ---
+        const currencyFormatter = new google.visualization.NumberFormat({
+            prefix: '$',
+            decimalSymbol: ',',
+            groupingSymbol: '.',
+            fractionDigits: 2
+        });
+        currencyFormatter.format(dataTable, 1); // H
+        currencyFormatter.format(dataTable, 2); // I
+
+        const numberFormatter = new google.visualization.NumberFormat({
+            decimalSymbol: ',',
+            groupingSymbol: '.',
+            fractionDigits: 0
+        });
+        numberFormatter.format(dataTable, 3); // K
+
+        const percentFormatter = new google.visualization.NumberFormat({
+            suffix: ' %',
+            decimalSymbol: ',',
+            groupingSymbol: '.',
+            fractionDigits: 2
+        });
+        percentFormatter.format(dataTable, 4); // M ya en base 100
+        percentFormatter.format(dataTable, 5); // N ya en base 100
+
+        // Renderizar tabla
+        const chartDiv = document.getElementById('precioUnitarioChart_div');
+        chartDiv.style.width = '100%';
+        chartDiv.style.height = 'auto';
+
+        const options = {
+            title: 'Indicadores Clave de Ventas',
+            showRowNumber: false,
+            width: '100%',
+            height: '100%',
+            allowHtml: true
+        };
+
+        const table = new google.visualization.Table(chartDiv);
+        table.draw(dataTable, options);
+
+    } catch (error) {
+        console.error('Error al generar la tabla:', error);
+        alert('Ocurrió un error al generar la tabla. Por favor recarga la página.');
+    }
+  }
+    
+//---------------------//
+//----FUNCION FETCH----//
+//-------------- ------//
+async function fetchSheetData(sheetName, queryText) {
+  const queryString = encodeURIComponent(queryText);
+  const url = "https://docs.google.com/spreadsheets/d/"+idParaGraficoPrueba+"/gviz/tq?sheet="+sheetName+"&tq="+queryString;
+  return new Promise((resolve, reject) => {
+    const query = new google.visualization.Query(url);
+    query.send(response => {
+      if (response.isError()) {
+        reject('Error: ' + response.getMessage() + response.getDetailedMessage());
+      } else {
+        resolve(response);
+      }
+    });
+  });
+}
+
+</script>

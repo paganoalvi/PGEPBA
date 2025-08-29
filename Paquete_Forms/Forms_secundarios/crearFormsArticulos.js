@@ -5,22 +5,22 @@ function articulo (){
     try {
       Logger.log("Iniciando creación del formulario de articulos");
  
-      let formularioArticulos = FormApp.create("Articulo");
+      let formularioArticulos = FormApp.create("Herramientas o Maquinaria");
       let formularioArticulosID = formularioArticulos.getId();
       PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioArticulosID);
-      let opcionesConceptoA =  ["Herramienta" ,"Maquinaria","Servicio"];// concepto de la compra
+      let opcionesConceptoA =  ["Herramienta" ,"Maquinaria","Otro"];// concepto de la compra
 
       formularioArticulos.setDescription(
-        "Este formulario permite llevar registro de los artículos comprados por tu emprendimiento,aquellos que no son materias primas o insumos"
+        "Este formulario permite llevar registro de las herramientas o maquinaria comprados por tu emprendimiento"
       );
      
       formularioArticulos.addTextItem()
-        .setTitle("Nombre artículo") // Nombre
+        .setTitle("Nombre Herramienta o Maquinaria") // Nombre
         .setRequired(true)
         .setHelpText("Ingrese el nombre del articulo");
      
       formularioArticulos.addMultipleChoiceItem()
-        .setTitle("Tipo de artículo") // Tipo articulo
+        .setTitle("Tipo") // Tipo articulo
         .setChoiceValues(opcionesConceptoA)
         .setRequired(true)
  
@@ -29,11 +29,11 @@ function articulo (){
         .setHelpText("Si es que posee");
 
       const formArticulosUrl = formularioArticulos.getPublishedUrl();
-      Logger.log("Enlace a formulario: " + formArticulosUrl)
+      Logger.log("ARTICULO: " + formArticulosUrl)
       PropertiesService.getUserProperties().setProperty("formularioArticulosUrl", formArticulosUrl);
       PropertiesService.getUserProperties().setProperty("formularioArticulosEditUrl", formularioArticulos.getEditUrl());
-      Logger.log(formularioArticulos.getEditUrl());
-      Logger.log("Formulario de articulos creado con ID: " + formularioArticulos.getId());
+      //Logger.log(formularioArticulos.getEditUrl());
+      //Logger.log("Formulario de articulos creado con ID: " + formularioArticulos.getId());
  
       return formularioArticulos;
  
@@ -42,4 +42,3 @@ function articulo (){
       return null;
     }
   }
-

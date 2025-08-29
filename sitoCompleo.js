@@ -1,37 +1,32 @@
-
 //////////////////////////////////////////
 //COPIA DE SEGURIDAD PARA MODIFICAR !!!!!!!!!! 
 ///////////////////////////////////
 function doGet() {
+
   const props = PropertiesService.getUserProperties();
-  props.setProperty("verificacionTemporalPrellenado","true")
-  if (props.getProperty("paqueteYaCreado") === "true") {
-    Logger.log("Ya se creó el paquete. Se omite.");
-    
+  const triggers = ScriptApp.getProjectTriggers();
+  
+  const yaExiste = triggers.some(trigger =>
+    trigger.getHandlerFunction() === "creacionCompleta"
+  );
+  if(props.getProperty("paqueteActivado") !== "true") {
+    if(!yaExiste){
+      pedirPermisos();
+      ScriptApp.newTrigger("creacionCompleta")
+        .timeBased()
+        .after(1 * 60 * 1000)
+        .create();
+      
+      Logger.log("Trigger creado correctamente");
+    }
+    if(props.getProperty("paqueteForms")){
+      return HtmlService.createHtmlOutputFromFile("PaginaYaCasi");
+    }else{
+      return HtmlService.createHtmlOutputFromFile("PaginaEspera");
+    } 
+  
   }else{
-    Logger.log("Creando paquete de forms");
-    props.setProperty("paqueteYaCreado", "true");
-    crearPaquete();
-    for(let i = 0; i<16; i++){
-      props.setProperty(`prellenadoNombre${i}`,"Vacio")
-      props.setProperty(`prellenadoEnlace${i}`,"https://sites.google.com/view/guiausuariopge/forms")
-    }
-    props.setProperty("verificacionTemporalPrellenado","false")
-    Logger.log("Formularios creados correctamente");
-
-    // Guardamos la propiedad ANTES de crear triggers o capas
-    
-    if (props.getProperty("formsLayersYaInsertados") !== "true") {
-      Logger.log("Insertando capas de formularios secundarios");
-      formsLayers();
-      props.setProperty("formsLayersYaInsertados", "true");
-    } else {
-      Logger.log("Capas de formularios ya insertadas");
-    }
-  }
-
-
-  try {
+     try {
     const nombresPrellenadoVector = Array.from({ length: 16 }, (_, i) =>
       props.getProperty(`prellenadoNombre${i}`)
     );
@@ -46,43 +41,51 @@ function doGet() {
     const fVentasUrl = props.getProperty("formularioVentasUrl");
     const fCostoFijoUrl = props.getProperty("formularioCostosFijosUrl");
   
-    const urlClientes = props.getProperty("Hoja6"); 
-    const urlProveedores = props.getProperty("Hoja8"); 
+    const urlClientes = props.getProperty("Hoja5"); 
+    const urlProveedores = props.getProperty("Hoja7");
+    const urlProductos = props.getProperty("Hoja10");
+    const urlEmpleados = props.getProperty("Hoja3"); 
+    const idHojaMensuales = props.getProperty("HojaResultadosHistorico") 
+
     const idParaGraficoPrueba = props.getProperty("HojaResultadosID");
-    Logger.log(idParaGraficoPrueba); 
 
     // CREAR TEMPLATE PARA USAR PÁGINA Y ASIGNAR LOS URLS
     const htmlTemplate = HtmlService.createTemplateFromFile("Main");
+    
     htmlTemplate.fComprasUrl = fComprasUrl;
     htmlTemplate.fProduccionUrl = fProduccionUrl;
     htmlTemplate.fVentasUrl = fVentasUrl;
     htmlTemplate.fCostoFijoUrl = fCostoFijoUrl;
     htmlTemplate.urlClientes = urlClientes;
     htmlTemplate.urlProveedores = urlProveedores;
+    htmlTemplate.urlProductos = urlProductos;
+    htmlTemplate.urlEmpleados = urlEmpleados;
     htmlTemplate.idParaGraficoPrueba = idParaGraficoPrueba;
     htmlTemplate.nombresPrellenado = nombresPrellenadoVector;
     htmlTemplate.enlacesPrellenado = enlacesPrellenadoVector;
+    htmlTemplate.idHojaMensuales = idHojaMensuales;
+    
+    
     // DEVUELVE LA PÁGINA COMPLETA
-    Logger.log(props.getProperty("verificacionTemporalPrellenado"))
     return htmlTemplate.evaluate().setTitle("Productor y Vendedor - Página Personal");
     
   } catch (error) {
     console.error(`Error al generar el HTML en doGet: ${error.message}`);
     return HtmlService.createHtmlOutput("Ocurrió un error al cargar la página. Contacta al administrador.");
   }
+  }
 }
 
-
-function enlacesPrimeraVez (){
-  const props = PropertiesService.getUserProperties()
-  for(let i = 0; i<16; i++){
+function creacionCompleta() {
+  let props = PropertiesService.getUserProperties();
+    crearPaquete();
+    for(let i = 0; i<16; i++){
       props.setProperty(`prellenadoNombre${i}`,"Vacio")
       props.setProperty(`prellenadoEnlace${i}`,"https://sites.google.com/view/guiausuariopge/forms")
     }
-  props.setProperty("verificacionTemporalPrellenado","false")
-}
+  }
 
-//Función para enlazar archivos (css/javascript)
+
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename)
       .getContent();
@@ -90,7 +93,26 @@ function include(filename) {
 
 
 
-  
+function pedirPermisos() {
+  const formP = FormApp.create("Formulario de prueba").setTitle("Eliminar después");
+  const fileForm = DriveApp.getFileById(formP.getId());
+  fileForm.setTrashed(true); 
+  DriveApp.getRootFolder();
+  const sheetP = SpreadsheetApp.create("Hoja de prueba");
+  const file = DriveApp.getFileById(sheetP.getId());
+  file.setTrashed(true);
+  PropertiesService.getUserProperties().setProperty("permisoConcedido","true");
+  return "Permisos solicitados";
+}
+
+function limpiezaParaPagina(){
+  limpiezaGeneral();
+  var carpetas = DriveApp.getFoldersByName("Portal Gestión");
+  while (carpetas.hasNext()) {
+        var carpeta = carpetas.next();
+        carpeta.setTrashed(true); 
+  }
+}
 
 
 

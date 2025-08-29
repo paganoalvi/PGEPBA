@@ -23,7 +23,7 @@ function proveedor (){
       .build();
       
     let opcionesTipoPersona = ["Persona fisica", "Persona juridica"];
-    let opcionesTipoProveedor = ["Herramiena o maquinaria", "Servicio","Otro"];
+    let opcionesTipoProveedor = ["Materia prima","Herramiena o maquinaria", "Servicio","Otro"];
 
     const TITULO_TELEFONO = "Teléfono";
     const TITULO_CORREO_ELECTRONICO = "Correo Electrónico";
@@ -32,6 +32,7 @@ function proveedor (){
       { tipo: "seleccion", titulo: "Tipo de proveedor", opciones: opcionesTipoProveedor, requerido: true},
       { tipo: "list", titulo: "Tipo de personeria", opciones: opcionesTipoPersona, requerido: true},
       { tipo: "text", titulo: "Nombre completo o Razón social", requerido: true},
+      { tipo: "text", titulo: "CUIT/CUIL/DNI",textoAyuda: "sin puntos, comas o guiones"},
       { tipo: "text", titulo: "Domicilio completo del proveedor"},
       { tipo: "text", titulo: "Teléfono", textoAyuda: "Ingrese número telefónico valido"},
       { tipo: "text", titulo: "Correo Electrónico", textoAyuda: "Correo válido, por ejemplo: usuario@dominio.com"},
@@ -77,20 +78,13 @@ function proveedor (){
     });
 
     const formProveedorUrl = formularioProveedor.getPublishedUrl();
-    Logger.log("Enlace a formulario: " + formProveedorUrl)
+    Logger.log("PROVEEDORES: " + formProveedorUrl)
     PropertiesService.getUserProperties().setProperty("formularioProveedorUrl", formProveedorUrl);
     PropertiesService.getUserProperties().setProperty("formularioProveedorEditUrl", formularioProveedor.getEditUrl());
-    Logger.log(formularioProveedor.getEditUrl());
+    //Logger.log(formularioProveedor.getEditUrl());
  
-    Logger.log("Formulario de compras creado con ID: " + formularioProveedor.getId());
+    //Logger.log("Formulario de compras creado con ID: " + formularioProveedor.getId());
 
     return formularioProveedor;
 
 }
-
-
-
-
-
-
-

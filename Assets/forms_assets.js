@@ -26,211 +26,235 @@ function crearSeccion(formulario, titulo, textoAyuda, preguntas) {
 //PARA REPETIR EL ENVIO DE UN FORMULARIO//////////////////
 ///////////////////////////////////////////////////////////
 
-function guardarRecetaSheet(listaMateriasP, nombreR, comentarioR) {
+function guardarRecetaSheet(listaMateriasP, nombreR, divisorCantReales) {
   try {
+    
     const props = PropertiesService.getUserProperties();
     const hoja = SpreadsheetApp.openById(props.getProperty("HojaResultadosID")).getSheetByName("Recetas");
+    const hojaStock = hoja.getParent().getSheetByName("Stock");
+    const hojaEq = hoja.getParent().getSheetByName("Punto Eq");
+    
+
+    // --- Insertar el nombre en el Form Producción ---
     const formProduccion = FormApp.openByUrl(props.getProperty("formularioProduccionEditUrl"));
     let items = formProduccion.getItems();
-    let itemProducto = items[0].asListItem(); // Corregido: llamada a asListItem()
-    let opcionesActualesC = itemProducto.getChoices().map(choice => choice.getValue()); // Obtener opciones actuales
-    opcionesActualesC.push(nombreR); // Agregar nuevo dato
+    let itemProducto = items[0].asListItem();
+    let opcionesActualesC = itemProducto.getChoices().map(choice => choice.getValue());
+
+    if (opcionesActualesC.includes(nombreR)) {
+      throw new Error(`El producto "${nombreR}" ya existe en el formulario.`);
+    }
+    const valores = hojaEq.getRange(2,7,hojaEq.getLastRow()-1).getValues(); 
+    const cantidad = valores.flat().filter(v => v !== "" && v !== null).length +2;
+    hojaEq.getRange(cantidad,7).setValue(nombreR);
+    
+
+
+    opcionesActualesC.push(nombreR);
+    opcionesActualesC.sort();
     itemProducto.setChoices(opcionesActualesC.map(valor => itemProducto.createChoice(valor)));
 
-    const valor = hoja.getRange("A1").getValue(); // CELDA DE BAJAS
+    // --- Insertar receta en hoja "Recetas" ---
+    const valor = hoja.getRange("A1").getValue(); // Celda de bajas
     let celdaElegida = parseInt(valor);
     const filaInicial = 2;
 
     if (celdaElegida === 0) {
-      // Alta normal (sin bajas disponibles)
+      // Alta normal
       celdaElegida = parseInt(hoja.getRange("A2").getValue());
-      hoja.getRange("A2").setValue(celdaElegida + 3); // reserva espacio para la siguiente
+      hoja.getRange("A2").setValue(celdaElegida + 4);
     } else {
       // Alta usando baja lógica
       const celdaBaja = hoja.getRange(filaInicial, celdaElegida).getValue(); // ej: "@12"
-      const siguienteBaja = parseInt(String(celdaBaja).slice(1)); // extrae "12" de "@12"
-      hoja.getRange("A1").setValue(siguienteBaja); // actualiza la cabecera con la próxima baja
+      const siguienteBaja = parseInt(String(celdaBaja).slice(1));
+      hoja.getRange("A1").setValue(siguienteBaja);
     }
 
-    // Escritura de receta
-    let fila = filaInicial;
-    hoja.getRange(fila, celdaElegida).setValue(nombreR);
-    fila++;
+    hoja.getRange(2, celdaElegida).setValue(nombreR);
 
-    listaMateriasP.forEach(function (materiaPrima) {
-      hoja.getRange(fila, celdaElegida).setValue(materiaPrima.NombreMp);
-      hoja.getRange(fila, celdaElegida + 1).setValue(materiaPrima.Cantidad);
-      hoja.getRange(fila, celdaElegida + 2).setValue(materiaPrima.Tipos);
-      fila++;
-    });
+    hoja.getRange(3, celdaElegida, listaMateriasP.length, 4).setValues(listaMateriasP);
 
-    // Escribir comentario solo si hay uno
-    if (comentarioR) {
-      hoja.getRange(fila, celdaElegida).setValue(comentarioR);
-    }
+    hoja.getRange(3 + listaMateriasP.length, celdaElegida).setValue(divisorCantReales);
 
-  } catch (e) {
-    Logger.log("Error en guardarRecetaSheet: " + e.message);
+    // --- Inicializar en stock ---
+    let ultimoEspacio = parseInt(hojaStock.getRange("A3").getValue());
+    hojaStock.getRange(ultimoEspacio, 2, 1, 2).setValues([[nombreR, 0]]);
+    ultimoEspacio++;
+    hojaStock.getRange("A3").setValue(ultimoEspacio);
+
+    // --- Inicializar materias primas ---
+    hojaStock.getRange(2, 5, hojaStock.getLastRow() - 1, 4).setValues(recetaAuxInicializarMP(listaMateriasP, hojaStock));
+
+    return true; // Indicar éxito al cliente
+  } catch (error) {
+    Logger.log("Error en guardarRecetaSheet: " + error.message);
+    throw new Error(error.message); // Mandar el mensaje de error al cliente
   }
+}
+
+function recetaAuxInicializarMP(receta,stock){
+  const stockMP = stock.getRange(2,5,stock.getLastRow()-1,4).getValues();
+  const nombresMpStock= stockMP.map(fila => fila[0]);
+  receta.forEach(function(materiaPrimaReceta){
+    /////HAY NORMALIZACION EN LOS NOMBRE DE MATERIAS PRIMAS?????//////////
+    const indiceMpStock = nombresMpStock.indexOf(materiaPrimaReceta[0])
+    if(!stockMP[indiceMpStock][3]){
+      if(materiaPrimaReceta[2] === "gramos"){
+        stockMP[indiceMpStock][3] = "kilogramos"
+      }else{
+        if(materiaPrimaReceta[2] === "mililitro"){
+          stockMP[indiceMpStock][3] = "litros"
+        }else{
+          stockMP[indiceMpStock][3] = materiaPrimaReceta[2];
+        }
+      }
+    }   
+  })
+  return stockMP;
+
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /// FUNCIONES PARA LA CARGA DE LA LISTA DESPLEGABLE DE MATERIAS PRIMAS EN RECETA///
 ///////////////////////////////////////////////////////////////////////////////////
+
 function agregarMPR(nombre) {
   try {
     const props = PropertiesService.getUserProperties();
-    const hojaMP = SpreadsheetApp.openById(props.getProperty("HojaResultadosID")).getSheetByName("Hoja 1");
-    
-    if (!hojaMP) {
-      throw new Error("No se encontró 'Hoja 1' en la hoja de cálculo");
-    }
-    
-    // Verificar si ya existe en columna E (5)
+    const hojaMP = SpreadsheetApp.openById(props.getProperty("HojaResultadosID")).getSheetByName("Stock");
+
     const lastRow = hojaMP.getLastRow();
     let existingMps = [];
-    
     if (lastRow >= 2) {
-      existingMps = hojaMP.getRange(2, 5, lastRow - 1, 1).getValues().flat();
+      existingMps = hojaMP.getRange(2, 5, lastRow - 1, 1).getValues().flat().map(mp => mp.toString().trim());
     }
-    
+
     if (existingMps.includes(nombre)) {
-      throw new Error("La materia prima ya existe");
+      return false; // Ya existe
     }
-    
-    // Sistema de altas/bajas (modificado para columna E)
-    const valor = hojaMP.getRange("A3").getValue();
-    let filaElegida = parseInt(valor) || 0;
-    
-    if (filaElegida === 0) {
-      // Alta normal (sin bajas disponibles)
-      filaElegida = parseInt(hojaMP.getRange("A4").getValue()) || 2; // Comenzar en fila 2 si A4 está vacío
-      hojaMP.getRange("A4").setValue(filaElegida + 1);
-    } else {
-      // Alta usando baja lógica
-      const celdaBaja = hojaMP.getRange(filaElegida, 5).getValue(); // Ahora en columna E
-      const siguienteBaja = parseInt(String(celdaBaja).slice(1));
-      hojaMP.getRange("A3").setValue(siguienteBaja);
-    }
-    
-    // Validar que filaElegida sea al menos 2
-    filaElegida = Math.max(filaElegida, 2);
-    
-    // Escribir en columna E (5)
-    hojaMP.getRange(filaElegida, 5).setValue(nombre);
-    
-    // Actualizar formulario de compras (opcional)
+
+    let espacioVacio = parseInt(hojaMP.getRange("A2").getValue());
+    hojaMP.getRange(espacioVacio, 5, 1, 2).setValues([[nombre, 0]]);
+    espacioVacio++;
+    hojaMP.getRange("A2").setValue(espacioVacio);
+
+    // AGREGAR NOMBRE DE MATERIA PRIMA EN PREGUNTA MP DE FORMULARIO COMPRAS 
     try {
       const formCompras = FormApp.openByUrl(props.getProperty("formularioComprasEditUrl"));
       let items = formCompras.getItems();
-      let itemProducto = items[2].asListItem();
-      let opcionesActualesC = itemProducto.getChoices().map(choice => choice.getValue());
+      let preguntaMateriaPrima = items[indicePreguntaMateriaPrima].asListItem();
+      let opcionesActualesC = preguntaMateriaPrima.getChoices().map(choice => choice.getValue());
       opcionesActualesC.push(nombre);
-      itemProducto.setChoices(opcionesActualesC.map(valor => itemProducto.createChoice(valor)));
+      preguntaMateriaPrima.setChoices(opcionesActualesC.map(valor => preguntaMateriaPrima.createChoice(valor)));
     } catch (e) {
       console.warn("No se pudo actualizar formulario de compras:", e);
     }
-    
+
     return true;
-    
+
   } catch (error) {
-    console.error("Error en agregarMPR:", error);
+    console.error(error);
     throw error;
   }
 }
 
-function obtenerMateriasPrimasDeSheet() {
-  try {
-    const spreadsheet = SpreadsheetApp.openById(PropertiesService.getUserProperties().getProperty("HojaResultadosID"));
-    const sheet = spreadsheet.getSheetByName("Hoja 1");
-    
-    if (!sheet) {
-      throw new Error("No se encontró la hoja 'Hoja 1'");
+
+
+//////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
+  function eliminarMateriaPrimaSeleccionada(nombre) {
+    try {
+      const sheet = SpreadsheetApp.openById(PropertiesService.getUserProperties().getProperty("HojaResultadosID"))
+        .getSheetByName("Stock");
+
+      const datosMP = sheet.getRange(2, 5, sheet.getLastRow() - 1, 4).getValues();
+      const nombresMP = datosMP.map(fila => fila[0].toString().trim());
+      const indiceNombreMP = nombresMP.indexOf(nombre);
+
+      if (indiceNombreMP === -1) {
+        return false; // No encontrado
+      }
+
+      datosMP.splice(indiceNombreMP, 1);
+      sheet.getRange(2, 5, sheet.getLastRow() - 1, 4).clearContent();
+      sheet.getRange(2, 5, datosMP.length, 4).setValues(datosMP);
+
+      let espacioVacio = sheet.getRange("A2").getValue();
+      espacioVacio--;
+      sheet.getRange("A2").setValue(espacioVacio);
+
+      try {
+        const formCompras = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty("formularioComprasEditUrl"));
+        const itemMP = formCompras.getItems()[2].asListItem();
+        const opcionesActuales = itemMP.getChoices().map(choice => choice.getValue());
+        const nuevasOpciones = opcionesActuales.filter(opcion => opcion !== nombre);
+        itemMP.setChoices(nuevasOpciones.map(opcion => itemMP.createChoice(opcion)));
+      } catch (e) {
+        console.warn("No se pudo actualizar formulario de compras:", e);
+      }
+
+      return true;
+
+    } catch (error) {
+      console.error("Error en eliminarMateriaPrimaSeleccionada:", error);
+      throw error;
     }
-    
-    const lastRow = sheet.getLastRow();
-    if (lastRow < 2) return []; // No hay datos
-    
-    // Obtener todas las materias primas de la columna E
-    const data = sheet.getRange(2, 5, lastRow - 1, 1).getValues();
-    
-    // Procesar y limpiar datos
-    return data
-      .flat()
-      .map(mp => mp.toString().trim())
-      .filter(mp => mp !== "");
-      
-  } catch (error) {
-    console.error("Error en obtenerMateriasPrimasDeSheet:", error);
-    throw error;
   }
-}
-
-function agregarMP(nombre){
-    const formCompras = FormApp.openByUrl(props.getProperty("formularioComprasEditUrl"));
-    let items = formCompras.getItems();
-    let itemProducto = items[2].asListItem(); // Corregido: llamada a asListItem()
-    let opcionesActualesC = itemProducto.getChoices().map(choice => choice.getValue()); // Obtener opciones actuales
-    opcionesActualesC.push(nombre); // Agregar nuevo dato
-    itemProducto.setChoices(opcionesActualesC.map(valor => itemProducto.createChoice(valor)));
-
-  const hoja = SpreadsheetApp.openById(PropertiesService.getUserProperties().getProperty("HojaResultadosID")).getSheetByName("Hoja 1");
-  const valor = hoja.getRange("A3").getValue(); // CELDA DE BAJAS
-  let filaElegida = parseInt(valor);
-  if (filaElegida === 0) {
-      // Alta normal (sin bajas disponibles)
-      filaElegida = parseInt(hoja.getRange("A4").getValue());
-      hoja.getRange("A4").setValue(filaElegida + 1); // reserva espacio para la siguiente
-    } else {
-      // Alta usando baja lógica
-      const celdaBaja = hoja.getRange(filaElegida, 2).getValue(); // ej: "@12"
-      const siguienteBaja = parseInt(String(celdaBaja).slice(1)); // extrae "12" de "@12"
-      hoja.getRange("A3").setValue(siguienteBaja); // actualiza la cabecera con la próxima baja
-    }
-  hoja.getRange(filaElegida,2).setValue(nombre);
-}
-
-function eliminarMP(nombre){
-  
-}
 
 function eliminarReceta(nombre) {
-  try {
-    const hoja = SpreadsheetApp
-      .openById(PropertiesService.getUserProperties().getProperty("HojaResultadosID"))
-      .getSheetByName("Recetas");
-
-    const lastColumn = hoja.getLastColumn();
-    const valores = hoja.getRange(1, 1, 2, lastColumn).getValues(); // A1 + fila 2
-    const valorCabecera = valores[0][0]; // A1
-    const filaNombres = valores[1].slice(2); // fila 2 desde columna C
-
-    const index = filaNombres.indexOf(nombre);
-    if (index !== -1) {
-      const columna = index + 2; // columna real
-      hoja.getRange(2, columna).setValue(`@${valorCabecera}`);
-      hoja.getRange("A1").setValue(columna);
-    } else {
-      throw new Error(`No se encontró la receta: ${nombre}`);
+    try {
+      // 1. Eliminar del formulario de producción
+      const formProduccion = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty("formularioProduccionEditUrl"));
+      const itemProducto = formProduccion.getItems()[0].asListItem();
+      const opcionesActuales = itemProducto.getChoices().map(choice => choice.getValue());
+      const nuevasOpciones = opcionesActuales.filter(opcion => opcion !== nombre);
+      itemProducto.setChoices(nuevasOpciones.map(opcion => itemProducto.createChoice(opcion)));
+      
+      // 2. Marcar como eliminado en hoja Recetas
+      const hojaRecetas = SpreadsheetApp.openById(PropertiesService.getUserProperties().getProperty("HojaResultadosID"))
+        .getSheetByName("Recetas");
+      const hojaEq = hojaRecetas.getParent().getSheetByName("Punto Eq");
+      
+      const lastColumn = hojaRecetas.getLastColumn();
+      let nombresProductos = hojaRecetas.getRange(2, 3, 1, lastColumn-2).getValues()[0];
+      const index = nombresProductos.indexOf(nombre);
+      
+      if (index !== -1) {
+        const columna = index + 3; // +3 porque empieza en columna C
+        const valorCabecera = hojaRecetas.getRange("A1").getValue();
+        
+        // Limpiar contenido y marcar como eliminado
+        hojaRecetas.getRange(3, columna, hojaRecetas.getLastRow()-2, 4).clearContent();
+        hojaRecetas.getRange(2, columna).setValue(`@${valorCabecera}`);
+        hojaRecetas.getRange("A1").setValue(columna);
+      }
+      
+      // 3. Eliminar de Hoja 1 (columna B)
+      const hoja1 = SpreadsheetApp.openById(PropertiesService.getUserProperties().getProperty("HojaResultadosID"))
+        .getSheetByName("Stock");
+      
+      const datosProductos = hoja1.getRange(2,2,hoja1.getLastRow()-1,3).getValues();
+      nombresProductos = datosProductos.map(fila => fila[0]);
+      const indiceNombreProducto = nombresProductos.indexOf(nombre);
+      if(indiceNombreProducto != -1){
+        datosProductos.splice(indiceNombreProducto,1);
+        hoja1.getRange(2,2,hoja1.getLastRow()-1,3).clearContent();
+        hoja1.getRange(2,2,datosProductos.length , 3).setValues(datosProductos);
+        let espacioVacio = hoja1.getRange("A3").getValue();
+        espacioVacio--;
+        hoja1.getRange("A3").setValue(espacioVacio);
+      }
+      ////////////////////////////////APARTADO PARA ELIMINARLO DE EQ//////////////
+      const bloqueProdEq = hojaEq.getRange(2,7,hojaEq.getLastRow(),5).getValues();
+      const nombresProdEq = bloqueProdEq.map(nombreEq => nombreEq[0].toString());
+      const indiceFilaEq = nombresProdEq.indexOf(nombre);
+      if (indiceFilaEq !== -1) {
+        bloqueProdEq.splice(indiceFilaEq, 1);
+        hojaEq.getRange(2,7,bloqueProdEq.length,5).setValues(bloqueProdEq);
+      }
+      return true;
+      
+    } catch (error) {
+      console.error("Error en eliminarReceta:", error);
+      throw error;
     }
-
-  } catch (e) {
-    Logger.log("Error en eliminarReceta: " + e.message);
-  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

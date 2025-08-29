@@ -25,13 +25,12 @@ function cliente (){
     let opcionesPersoneria = ["Persona Fisica","Persona Juridica"];
 
     const preguntasClientes =  [
-      {tipo: "seleccion",titulo: "Personeria",opciones: opcionesPersoneria,requerido: true},
+      {tipo: "list",titulo: "Personeria",opciones: opcionesPersoneria,requerido: true},
       {tipo: "text",titulo: "Nombre completo o Razón social",requerido: true},
-      {tipo: "text",titulo: "CUIT/CUIL/DNI",requerido: true}, // VALIDACION SOLO NUMEROS
+      {tipo: "text",titulo: "CUIT/CUIL/DNI",textoAyuda: "sin puntos, comas o guiones"}, // VALIDACION SOLO NUMEROS
       {tipo: "text",titulo: "Teléfono"},
       {tipo: "text",titulo: "Domicilio"},      
       {tipo: "text",titulo: "Correo electrónico"},
-      {tipo: "text",titulo: "Nombre y apellido de contacto",textoAyuda: "Ingrese el nombre de persona adicional de importancia"},
       {tipo: "list",titulo: "Condicion frente al IVA",opciones: opcionesCondFrenteIva},
       {tipo: "text",titulo: "Datos adicionales"},
     ]
@@ -49,9 +48,6 @@ function cliente (){
         //Validacion para dni
         if (p.titulo == "CUIT/CUIL/DNI") {
           pregunta.setValidation(val);
-        }
-        if (p.titulo == "Correo electrónico") {
-          pregunta.setValidation(valCE);
         }
         break;
       case "date":
@@ -73,13 +69,13 @@ function cliente (){
   });
 
     const formClientesUrl = formularioClientes.getPublishedUrl();
-    Logger.log("Enlace a formulario: " + formClientesUrl)
+    Logger.log("CLIENTES: " + formClientesUrl)
     PropertiesService.getUserProperties().setProperty("formularioClientesUrl", formClientesUrl);
     PropertiesService.getUserProperties().setProperty("formularioClientesEditUrl", formularioClientes.getEditUrl());
-    Logger.log(formularioClientes.getEditUrl());
+    //Logger.log(formularioClientes.getEditUrl());
 
 
-    Logger.log("Formulario de clientes creado con ID: " + formularioClientes.getId());
+    //Logger.log("Formulario de clientes creado con ID: " + formularioClientes.getId());
 
 
     return formularioClientes;
@@ -90,11 +86,3 @@ function cliente (){
     return null;
   }
 }
-
-
-
-
-
-
-
-

@@ -10,8 +10,11 @@ function costosFijos (){
     PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioCostosFijosID);
 
     formularioCostosFijos.setDescription(
-      "Este formulario permite llevar registro de los gastos fijos mensuales de tu emprendimiento"
+      "Completa este formulario para registrar todos los egresos de dinero que se mantienen constantes independientemente del nivel de tus ventas"
     );
+    formularioCostosFijos.addDateItem()
+      .setTitle("Elegí la fecha en la que se va a registrar el gasto")
+      .setRequired(true);
 
     let preguntaInicial = formularioCostosFijos.addMultipleChoiceItem()
       .setTitle("Elija el tipo de costo fijo")
@@ -31,13 +34,16 @@ function costosFijos (){
     seccion2.setGoToPage(FormApp.PageNavigationType.SUBMIT);
     seccion3.setGoToPage(FormApp.PageNavigationType.SUBMIT);
 
-    const formVentasUrl = formularioCostosFijos.getPublishedUrl();
-    Logger.log("Enlace a formulario: " + formVentasUrl)
-    PropertiesService.getUserProperties().setProperty("formularioCostosFijosUrl", formVentasUrl);
+    const formCostosFijosUrl = formularioCostosFijos.getPublishedUrl();
+    Logger.log("||||||||||||||||||")
+    Logger.log("COSTOS FIJOS: ")
+    Logger.log(formCostosFijosUrl)
+    Logger.log("||||||||||||||||||")
+    PropertiesService.getUserProperties().setProperty("formularioCostosFijosUrl", formCostosFijosUrl);
     PropertiesService.getUserProperties().setProperty("formularioCostosFijosEditUrl", formularioCostosFijos.getEditUrl());
-    Logger.log(formularioCostosFijos.getEditUrl());
+    //Logger.log(formularioCostosFijos.getEditUrl());
 
-    Logger.log("Formulario de costos fijos creado con ID: " + formularioCostosFijos.getId());
+    //Logger.log("Formulario de costos fijos creado con ID: " + formularioCostosFijos.getId());
 
     return formularioCostosFijos;
 
@@ -128,7 +134,7 @@ function seccionPagoServicios(formulario) {
     const preguntasPagoServicios = [
       { tipo: "list", titulo: "Servicio", opciones: opcionesTipoServicio, requerido: true},      
       { tipo: "text", titulo: "Monto abonado", requerido: true},
-      { tipo: "list", titulo: "Proveedor", opciones: opcionesProveedores, requerido: true},
+      { tipo: "list", titulo: "Proveedor", opciones: opcionesProveedores},
       { tipo: "text", titulo: "Descripcion adicional"}
     ];
     preguntasPagoServicios.forEach(p => {
@@ -181,11 +187,11 @@ function seccionPagoImpuestos(formulario) {
     let nuevaSeccion = formulario.addPageBreakItem()
       .setTitle("Pago de impuestos")
    
-    let opcionesTipoImpuesto = ["Monotributo","Ingresos Brutos","IVA","Ganancias","Seguridad Social / Aportes Jubilatorios","Obra Social","ARBA / Rentas provinciales","Tasas municipales","Otros"];
+    let opcionesTipoImpuesto = ["Monotributo","Ingresos Brutos","Seguridad Social / Aportes Jubilatorios","Obra Social"," Rentas provinciales","Tasas municipales","Otros"];
 
     const TITULO_MONTO_IMPUESTO = "Monto impuesto abonado"
     const preguntasPagoImpuestos = [
-      { tipo: "list", titulo: "Impuesto", opciones: opcionesTipoImpuesto, requerido: true, textoAyuda: "Seleccione un impuesto a pagar" },      
+      { tipo: "list", titulo: "Impuesto", opciones: opcionesTipoImpuesto, requerido: true, textoAyuda: "Pagos obligatorios que se hacen  para contribuir al funcionamiento de los servicios públicos y al desarrollo de la comunidad" },      
       { tipo: "text", titulo: "Monto impuesto abonado", requerido: true, textoAyuda: "Ingrese el monto abonado por el impuesto" },
       { tipo: "text", titulo: "Descripcion adicional"}
     ];
@@ -229,10 +235,3 @@ function seccionPagoImpuestos(formulario) {
     return { nuevaSeccion: null };
   }
 }
-
-
-
-
-
-
-

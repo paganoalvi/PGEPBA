@@ -32,7 +32,7 @@ function proveedorCF (){
     const preguntasProveedorCF = [
       { tipo: "list", titulo: "Tipo de personeria", opciones: opcionesTipoPersona, requerido: true},
       { tipo: "text", titulo: "Nombre y apellido o Razon social", requerido: true},
-      { tipo: "text", titulo: "CUIT/CUIL/DNI", requerido: true,textoAyuda: "sin puntos, comas o guiones"},
+      { tipo: "text", titulo: "CUIT/CUIL/DNI",textoAyuda: "sin puntos, comas o guiones"},
       { tipo: "text", titulo: "Telefono", requerido: true},
       { tipo: "text", titulo: "Correo electronico"},
       { tipo: "text", titulo: "Descripcion adicional"},
@@ -85,7 +85,7 @@ function proveedorCF (){
     });
 
     const formProveedorCFUrl = formularioProveedorCF.getPublishedUrl();
-    Logger.log("Enlace a formulario: " + formProveedorCFUrl)
+    Logger.log("PROVEEDORES CF: " + formProveedorCFUrl)
     PropertiesService.getUserProperties().setProperty("formularioProveedorCFUrl", formProveedorCFUrl);
     PropertiesService.getUserProperties().setProperty("formularioProveedorCFEditUrl", formularioProveedorCF.getEditUrl());
     //Logger.log(formularioProveedor.getEditUrl());

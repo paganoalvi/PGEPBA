@@ -14,12 +14,14 @@ function produccion (){
       );
       const TITULO_CANTIDAD = "Cantidad"
       let opcionesProductos = [" "];
+      let opcionesUnidadProduccion = ["Unidad","Kg","Litros","Metros"]
 
       const preguntasProduccion = [
         {tipo: "list",titulo: "Producto",opciones: opcionesProductos,requerido: true},
         {tipo: "text",titulo: "Cantidad",requerido: true, textoAyuda: "Indique la cantidad de productos fabricados en este lote"},
-        {tipo: "text",titulo: "Lote",requerido: true, textoAyuda: "Indique codigo de lote"},
-        {tipo: "text",titulo: "Descripcion adicional"},
+        {tipo: "text",titulo: "Numero de Lote",requerido: true, textoAyuda: "Indique codigo de lote"},
+        {tipo:"list",titulo:"Unidad de produccion",opciones: opcionesUnidadProduccion},
+        {tipo: "text",titulo: "Descripcion adicional"}
       ]
 
       preguntasProduccion.forEach(p =>{
@@ -61,11 +63,14 @@ function produccion (){
     });
     
       const formProduccionUrl = formularioProduccion.getPublishedUrl();
-      Logger.log("Enlace a formulario: " + formProduccionUrl)
+      Logger.log("||||||||||||||||||")
+      Logger.log("PRODUCCION: ")
+      Logger.log(formProduccionUrl)
+      Logger.log("||||||||||||||||||")
       PropertiesService.getUserProperties().setProperty("formularioProduccionUrl", formProduccionUrl);
       PropertiesService.getUserProperties().setProperty("formularioProduccionEditUrl", formularioProduccion.getEditUrl());
-      Logger.log(formularioProduccion.getEditUrl());
-      Logger.log("Formulario de produccion creado con ID: " + formularioProduccion.getId());
+      //Logger.log(formularioProduccion.getEditUrl());
+      //Logger.log("Formulario de produccion creado con ID: " + formularioProduccion.getId());
  
       return formularioProduccion;
  
@@ -74,4 +79,3 @@ function produccion (){
       return null;
     }
   }
-

@@ -13,9 +13,13 @@ function ventas (){
       "Este formulario permite llevar registro de los lotes de productos que vendes, constituye los ingresos de plata a tu emprendimiento"
     );
 
-    const val = FormApp.createTextValidation()
+    const valCant = FormApp.createTextValidation()
       .requireNumber()
       .requireNumberGreaterThan(0)
+      .build();
+
+    const val = FormApp.createTextValidation()
+      .requireNumber()
       .build();
 
     let opcionesTipoComprobanteVentas = ["Factura 'A'", "Factura 'B'", "Factura 'C'","Factura E","Factura M","Nota de crédito","Sin comprobante"];
@@ -28,9 +32,9 @@ function ventas (){
       { tipo: "list", titulo: "Producto Terminado", opciones: opcionesProductosTerminados, requerido: true}, // pregunta nombre articulo terminado
       { tipo: "text", titulo: "Cantidad de productos vendidos", requerido: true},//VALIDACION NUMERICA
       { tipo: "text", titulo: "Precio de venta (con IVA)", requerido: true}, // VALIDACION NUMERICA
-      { tipo: "list", titulo: "Cliente", opciones: opcionesClientes, requerido: true}, // cambiar por formClienteUrl      
+      { tipo: "list", titulo: "Cliente", opciones: opcionesClientes},   
       { tipo: "date", titulo: "Fecha de venta", requerido: true},
-      { tipo: "list", titulo: "Tipo de comprobante", opciones: opcionesTipoComprobanteVentas, requerido: true},
+      { tipo: "list", titulo: "Tipo de comprobante", opciones: opcionesTipoComprobanteVentas},
       //{ tipo: "text", titulo: "Número de comprobante", textoAyuda: "Ingrese número de comprobante" }, // VALIDACION NUMERICA
     ];
     preguntasVentaProductos.forEach(p => {
@@ -46,7 +50,7 @@ function ventas (){
           pregunta = formularioVentas.addTextItem();
           //Validacion para la cantidad
           if (p.titulo === TITULO_CANTIDAD_PV) {
-            pregunta.setValidation(val);
+            pregunta.setValidation(valCant);
           }
           //Validacio para el precio de la venta
           if (p.titulo === PRECIO_VENTA_IVA) {
@@ -72,12 +76,15 @@ function ventas (){
     });
 
     const formVentasUrl = formularioVentas.getPublishedUrl();
-    Logger.log("Enlace a formulario: " + formVentasUrl)
+    Logger.log("||||||||||||||||||")
+    Logger.log("VENTAS: ")
+    Logger.log(formVentasUrl)
+    Logger.log("||||||||||||||||||")
     PropertiesService.getUserProperties().setProperty("formularioVentasUrl", formVentasUrl);
     PropertiesService.getUserProperties().setProperty("formularioVentasEditUrl", formularioVentas.getEditUrl());
-    Logger.log(formularioVentas.getEditUrl());
+    //Logger.log(formularioVentas.getEditUrl());
 
-    Logger.log("Formulario de ventas creado con ID: " + formularioVentas.getId());
+    //Logger.log("Formulario de ventas creado con ID: " + formularioVentas.getId());
 
     return formularioVentas;
 
