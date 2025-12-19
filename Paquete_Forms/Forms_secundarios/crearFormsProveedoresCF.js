@@ -88,9 +88,6 @@ function proveedorCF (){
     Logger.log("PROVEEDORES CF: " + formProveedorCFUrl)
     PropertiesService.getUserProperties().setProperty("formularioProveedorCFUrl", formProveedorCFUrl);
     PropertiesService.getUserProperties().setProperty("formularioProveedorCFEditUrl", formularioProveedorCF.getEditUrl());
-    //Logger.log(formularioProveedor.getEditUrl());
-  
-    //Logger.log("Formulario de compras creado con ID: " + formularioProveedor.getId());
 
     return formularioProveedorCF;
 

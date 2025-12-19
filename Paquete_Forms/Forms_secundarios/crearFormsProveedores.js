@@ -4,7 +4,6 @@
 function proveedor (){
     Logger.log("Iniciando creación del formulario de proveedor");
 
-
     let formularioProveedor = FormApp.create("Proveedor");
     let formularioProveedorID = formularioProveedor.getId();
     PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioProveedorID);
@@ -53,7 +52,7 @@ function proveedor (){
             if (p.titulo === TITULO_TELEFONO) {
               pregunta.setValidation(val);
             }
-            //Validación para correo electrónico
+            //Validación formato para correo electrónico
             if (p.titulo === TITULO_CORREO_ELECTRONICO) {
               pregunta.setValidation(valCE);
             }
@@ -81,9 +80,6 @@ function proveedor (){
     Logger.log("PROVEEDORES: " + formProveedorUrl)
     PropertiesService.getUserProperties().setProperty("formularioProveedorUrl", formProveedorUrl);
     PropertiesService.getUserProperties().setProperty("formularioProveedorEditUrl", formularioProveedor.getEditUrl());
-    //Logger.log(formularioProveedor.getEditUrl());
- 
-    //Logger.log("Formulario de compras creado con ID: " + formularioProveedor.getId());
 
     return formularioProveedor;
 

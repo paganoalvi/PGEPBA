@@ -62,8 +62,7 @@ function anadirNuevaMateriaPrima(event) {
         Swal.fire({
           icon: 'warning',
           title: 'Duplicado detectado en la hoja',
-          text: `La materia prima "${nuevaMp}" ya existe en la hoja.`,
-          confirmButtonText: 'Aceptar',
+          text: `El Insumo "${nuevaMp}" ya existe en la hoja.`,
           allowOutsideClick: false
         });
       }
@@ -80,7 +79,7 @@ function anadirNuevaMateriaPrima(event) {
       Swal.fire({
         icon: 'error',
         title: 'Error al agregar',
-        text: error.message || 'Ocurrió un error desconocido.',
+        text: 'Ocurrió un error desconocido.',
         confirmButtonText: 'Aceptar'
       });
 
@@ -118,7 +117,7 @@ function cargarMateriasPrimasEnSelects() {
   // Actualizar selects de materia prima
   selectsMateriaPrima.forEach(select => {
     if (select) {
-      select.innerHTML = '<option value="">--Seleccione una Materia Prima--</option>';
+      select.innerHTML = '<option value="">--Seleccione un Insumo--</option>';
       materiasPrimasDisponibles.forEach(mp => {
         const option = document.createElement("option");
         option.value = mp;
@@ -223,23 +222,6 @@ function eliminarMateriaPrimaSelec(event) {
   }
 
 
-//--- Guardar receta y refrescar lista ---//
-function enviarRecetaAlServidor(listaMateriasP, nombreR, comentarioR) {
-  google.script.run
-    .withSuccessHandler(function(exito) {
-      if (exito) {
-
-        cargarProductosDesdeSheets(); // refresca lista sin recargar página
-      } else {
-        alert("Error al guardar la receta");
-      }
-    })
-    .withFailureHandler(function(error) {
-      console.error(error);
-      alert("Error: " + error.message);
-    })
-    .guardarRecetaSheet(listaMateriasP, nombreR, comentarioR); // llamada a app script
-}
 
 // --- Eliminar receta y refrescar lista ---
 function eliminarRecetaPorNombre(event) {

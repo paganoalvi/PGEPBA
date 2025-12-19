@@ -82,9 +82,6 @@ function ventas (){
     Logger.log("||||||||||||||||||")
     PropertiesService.getUserProperties().setProperty("formularioVentasUrl", formVentasUrl);
     PropertiesService.getUserProperties().setProperty("formularioVentasEditUrl", formularioVentas.getEditUrl());
-    //Logger.log(formularioVentas.getEditUrl());
-
-    //Logger.log("Formulario de ventas creado con ID: " + formularioVentas.getId());
 
     return formularioVentas;
 

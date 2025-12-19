@@ -1,11 +1,11 @@
 function crearPaquete() {
-  // Crear carpetas principales
+  // Crear carpetas principales en el drive del usuario
   
   let folderPortal = DriveApp.createFolder("Portal Gestión");
   let folderResultados = folderPortal.createFolder("Resultados");
   let folderGestion = folderPortal.createFolder("Gestion");
 
-  // Crear los formularios
+  // Crear todos los formularios
   const formularios = [
     proveedorCF(),         // índice 0
     proveedor(),           // índice 1
@@ -52,17 +52,13 @@ function crearPaquete() {
   return folderPortal;
 }
 
-
 /////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////
+/////////////////CONECTAR RESPUESTAS DE FORMS CON HOJA DE RESPUESTAS/////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 function configurarHojas() {
   const propert = PropertiesService.getUserProperties();
   const sheet = SpreadsheetApp.openByUrl(propert.getProperty("HojaResultados"));
   
-
-
-
   let hojas = sheet.getSheets();
    
   hojas[0].setName("Articulo");
@@ -229,10 +225,9 @@ function configurarHojas() {
 }
 
 
-
 function tieneAcceso(id) {
   try {
-    SpreadsheetApp.openById(id); // si no tiene acceso, explota acá
+    SpreadsheetApp.openById(id); // si no tiene acceso, rompe aca
     return true;
   } catch (e) {
     return false;
@@ -243,29 +238,29 @@ function pintarHoja(){
   const sheet = SpreadsheetApp.openById(props.getProperty("HojaResultadosID"));
   const hojaStock = sheet.getSheetByName("Stock");
   const hojaRecetas = sheet.getSheetByName("Recetas");
-  // const titulos = ["Nombre prod. + Nombre mat. pr.", "Cant mp consumida", "Tipo Unidad", "Cant mp * rendimiento"];
-  // const guia = [...titulos, ...titulos];
-  // hojaRecetas.getRange(1, 3, 1, guia.length)
-  //   .setValues([guia])
-  //   .setWrap(true)
-  //   .setFontColor("white")
-  //   .setBackground("#873100");
-  // hojaRecetas.getRange(1,7,1,4).setBackground("#007013");
-  // hojaRecetas.getRange("A1:A3").setBackground("black").setFontColor("white");
-  // hojaRecetas.getRange("A3").setValue("NO MODIFICAR ESTOS VALORES").setWrap(true);
-  // hojaStock.getRange(1,2,1,9).setFontColor("white");
-  // hojaStock.getRange("A5").setValue("NO MODIFICAR ESTOS VALORES").setWrap(true);
-  // hojaStock.getRange("A1:A5").setBackground("black").setFontColor("white");
-  // hojaStock.getRange("B1:D100").applyRowBanding(SpreadsheetApp.BandingTheme.CYAN);
-  // hojaStock.getRange("E1:H100").applyRowBanding(SpreadsheetApp.BandingTheme.TEAL);
-  // hojaStock.getRange("J1:J100").applyRowBanding(SpreadsheetApp.BandingTheme.ORANGE);
+  const titulos = ["Nombre prod. + Nombre mat. pr.", "Cant mp consumida", "Tipo Unidad", "Cant mp * rendimiento"];
+  const guia = [...titulos, ...titulos];
+  hojaRecetas.getRange(1, 3, 1, guia.length)
+     .setValues([guia])
+     .setWrap(true)
+     .setFontColor("white")
+     .setBackground("#873100");
+  hojaRecetas.getRange(1,7,1,4).setBackground("#007013");
+  hojaRecetas.getRange("A1:A3").setBackground("black").setFontColor("white");
+  hojaRecetas.getRange("A3").setValue("NO MODIFICAR ESTOS VALORES").setWrap(true);
+  hojaStock.getRange(1,2,1,9).setFontColor("white");
+  hojaStock.getRange("A5").setValue("NO MODIFICAR ESTOS VALORES").setWrap(true);
+  hojaStock.getRange("A1:A5").setBackground("black").setFontColor("white");
+  hojaStock.getRange("B1:D100").applyRowBanding(SpreadsheetApp.BandingTheme.CYAN);
+  hojaStock.getRange("E1:H100").applyRowBanding(SpreadsheetApp.BandingTheme.TEAL);
+  hojaStock.getRange("J1:J100").applyRowBanding(SpreadsheetApp.BandingTheme.ORANGE);
   let cambio = true;
   for (let i = 3; i < 61; i += 4) {
     if(cambio){
       hojaRecetas.getRange(2,i,100,4).setFontWeight("bold").applyRowBanding(SpreadsheetApp.BandingTheme.BROWN);
       cambio = false;
     }else{
-      hojaRecetas.getRange(2,i,100,4).setFontColor("white").setFontWeight("bold").applyRowBanding(SpreadsheetApp.BandingTheme.TEAL);
+      hojaRecetas.getRange(2,i,100,4).setFontWeight("bold").applyRowBanding(SpreadsheetApp.BandingTheme.TEAL);
       cambio = true;
     }
   }
@@ -287,7 +282,6 @@ function pintarHoja(){
   const indicePreguntaProveedorCF = 9;
 
 
-
 function insertarPublishedUrlCompras(editForm,urlArticulo,urlProveedor){
   const formCompras = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty(editForm));
   let items = formCompras.getItems(); 
@@ -298,7 +292,6 @@ function insertarPublishedUrlCompras(editForm,urlArticulo,urlProveedor){
 
   items[indicePreguntaProveedorServ].setHelpText("Seleccione un proveedor para llevar registro o agreguelo con el siguiente enlace => " + urlProvee ); // seteo helpText de forms compras item proveedor con link a forms proveedor
 
-  // AGREGAR PROVEEDOR DE SERVICIOS EN COMPRAS?? SISI
 }
 
 function insertarPublishedUrlVentas(editForm,unCliente){
@@ -309,9 +302,9 @@ function insertarPublishedUrlVentas(editForm,unCliente){
   //items[14].setHelpText("Seleccione desde la casilla desplegable o agregue un CLIENTE con el siguiente enlace => " + urlClie); // seteo helpText de forms compras item articulo con link a forms articulo
 } 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-////// insertar url de forms secundarios ADMINISTRACION,COMERCIALIZACION,SERVICIO CF,SUELDOS,IMPUESTOS en forms primario COSTOS FIJOS///////
-/////////////////////////////////////////////////////////////////////////////////////////////// 
+////////////////////////////////////////////////
+////// insertar link a forms secundarios ///////
+////////////////////////////////////////////////
 function insertarPublishedUrlCostosFijos(editForm,unEmpleado,unProveedor){
 
   const formCostosfijos = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty(editForm));

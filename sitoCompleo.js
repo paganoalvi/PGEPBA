@@ -1,6 +1,6 @@
-//////////////////////////////////////////
-//COPIA DE SEGURIDAD PARA MODIFICAR !!!!!!!!!! 
-///////////////////////////////////
+///////////////////////////////////////
+///// Interfaz Principal /////////////          
+//////////////////////////////////////
 function doGet() {
 
   const props = PropertiesService.getUserProperties();
@@ -113,10 +113,3 @@ function limpiezaParaPagina(){
         carpeta.setTrashed(true); 
   }
 }
-
-
-
-
-
-
-

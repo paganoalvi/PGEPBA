@@ -35,7 +35,7 @@ function produccion (){
           break;
         case "text":
           pregunta = formularioProduccion.addTextItem();
-          //Validacion para la cantidad
+          //Validacion numerica para la cantidad
           if (p.titulo === TITULO_CANTIDAD) {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()
@@ -69,9 +69,7 @@ function produccion (){
       Logger.log("||||||||||||||||||")
       PropertiesService.getUserProperties().setProperty("formularioProduccionUrl", formProduccionUrl);
       PropertiesService.getUserProperties().setProperty("formularioProduccionEditUrl", formularioProduccion.getEditUrl());
-      //Logger.log(formularioProduccion.getEditUrl());
-      //Logger.log("Formulario de produccion creado con ID: " + formularioProduccion.getId());
- 
+
       return formularioProduccion;
  
     } catch (error) {

@@ -402,8 +402,3 @@ function pruebaQueEsDate(){
   Logger.log(typeof(nuevo));
 }
 
-
-
-
-
-

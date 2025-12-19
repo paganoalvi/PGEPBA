@@ -41,9 +41,6 @@ function costosFijos (){
     Logger.log("||||||||||||||||||")
     PropertiesService.getUserProperties().setProperty("formularioCostosFijosUrl", formCostosFijosUrl);
     PropertiesService.getUserProperties().setProperty("formularioCostosFijosEditUrl", formularioCostosFijos.getEditUrl());
-    //Logger.log(formularioCostosFijos.getEditUrl());
-
-    //Logger.log("Formulario de costos fijos creado con ID: " + formularioCostosFijos.getId());
 
     return formularioCostosFijos;
 
@@ -148,7 +145,7 @@ function seccionPagoServicios(formulario) {
           break;
         case "text":
           pregunta = formulario.addTextItem();
-          // Validación para MONTO DEL SUELDO (número decimal positivo)
+          // Validación numerica para MONTO DEL SUELDO (número decimal positivo)
           if (p.titulo === TITULO_MONTO_SERVICIO) {
             pregunta.setValidation(valNum);
           }

@@ -32,9 +32,7 @@ function articulo (){
       Logger.log("ARTICULO: " + formArticulosUrl)
       PropertiesService.getUserProperties().setProperty("formularioArticulosUrl", formArticulosUrl);
       PropertiesService.getUserProperties().setProperty("formularioArticulosEditUrl", formularioArticulos.getEditUrl());
-      //Logger.log(formularioArticulos.getEditUrl());
-      //Logger.log("Formulario de articulos creado con ID: " + formularioArticulos.getId());
- 
+
       return formularioArticulos;
  
     } catch (error) {
@@ -42,3 +40,4 @@ function articulo (){
       return null;
     }
   }
+

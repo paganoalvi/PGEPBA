@@ -41,9 +41,6 @@ function compras (){
     Logger.log("||||||||||||||||||")
     PropertiesService.getUserProperties().setProperty("formularioComprasUrl", formComprasUrl);
     PropertiesService.getUserProperties().setProperty("formularioComprasEditUrl", formularioCompras.getEditUrl());
-    //Logger.log(formularioCompras.getEditUrl());
-
-    //Logger.log("Formulario de compras creado con ID: " + formularioCompras.getId());
 
     return formularioCompras;
 
@@ -78,7 +75,6 @@ function seccionCompraMP(formulario) {
       { tipo: "text", titulo: "Precio de compra(con IVA)", requerido: true}, // VALIDACION NUMERIC
       { tipo: "list", titulo: "Proveedor", opciones: opcionesProveedor}, // 
       { tipo: "list", titulo: "Tipo de comprobante", opciones: opcionesTipoComprobanteCompras},
-      //{ tipo: "text", titulo: "Número de comprobante", textoAyuda: "Ingrese número de comprobante" }, // VALIDACION NUMERICA
     ];
     preguntasCompraMP.forEach(p => {
       let pregunta;
@@ -91,7 +87,7 @@ function seccionCompraMP(formulario) {
           break;
         case "text":
           pregunta = formulario.addTextItem();
-          //Validacion para la cantidad
+          //Validacion numerica para la cantidad
           if (p.titulo === TITULO_CANTIDAD) {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()
@@ -99,7 +95,7 @@ function seccionCompraMP(formulario) {
               .build();
             pregunta.setValidation(val);
           }
-          //Validacio para el precio de la venta
+          //Validacio numerica para el precio de la venta
           if (p.titulo === PECIO_COMPRA_IVA) {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()
@@ -133,14 +129,11 @@ function seccionCompraMP(formulario) {
   }
 }
 
-
 /////////////////////////////////////////////////////////
 // SECCIÓN COMPRA ARTICULOS   ////////////////////////
 /////////////////////////////////////////////////////////
-
 function seccionCompraArticulos(formulario) {
   try {
-
 
     let nuevaSeccion = formulario.addPageBreakItem()
       .setTitle("Herramientas o Maquinaria")
@@ -155,8 +148,6 @@ function seccionCompraArticulos(formulario) {
       { tipo: "text", titulo: "Cantidad", requerido: true},//VALIDACION NUMERICA
       { tipo: "text", titulo: "Precio de compra (con IVA)"}, // VALIDACION NUMERICA
       { tipo: "list", titulo: "Tipo de comprobante", opciones: opcionesTipoComprobanteVentas}, // ARCHIVO PDF?
-      //{ tipo: "text", titulo: "Número de comprobante", requerido: true, textoAyuda: "Ingrese número de comprobante" }, // VALIDACION NUMERICA
-
     ];
     preguntasCompraArticulo.forEach(p => {
       let pregunta;
@@ -169,7 +160,7 @@ function seccionCompraArticulos(formulario) {
           break;
         case "text":
           pregunta = formulario.addTextItem();
-          //Validacion precio venta
+          //Validacion numerica precio venta
           if (p.titulo === PRECIO_Compra_Articulo) {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()
@@ -203,14 +194,12 @@ function seccionCompraArticulos(formulario) {
   }
 }
 
-
 /////////////////////////////////////////////////////////
 // SECCIÓN COMPRA SERVICIOS   ////////////////////////
 /////////////////////////////////////////////////////////
 
 function seccionCompraServicios(formulario) {
   try {
-
 
     let nuevaSeccion = formulario.addPageBreakItem()
       .setTitle("Servicio")
@@ -226,8 +215,6 @@ function seccionCompraServicios(formulario) {
       { tipo: "text", titulo: "Precio de compra (con IVA)", requerido: true,}, // VALIDACION NUMERICA
       { tipo: "list", titulo: "Proveedor", opciones: opcionesProveed},
       { tipo: "list", titulo: "Tipo de comprobante", opciones: opcionesTiposComprobante,},
-      //{ tipo: "text", titulo: "Número de comprobante", requerido: true, textoAyuda: "Ingrese número de comprobante" }, // VALIDACION NUMERICA
-
     ];
     preguntasCompraServicios.forEach(p => {
       let pregunta;
@@ -240,7 +227,7 @@ function seccionCompraServicios(formulario) {
           break;
         case "text":
           pregunta = formulario.addTextItem();
-          //Validacion precio venta
+          //Validacion numerica precio venta
           if (p.titulo === PRECIO_Compra_Servicio) {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()

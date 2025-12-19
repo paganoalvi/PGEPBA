@@ -222,17 +222,18 @@
                 </button>
                 <div id="balance_div"></div>
               </section>
-
+              <div>
+                <p>Ventas y compras totales por periodo seleccionado:</p>
+                <div id="comprasVentasTotales_div"></div>
+              </div>
+              <p>$ Ventas: <span style="color: green; font-weight:bold;" id="tVentas"></span></p>
+              <p>$ Gastos: <span style="color: red; font-weight:bold;" id="tGastos"></span></p>
               <button onclick="mostrarIndicador()">
                 Mostrar producto mas vendido
               </button>
               <div>
                 <p>Producto más vendido:</p>
-                <div id="productoMax_div"></div>
-              </div>
-              <div>
-                <p>Ventas y compras totales historicas o por periodo seleccionado:</p>
-                <div id="comprasVentasTotales_div"></div>
+                <p id="productoMax_div" style="color: blue"></p>
               </div>
             </section>
 
@@ -336,19 +337,19 @@
                     <label for="inputNuevaMateriaPrima">Actualizá listas desplegables:</label>
                     <input type="text" id="inputNuevaMateriaPrima" name="materiaPrima"/>
                   </p>
-                  <button id="agg" type="button" onclick="anadirNuevaMateriaPrima(event)"> + Añadir Materia Prima a la lista</button>
+                  <button id="agg" type="button" onclick="anadirNuevaMateriaPrima(event)"> + Añadir Insumo a la lista</button>
               </section>
             </div>
             <div class="BotonesAggSuprMateria">
-              <button id="agg" type="button" onclick="agregarElemento('clonMaterias')"> + Añadir Materia Prima a la receta</button>
-              <button id="supr" type="button" onclick="eliminarElemento('clonMaterias')"> - Quitar Materia Prima de la receta</button>
+              <button id="agg" type="button" onclick="agregarElemento('clonMaterias')"> + Añadir Insumo a la receta</button>
+              <button id="supr" type="button" onclick="eliminarElemento('clonMaterias')"> - Quitar Insumo de la receta</button>
             </div>
 
             <fieldset id="contenedorElementos">
               <p class="element">
-                <label for="materiaPrima">Lista de Materias Primas:</label>
+                <label for="materiaPrima">Listado de Insumos:</label>
                 <select name="materiaPrima[]" id="materiaPrima" required>
-                  <option value="">--Seleccioná una Materia Prima--</option>
+                  <option value="">--Seleccioná un Insumo--</option>
                 </select>
               </p>
               <p class="cant">
@@ -365,6 +366,7 @@
                   <option value="gramos">Gramos</option>
                   <option value="kilogramo">Kg</option>
                   <option value="metro">Metros</option>
+                  <option value="metro cuadrado">Metros²</option>
                 </select>
               </p>
             </fieldset>
@@ -378,15 +380,15 @@
 
         <div class="containerCard-CreaProducto">
           <section class="borrar-MateriaPrima card">
-            <h2>Eliminar Materia Prima</h2>
+            <h2>Eliminar Insumo</h2>
             <p class="suprMateriaPrima">
-              <label for="eliminarMateriaPrima">Materia Prima a eliminar:</label>
+              <label for="eliminarMateriaPrima">Insumo a eliminar:</label>
               <select id="eliminarMateriaPrima" name="materiaPrima" required>
-                <option value="">--Seleccione Materia Prima--</option>
+                <option value="">--Seleccione Insumo--</option>
               </select>
             </p>
             <button id="supr" type="button" onclick="eliminarMateriaPrimaSelec(event)">
-              Eliminar Materia Prima
+              Eliminar Insumo
             </button>
           </section>
           <section class="borrar-Receta card">

@@ -4,9 +4,10 @@
     //visualizar estos datos.
       
 
-    //////////////////////////////////////////////////////////////
-    // EVENTO PARA OCULTAR Y MOSTRAR LAS PAGINAS CORRESPONDIENTES
-    //////////////////////////////////////////////////////////////
+    
+    /* EVENTO PARA OCULTAR Y MOSTRAR LAS PAGINAS CORRESPONDIENTES */
+    
+    
     function mostrarPagina(id, navegador) {
       document.startViewTransition(() => {
         // Ocultar todos los divs(páginas) de contenido
@@ -27,19 +28,39 @@
     /////////////////////////////////////////////////////
     function repetirCompras(){
       google.script.run.envioRespuestasCompras()
-      alert("Formulario ventas Repetido con exito")
+      Swal.fire({
+        icon: 'success',
+        title: 'Formulario compras',
+        text: 'Repetido con éxito',
+        confirmButtonText: 'Aceptar'
+      });
     }
     function repetirVentas(){
       google.script.run.envioRespuestasVentas()
-      alert("Formulario ventas Repetido con exito")
+      Swal.fire({
+        icon: 'success',
+        title: 'Formulario ventas',
+        text: 'Repetido con éxito',
+        confirmButtonText: 'Aceptar'
+      });
     }
     function repetirProduccion(){
       google.script.run.envioRespuestasProduccion()
-      alert("Formulario ventas Repetido con exito")
+      Swal.fire({
+        icon: 'success',
+        title: 'Formulario producción',
+        text: 'Repetido con éxito',
+        confirmButtonText: 'Aceptar'
+      });
     }
     function repetirCostoFijo(){
       google.script.run.envioRespuestasCostoFijo()
-      alert("Formulario ventas Repetido con exito")
+      Swal.fire({
+        icon: 'success',
+        title: 'Formulario costo fijo',
+        text: 'Repetido con éxito',
+        confirmButtonText: 'Aceptar'
+      });
     }   
 
     
@@ -138,7 +159,12 @@
         }
         mostrarAlertaTemporal("Por favor espere - guardando form", 7000);
       }else{
-        alert("Porfavor seleccione un boton donde guardarlo");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Atención',
+          text: 'Por favor seleccione un botón donde guardarlo',
+          confirmButtonText: 'Aceptar'
+        });
       }
     }
 
@@ -161,8 +187,9 @@
       const valorBalance = ventas - compras;
       const visualizacionDiv = document.getElementById("balance_div");
       const balanceFormateado = formatearNumero(valorBalance);
+      console.log("BALANCE"+balanceFormateado);
       if (balanceFormateado >= 0) {
-        visualizacionDiv.innerHTLM = `BALANCE :: <span style="color: green; font-weight: bold;">$${balanceFormateado}</span>`;
+        visualizacionDiv.innerHTML = `BALANCE :: <span style="color: green; font-weight: bold;">$${balanceFormateado}</span>`;
       } else {
         visualizacionDiv.innerHTML = `BALANCE :: <span style="color: red; font-weight: bold;">$${balanceFormateado}</span>`;
       }
@@ -282,7 +309,12 @@
       
 
       if (!nombreProducto) {
-        alert("Por favor ingrese el nombre del producto.");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Atención',
+          text: 'Por favor ingrese el nombre del producto.',
+          confirmButtonText: 'Aceptar'
+        });
         return;
       }
 
@@ -318,16 +350,21 @@
               cargarMateriasPrimasEnSelects(); // llamado a app script
             }
           } else {
-            alert("No se pudo guardar la receta (tal vez ya existe).");
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al guardar la receta',
+              text: 'Tal vez ya existe',
+              confirmButtonText: 'Aceptar'
+            });
           }
         })
         .withFailureHandler(function(error) {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = submitBtn.dataset.orig || "Enviar";
-          }
-          console.error("Error guardando receta:", error);
-          alert("Error al guardar la receta: " + (error.message || error));
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = submitBtn.dataset.orig || "Enviar";
+            }
+            console.error("Error guardando receta:", error);
+            alert("Error al guardar la receta: " + (error.message || error));
         })
         .guardarRecetaSheet(receta, nombreProducto, datoDivisor); // llamado a app script
     });

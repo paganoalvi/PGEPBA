@@ -1,5 +1,5 @@
 <style>
-    /* ==== GLOBAL / RESET ==== Estilos globales ==== */
+    //* ==== GLOBAL / RESET ==== Estilos globales ====*//
     * {
       box-sizing: border-box;
     }
@@ -7,18 +7,17 @@
       margin: 0;
       padding: 0;
       font-family: "Quicksand", "sans-serif";
-      /* background-image:url('https://i.imgur.com/3UCTpEZ.jpeg'); */
-      /* background-size: 100% 100%; */
-      /* background-repeat: no-repeat; */
-      /* background-attachment: fixed; */
-      /* background-position: center; */
+      //background-image:url('https://i.imgur.com/3UCTpEZ.jpeg');
+      //background-size: 100% 100%;
+      //background-repeat: no-repeat;
+      //background-attachment: fixed;
+      //background-position: center;
       scrollbar-gutter: auto;
       background-color: white;
     }  
-
-  /* ============================= */
-  /* ==== NAVBAR / ENCABEZADO ==== */
-  /* ============================= */  
+  //*///////////////////////////////*//
+  //* ==== NAVBAR / ENCABEZADO ==== *//
+  //*///////////////////////////////*//  
     nav {
         position: fixed;
         top: 5px; 
@@ -78,6 +77,7 @@
           position: absolute;
           left: 0;
           margin-left: 10px;
+
       }
       .activo{
         background-color: #05b7b3;
@@ -97,17 +97,18 @@
       }
     }
     
-  /* ============================ */
-  /* ==== CUERPO PRINCIPAL ====  */
-  /* ============================ */
+  //*////////////////////////////*//
+  //* ==== CUERPO PRINCIPAL ==== *//
+  //*////////////////////////////*//
 
-    /* --------- Paginas --------- */
+    //--------------------------------//
+    //*************Paginas************//
 
-    /* Ocultar Pagina */
+    //Ocultar Pagina//
     .contenido {
       display: none;     
     }
-    /* Mostrar Pagina */
+    //Mostrar Pagina//
     .visible {
       display: block;
       position: relative;
@@ -115,7 +116,7 @@
       height: auto;
       view-transition-name: visible;
     }
-    /* Animar Pagina */
+    //Animar Pagina//
         ::view-transition-old(visible){
           animation: fadeOut 1s forwards;
         }
@@ -147,14 +148,15 @@
       padding-top: 20px;
     }
 
-    /* Tarjetas y componentes */
+    //--------------------------------//
+    //*****Tarjetas y componentes*****//
     h2{
       text-align:center;
       margin-block-start: 0;
       margin-block-end: 20px;
       color: #333333;
     }
-    /* Generales */
+    //Generales
     .card {
       display: flex;
       flex-flow: column nowrap;
@@ -175,7 +177,7 @@
       marigin: 0 auto;
     }
 
-    /* --- de Pagina Gestion --- */
+    // --- de Pagina Gestion ---//
     .containerCards-Gestion{
       height: 100%;
       max-width: 1200px;
@@ -247,6 +249,7 @@
       .icon {
         display: inline-block;
         transition: transform 0.3s ease;
+
         vertical-align: middle;
         padding-bottom: 3px;
       }
@@ -355,7 +358,6 @@
       }
         .opction-configuration button:nth-child(1) { animation-delay: 0.1s; }
         .opction-configuration button:nth-child(2) { animation-delay: 0.2s; }
-
       /* Keyframes */
       @keyframes fadeInUp {
         to {
@@ -364,7 +366,7 @@
         }
       }
 
-        /* °°° Cuadro del modal °°° */
+        //°°° Cuadro del modal °°°//
         .modal {
           background: #fff;
           padding: 20px;
@@ -391,9 +393,8 @@
           align-items: center;
           z-index: 1000;
         }
-
     /* --- de Pagina Resultado --- */
-      /* 1°Tabla (Compras, ventas, stock, etc) */
+      //1°Tabla (Compras, ventas, stock, ect)
     .containerCards-Resultados1{
       grid-template-columns: repeat(4, 1fr);
       gap: 5px;
@@ -448,7 +449,7 @@
     max-height: 215px;   
     overflow: auto;       
   }
-  /* 2°Tabla (Punto de equilibrio, tabla de indicadores, etc) */
+  //2°Tabla (Punto de equilibrio, tabla de indicadores, etc)
     .containerCards-Resultados2{
       display: flex;
       flex-flow: column nowrap;
@@ -469,7 +470,7 @@
       max-height: 215px;
       overflow: auto;
     }
-  /* 3°Tabla (Iconos de redireccionamiento al excel) */
+  //2°Table (Iconos de redireccinamiento al excel)
     .containerCards-Resultados3{
       display: flex;
       width: 100%; 
@@ -488,7 +489,6 @@
       .containerCards-Resultados3 section:nth-child(4) img{
         transform-origin: bottom right;
       }
-
     /* --- de Pagina Crear tu Producto --- */
     form{
       display: flex;
@@ -588,7 +588,7 @@
         width: 100%;
       }
       .element select, .cant input, unit select{
-       width: 100%;
+        width: 100%;
       }
         
       .botonEnviar {
@@ -675,8 +675,7 @@
     }
     .banner img{
       width: 100%;
-      border: 1.5px solid #c824bb;
-      box-shadow: 0 0 10px #c44384;
+      border: 1.5px;
       border-radius: 20px;
     }
   

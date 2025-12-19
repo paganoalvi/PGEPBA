@@ -72,14 +72,8 @@ function cliente (){
     Logger.log("CLIENTES: " + formClientesUrl)
     PropertiesService.getUserProperties().setProperty("formularioClientesUrl", formClientesUrl);
     PropertiesService.getUserProperties().setProperty("formularioClientesEditUrl", formularioClientes.getEditUrl());
-    //Logger.log(formularioClientes.getEditUrl());
-
-
-    //Logger.log("Formulario de clientes creado con ID: " + formularioClientes.getId());
-
 
     return formularioClientes;
-
 
   } catch (error) {
     console.error("Error al crear el formulario de clientes:", error.message);

@@ -94,21 +94,8 @@
 
       chart = new google.visualization.ColumnChart(document.getElementById('comprasChart_div'));
       chart.draw(dataTable, options);
-      const muestraIndicadores = document.getElementById("comprasVentasTotales_div");
-      let textoActual = muestraIndicadores.textContent;
-      const regexCompras = /\s*\|\s*Gastos totales:.*$/;
-      ///////////
-      if (regexCompras.test(textoActual)) {
-        textoActual = textoActual.replace(
-          regexCompras,
-          ` | Gastos totales: <span style="color: red; font-weight: bold;">$${formatearNumero(montoTotal)}</span>`
-        );
-      } else {
-        textoActual += ` | Gastos totales: <span style="color: red; font-weight: bold;">$${formatearNumero(montoTotal)}</span>`;
-        
-      }
-      //////
-      muestraIndicadores.innerHTML = textoActual;
+      const muestraIndicadores = document.getElementById("tGastos");
+      muestraIndicadores.textContent =` $${formatearNumero(montoTotal)}`
       return montoTotal;
     }
     ////FUNCION FORMATEAR NUMERO PARA MOSTRARLO CON SIGNO PESOS,PUNTOS Y COMAS////
@@ -188,21 +175,8 @@
 
         const chart = new google.visualization.ColumnChart(chartDiv);
         chart.draw(data, options);
-        const muestraIndicadores = document.getElementById("comprasVentasTotales_div");
-        let textoActual = muestraIndicadores.textContent;
-        const regexVentas = /\s*\|\s*Total de dinero por Ventas:.*$/;
-        ////////
-        if (regexVentas.test(textoActual)) {
-          textoActual = textoActual.replace(
-            regexVentas,
-            ` | Total de dinero por Ventas: <span style="color: green; font-weight: bold;">$${formatearNumero(montoTotal)}</span>`
-          );
-        } else {
-          textoActual += ` | Total de dinero por Ventas: <span style="color: green; font-weight: bold;">$${formatearNumero(montoTotal)}</span>`;
-          
-        }
-        /////////
-        muestraIndicadores.innerHTML = textoActual;
+        const muestraIndicadores = document.getElementById("tVentas");
+        muestraIndicadores.textContent = `$${formatearNumero(montoTotal)}`
         return montoTotal;
       }
 
@@ -329,7 +303,12 @@
           fetchSheetData('Stock', "SELECT E"),
           fetchSheetData('Stock', "SELECT G")
         ]);
-        alert("No hay fechas seleccionadas, se mostrará un historico")
+        Swal.fire({
+          icon: 'info',
+          title: 'Atención',
+          text: 'No hay fechas seleccionadas, se mostrará un histórico',
+          confirmButtonText: 'Aceptar'
+        });
         }else{
           let finDate = new Date(fechaFin);
           finDate.setDate(finDate.getDate() + 1);
@@ -480,7 +459,7 @@
               maximos.nombreMax = nombre;
             }
         }
-        divDispuesto.textContent = `El producto ${maximos.nombreMax} fue el mas vendido, se vendieron: ${maximos.montoMax}`
+        divDispuesto.textContent = `${maximos.nombreMax} vendio: ${maximos.montoMax} Unidades`
       }
 
   //Grafico de Punto de Equilibrio//
@@ -679,7 +658,7 @@
             fractionDigits: 2
         });
         percentFormatter.format(dataTable, 4); // M ya en base 100
-        percentFormatter.format(dataTable, 5); // N ya en base 100
+        currencyFormatter.format(dataTable, 5); // N ya en base 100
 
         // Renderizar tabla
         const chartDiv = document.getElementById('precioUnitarioChart_div');
@@ -699,7 +678,12 @@
 
     } catch (error) {
         console.error('Error al generar la tabla:', error);
-        alert('Ocurrió un error al generar la tabla. Por favor recarga la página.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al generar la tabla',
+          text: 'Ocurrió un error al generar la tabla. Por favor recarga la página.',
+          confirmButtonText: 'Aceptar'
+        });
     }
   }
     
