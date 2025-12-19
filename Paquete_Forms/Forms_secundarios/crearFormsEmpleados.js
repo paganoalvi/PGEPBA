@@ -10,6 +10,7 @@ function empleado (){
     let formularioEmpleadosID = formularioEmpleados.getId();
     PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioEmpleadosID);
 
+    formularioEmpleados.setDescription("Este formulario permite llevar registro de las personas que llevan adelante el servicio (empleados, contratados, titulares, etc.) y las horas trabajadas.");
 
     const val = FormApp.createTextValidation()
             .requireWholeNumber()
@@ -19,25 +20,21 @@ function empleado (){
     const val_correo = FormApp.createTextValidation()
             .requireTextIsEmail()
             .build();
-           
-    formularioEmpleados.setDescription(
-      "Este formulario permite llevar registro de los empleados de tu emprendimiento"
-    );
 
-  let opcionesCargo = ["administrativo","contabilidad","ventas","producción","logística","compras","marketing","atención al cliente","sistemas","diseño gráfico","recursos humanos","calidad","legal","finanzas","gerente general","asistente","supervisor","operario","desarrollador","comercial","otro"];
-  let opcionesContratacion = ["Relacion de dependencia","Monotributista","Otras"];
+  let opcionesCargo = ["Administrativo","Contabilidad","Ventas","Producción","Logística","Compras","Marketing","Atención al cliente","Sistemas","Diseño gráfico","Recursos humanos","Calidad","Legal","Finanzas","Gerente general","Asistente","Supervisor","Operario","Desarrollador","Comercial","Otro"];
+  let opcionesContratacion = ["Relación de dependencia","Monotributista","Otro"];
   let opcionesTiempoJornada = ["Tiempo completo","Medio tiempo","Periodo de prueba","Eventual","Por temporada","Otro"];
 
   const preguntasEmpleados =  [
-      {tipo: "text",titulo: "Nombre Completo y Apellido",requerido: true},
-      {tipo: "text",titulo: "CUIT/CUIL/DNI",requerido: true, textoAyuda:"sin puntos, coma o guiones"}, // VALIDACION SOLO NUMEROS
-      {tipo: "date",titulo: "Fecha de ingreso",requerido: true},
-      {tipo: "text",titulo: "telefono",requerido: true},   
+      {tipo: "text",titulo: "Nombre y apellido",requerido: true},
+      {tipo: "text",titulo: "CUIT/CUIL/DNI",requerido: true, textoAyuda:"sin puntos, comas o guiones."}, // VALIDACION SOLO NUMEROS
+      {tipo: "date",titulo: "Fecha de ingreso",requerido: true,textoAyuda:"Fecha en la que comenzó a trabajar en el emprendimiento."},
+      {tipo: "text",titulo: "Teléfono",requerido: true},   
       {tipo: "text",titulo: "Domicilio",requerido: true},      
       {tipo: "text",titulo: "Contacto de emergencia"},
       {tipo: "list",titulo: "Cargo/rol",opciones : opcionesCargo,requerido: true},
-      {tipo: "list",titulo: "Condicion de contratacion",opciones: opcionesContratacion,requerido: true},
-      {tipo: "list",titulo: "Tiempo de jornada",opciones: opcionesTiempoJornada}
+      {tipo: "list",titulo: "Condición de contratación",opciones: opcionesContratacion,requerido: true},
+      {tipo: "list",titulo: "Tipo de jornada",opciones: opcionesTiempoJornada}
     ]
 
     preguntasEmpleados.forEach(p =>{
@@ -80,7 +77,7 @@ function empleado (){
     const formEmpleadosUrl = formularioEmpleados.getPublishedUrl();
     Logger.log("EMPLEADO " + formEmpleadosUrl)
     PropertiesService.getUserProperties().setProperty("formularioEmpleadosUrl", formEmpleadosUrl);
-    PropertiesService.getUserProperties().setProperty("formularioProveedoresEditUrl", formularioEmpleados.getEditUrl());
+    PropertiesService.getUserProperties().setProperty("formularioEmpleadosEditUrl", formularioEmpleados.getEditUrl());
     //Logger.log(formularioEmpleados.getEditUrl());
 
 

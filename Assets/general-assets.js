@@ -1,23 +1,4 @@
 
-
-///////////////////////////////////////////////////
-//PARA LA LISTA DESPLEGABLE DE LOS FORMS////////
-/////////////////////////////////////////////////
-
-function obtenerItemsFormulario(bAddId) {
-    const datosForm = seleccionDatosForm(bAddId); 
-    var form = FormApp.openByUrl(datosForm[0]);
-    var items = form.getItems(FormApp.ItemType.LIST); // Obtener todas las listas desplegables del formulario
-
-    for (var i = 0; i < items.length; i++) {
-        var lista = items[i].asListItem();
-        if (lista.getTitle() === datosForm[1]) { 
-            return lista.getChoices().map(choice => choice.getValue()); 
-        }
-    }
-    return []; 
-}
-
 ///////////////////////////////////////////////////////////////
 ////LIMPIAR PROPIEDADES Y TRIGGERS/////////////////////////////
 ///////////////////////////////////////////////////////////////
@@ -36,10 +17,12 @@ function limpiarTriggers() {
   }
 }
 
-///////////////////////////////////////////////////////
-/////////// MOSTRAR PROPERTIES ////////////////////////
+
+/////////////////////////////////////////////////////////////
+//MOSTRAR PROPERTIES////////////////////////
 ///////////////////////////////////////////////////////
 function mostrarTodasLasPropiedades() {
+  // Puedes cambiar esto a .getScriptProperties() o .getUserProperties() si lo necesitas
   var properties = PropertiesService.getUserProperties(); 
   var allProps = properties.getProperties();
   
@@ -77,4 +60,13 @@ function pruebaProtectedHojas(){
   // Creamos la protección pero solo con aviso
   const protection = rango.protect().setDescription("Aviso: No modifiques esta celda");
   protection.setWarningOnly(true);
+}
+
+function validacionNumeroEnteroMayorACero(preguntaTexto){
+  const validacion = FormApp.createTextValidation()
+    .requireNumber()
+    .requireNumberGreaterThan(0)
+    .build();
+  
+  return preguntaTexto.setValidation(validacion);
 }

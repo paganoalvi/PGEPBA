@@ -1,4 +1,4 @@
- /////////////////////////////////////////
+/////////////////////////////////////////
 // FUNCIÓN PRINCIPAL: Crear el Form COMPRAS   //
 ////////////////////////////////////////
 function compras (){
@@ -9,15 +9,16 @@ function compras (){
     let formularioComprasID = formularioCompras.getId();
     PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioComprasID);
 
-    formularioCompras.setDescription("Completa este formulario con todos los egresos de dinero que no constituyen gastos fijos");
+    formularioCompras.setDescription("Registrá todas las compras realizadas para la prestación del servicio, pueden ser insumos, herramientas u otro servicio.");
 
     formularioCompras.addDateItem()
-      .setTitle("Elegí la fecha de la compra")
-      .setRequired(true);
+      .setTitle("Fecha de la compra")
+      .setRequired(true)
+      .setHelpText("Indicá el día en que se realizó la compra.");
 
 
     let preguntaInicial = formularioCompras.addMultipleChoiceItem()
-      .setTitle("Elija el tipo de compra que va a registrar")
+      .setTitle("Indicá el tipo de compra que vas a registrar")
       .setRequired(true);
    
     const seccionMP = seccionCompraMP(formularioCompras).nuevaSeccion;
@@ -25,9 +26,9 @@ function compras (){
     const seccionServicios = seccionCompraServicios(formularioCompras).nuevaSeccion;
 
     preguntaInicial.setChoices([
-      preguntaInicial.createChoice("Materias Primas o Insumos", seccionMP),
-      preguntaInicial.createChoice("Herramientas o Maquinaria", seccionArticulos),
-      preguntaInicial.createChoice("Servicios", seccionServicios),
+      preguntaInicial.createChoice("Insumo", seccionMP),
+      preguntaInicial.createChoice("Herramientas/maquinaria", seccionArticulos),
+      preguntaInicial.createChoice("Servicio", seccionServicios),
     ]);
 
     seccionMP.setGoToPage(FormApp.PageNavigationType.SUBMIT);
@@ -41,6 +42,9 @@ function compras (){
     Logger.log("||||||||||||||||||")
     PropertiesService.getUserProperties().setProperty("formularioComprasUrl", formComprasUrl);
     PropertiesService.getUserProperties().setProperty("formularioComprasEditUrl", formularioCompras.getEditUrl());
+    //Logger.log(formularioCompras.getEditUrl());
+
+    //Logger.log("Formulario de compras creado con ID: " + formularioCompras.getId());
 
     return formularioCompras;
 
@@ -51,30 +55,30 @@ function compras (){
 }
 
 /////////////////////////////////////////////////////////
-// SECCIÓN COMPRA MATERIAS PRIMAS   ////////////////////////
+// SECCIÓN COMPRA INSUMO ////////////////////////////////
 /////////////////////////////////////////////////////////
-let opcionesTipoComprobanteCompras = ["Factura 'A'", "Factura 'B'", "Factura 'C'","Factura E","Factura M","Nota de crédito","Sin comprobante"];
+let opcionesTipoComprobanteCompras = ["Factura 'A'", "Factura 'B'", "Factura 'C'","Factura 'E'","Factura 'M'","Nota de crédito","Sin comprobante"];
 function seccionCompraMP(formulario) {
   try {
 
     let nuevaSeccion = formulario.addPageBreakItem()
-      .setTitle("Materias primas o insumos")
-      .setHelpText("Ingrese los detalles de la compra de materias primas.");
+      .setTitle("Registro de compra de insumos")
 
     let opcionesProveedor = [" "]
     let opcionesMP = [" "]
     let opcionesUnidadCompra  = ["Unidad","Kg","Litros","Metros"]
-    const TITULO_CANTIDAD = "Cantidad comprada"
-    const PECIO_COMPRA_IVA = "Precio de compra(con IVA)"
+    const TITULO_CANTIDAD = "Cantidad adquirida"
+    const PECIO_COMPRA_IVA = "Precio de compra (con IVA)"
 
     const preguntasCompraMP = [
      
-      { tipo: "list", titulo: "Materia Prima", opciones: opcionesMP, requerido: true}, //  
-      { tipo: "text", titulo: "Cantidad comprada", requerido: true,},//VALIDACION NUMERICA
-      { tipo: "list", titulo: "Unidad de compra", opciones: opcionesUnidadCompra, requerido: true, textoAyuda : "Seleccione la unidad de compra"}, //
-      { tipo: "text", titulo: "Precio de compra(con IVA)", requerido: true}, // VALIDACION NUMERIC
+      { tipo: "list", titulo: "Insumo adquirido", opciones: opcionesMP, requerido: true}, //  
+      { tipo: "text", titulo: TITULO_CANTIDAD, requerido: true,textoAyuda:"Indicá cuántas unidades o medidas del insumo se compraron."},//VALIDACION NUMERICA
+      { tipo: "list", titulo: "Unidad de compra", opciones: opcionesUnidadCompra, requerido: true, textoAyuda : "Seleccioná la unidad de compra."}, //
+      { tipo: "text", titulo: PECIO_COMPRA_IVA, requerido: true}, // VALIDACION NUMERIC
       { tipo: "list", titulo: "Proveedor", opciones: opcionesProveedor}, // 
       { tipo: "list", titulo: "Tipo de comprobante", opciones: opcionesTipoComprobanteCompras},
+      //{ tipo: "text", titulo: "Número de comprobante", textoAyuda: "Ingrese número de comprobante" }, // VALIDACION NUMERICA
     ];
     preguntasCompraMP.forEach(p => {
       let pregunta;
@@ -87,7 +91,7 @@ function seccionCompraMP(formulario) {
           break;
         case "text":
           pregunta = formulario.addTextItem();
-          //Validacion numerica para la cantidad
+          //Validacion para la cantidad
           if (p.titulo === TITULO_CANTIDAD) {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()
@@ -95,7 +99,7 @@ function seccionCompraMP(formulario) {
               .build();
             pregunta.setValidation(val);
           }
-          //Validacio numerica para el precio de la venta
+          //Validacio para el precio de la venta
           if (p.titulo === PECIO_COMPRA_IVA) {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()
@@ -129,25 +133,29 @@ function seccionCompraMP(formulario) {
   }
 }
 
+
 /////////////////////////////////////////////////////////
-// SECCIÓN COMPRA ARTICULOS   ////////////////////////
+// SECCIÓN COMPRA HERRAMIENTA/MAQUINARIA/////////////////
 /////////////////////////////////////////////////////////
+
 function seccionCompraArticulos(formulario) {
   try {
 
-    let nuevaSeccion = formulario.addPageBreakItem()
-      .setTitle("Herramientas o Maquinaria")
-      .setHelpText("Ingrese los detalles de la compra de herramientas o maquinaria");
 
-    let opcionesTipoComprobanteVentas = ["Factura 'A'", "Factura 'B'", "Factura 'C'","Factura E","Factura M","Nota de crédito","Sin comprobante"];
+    let nuevaSeccion = formulario.addPageBreakItem()
+      .setTitle("Registro de compra de herramienta/maquinaria")
+
+    let opcionesTipoComprobanteVentas = ["Factura 'A'", "Factura 'B'", "Factura 'C'","Factura 'E'","Factura 'M'","Nota de crédito","Sin comprobante"];
     let opcionesArticulo = [" "]
     const PRECIO_Compra_Articulo = "Precio de compra (con IVA)"
 
     const preguntasCompraArticulo = [
-      { tipo: "list", titulo: "Herramientas o Maquinaria", opciones: opcionesArticulo, requerido: true},
-      { tipo: "text", titulo: "Cantidad", requerido: true},//VALIDACION NUMERICA
-      { tipo: "text", titulo: "Precio de compra (con IVA)"}, // VALIDACION NUMERICA
+      { tipo: "list", titulo: "Herramienta/maquinaria adquirida", opciones: opcionesArticulo, requerido: true},
+      { tipo: "text", titulo: "Cantidad adquirida", requerido: true},//VALIDACION NUMERICA //CHECK
+      { tipo: "text", titulo: PRECIO_Compra_Articulo, requerido:true}, // VALIDACION NUMERICA // CHECK
       { tipo: "list", titulo: "Tipo de comprobante", opciones: opcionesTipoComprobanteVentas}, // ARCHIVO PDF?
+      //{ tipo: "text", titulo: "Número de comprobante", requerido: true, textoAyuda: "Ingrese número de comprobante" }, // VALIDACION NUMERICA
+
     ];
     preguntasCompraArticulo.forEach(p => {
       let pregunta;
@@ -160,8 +168,14 @@ function seccionCompraArticulos(formulario) {
           break;
         case "text":
           pregunta = formulario.addTextItem();
-          //Validacion numerica precio venta
+          //Validacion precio venta
           if (p.titulo === PRECIO_Compra_Articulo) {
+            let val = FormApp.createTextValidation()
+              .requireWholeNumber()
+              .build();
+            pregunta.setValidation(val);
+          }
+          if (p.titulo === "Cantidad") {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()
               .build();
@@ -194,27 +208,30 @@ function seccionCompraArticulos(formulario) {
   }
 }
 
+
 /////////////////////////////////////////////////////////
-// SECCIÓN COMPRA SERVICIOS   ////////////////////////
+// SECCIÓN COMPRA SERVICIO///////////////////////////////
 /////////////////////////////////////////////////////////
 
 function seccionCompraServicios(formulario) {
   try {
 
-    let nuevaSeccion = formulario.addPageBreakItem()
-      .setTitle("Servicio")
-      .setHelpText("Ingrese los detalles del servicio contratado");
 
-    let opcionesTiposComprobante = ["Factura 'A'", "Factura 'B'", "Factura 'C'","Factura E","Factura M","Nota de crédito","Sin comprobante"];
+    let nuevaSeccion = formulario.addPageBreakItem()
+      .setTitle("Registro de adquisición de un servicio")
+
+    let opcionesTiposComprobante = ["Factura 'A'", "Factura 'B'", "Factura 'C'","Factura 'E'","Factura 'M'","Nota de crédito","Sin comprobante"];
     let opcionesProveed = [" "]
 
-    const PRECIO_Compra_Servicio = "Precio de compra (con IVA)"
+    const PRECIO_Compra_Servicio = "Valor del servicio";
 
     const preguntasCompraServicios = [
-      { tipo: "text", titulo: "Nombre del servicio", requerido: true},//VALIDACION NUMERICA
-      { tipo: "text", titulo: "Precio de compra (con IVA)", requerido: true,}, // VALIDACION NUMERICA
+      { tipo: "text", titulo: "Servicio adquirido", requerido: true},//VALIDACION NUMERICA
+      { tipo: "text", titulo: PRECIO_Compra_Servicio, requerido: true,}, // VALIDACION NUMERICA
       { tipo: "list", titulo: "Proveedor", opciones: opcionesProveed},
       { tipo: "list", titulo: "Tipo de comprobante", opciones: opcionesTiposComprobante,},
+      //{ tipo: "text", titulo: "Número de comprobante", requerido: true, textoAyuda: "Ingrese número de comprobante" }, // VALIDACION NUMERICA
+
     ];
     preguntasCompraServicios.forEach(p => {
       let pregunta;
@@ -227,7 +244,7 @@ function seccionCompraServicios(formulario) {
           break;
         case "text":
           pregunta = formulario.addTextItem();
-          //Validacion numerica precio venta
+          //Validacion precio venta
           if (p.titulo === PRECIO_Compra_Servicio) {
             let val = FormApp.createTextValidation()
               .requireWholeNumber()

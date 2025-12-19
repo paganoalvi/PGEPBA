@@ -2,18 +2,14 @@
     //* ==== GLOBAL / RESET ==== Estilos globales ====*//
     * {
       box-sizing: border-box;
-    }
-    body {
       margin: 0;
       padding: 0;
+    }
+    body {
       font-family: "Quicksand", "sans-serif";
-      //background-image:url('https://i.imgur.com/3UCTpEZ.jpeg');
-      //background-size: 100% 100%;
-      //background-repeat: no-repeat;
-      //background-attachment: fixed;
-      //background-position: center;
-      scrollbar-gutter: auto;
       background-color: white;
+      scrollbar-gutter: stable;
+      overflow-y: auto;
     }  
   //*///////////////////////////////*//
   //* ==== NAVBAR / ENCABEZADO ==== *//
@@ -73,17 +69,29 @@
           color: #05B7B3; /* Cambia el color al pasar el mouse por encima */
         }
       }
-      .liProducto{  
-          position: absolute;
-          left: 0;
-          margin-left: 10px;
-
+      #nav-inicio{  
+        position: absolute;
+        left: 0;
+        margin-left: 10px;
       }
       .activo{
         background-color: #05b7b3;
         box-shadow: 0px 0px 5px #196377;
         border-radius: 20px;
-      }    
+      }   
+
+      .nav-volver {
+        display: none; /* oculto por defecto */
+      }
+
+      .nav-volver.show {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        background-color: #05b7b3;
+        box-shadow: 0px 0px 5px #196377;
+        border-radius: 20px;
+      }
  
     @keyframes animacion-header{
       to{
@@ -111,9 +119,7 @@
     //Mostrar Pagina//
     .visible {
       display: block;
-      position: relative;
-      top: 51px;
-      height: auto;
+      padding-top: 61px;
       view-transition-name: visible;
     }
     //Animar Pagina//
@@ -140,12 +146,9 @@
               transform: translateX(0);
             }
           }
-    #gestion{
-      height: calc(100vh - 51px);
-    }
+
     #gestion, #resultado, #definirProducto{
-      padding: 10px;
-      padding-top: 20px;
+      padding-inline: 30px;
     }
 
     //--------------------------------//
@@ -178,22 +181,46 @@
     }
 
     // --- de Pagina Gestion ---//
-    .containerCards-Gestion{
-      height: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      border: 1.5px solid #05b7b3;
-      box-shadow: 0 0 10px #05b7b3;
-      border-radius: 20px;
-      grid-template-columns: repeat(2, 1fr);
-      grid-auto-rows: 50%;
-      place-items: center;
-    }
-      .card-gestion{
-        width: auto;
-        min-width: 0;
-        gap: 12px;
+    #gestion{
+
+      >div{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+
+        .containerCards-Gestion{
+          border: 1.5px solid #05b7b3;
+          box-shadow: 0 0 10px #05b7b3;
+          border-radius: 20px;
+          grid-template-columns: repeat(6, 1fr);
+          grid-auto-rows: 50%;
+          place-items: center;
+          height: 100vh;
+          width: 100%;
+        
+          .card-gestion{
+            width: auto;
+            min-width: 0;
+            gap: 12px;
+
+            grid-column: span 2;
+          }
+
+          :nth-child(4){
+            grid-column-start: 2;
+            grid-column-end: 4;
+          }
+          :nth-child(5){
+            grid-column-start: 4;
+            grid-column-end: 6;
+          }
+        }
+        
       }
+    }
+      
       .card-gestion img,
       .containerCards-Resultados3 img{
         max-width: 180px;
@@ -315,6 +342,58 @@
         opacity: 1;
       }
       
+      .BotonRepetir{
+        width: 100%;
+      }
+      
+      
+      .BotonEliminarEmpe {
+        width: 200px;
+        padding: 12px;
+        background: #f44336;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: background 0.3s;
+      }
+      .BotonCobros{
+        width: 200px;
+        padding: 12px;
+        background: #4caf50; /* Verde para ingresos */
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: background 0.3s;
+      }
+      .BotonCobros:hover{
+        background: #388e3c; /* Verde más oscuro */
+      }
+      .BotonPagos{
+        width: 200px;
+        padding: 12px;
+        background: #ff9800; /* Naranja para pagos salientes */
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: background 0.3s;
+      }
+      .BotonPagos:hover {
+        background: #f57c00; /* Naranja más oscuro */
+      }
+
+      .BotonEliminarEmpe:hover {
+        background: #d32f2f;
+      }
+
       /* Botones individuales */
       .buttons-container button {
         padding: 8px;
@@ -393,6 +472,8 @@
           align-items: center;
           z-index: 1000;
         }
+
+
     /* --- de Pagina Resultado --- */
       //1°Tabla (Compras, ventas, stock, ect)
     .containerCards-Resultados1{
@@ -489,195 +570,236 @@
       .containerCards-Resultados3 section:nth-child(4) img{
         transform-origin: bottom right;
       }
-    /* --- de Pagina Crear tu Producto --- */
-    form{
+
+
+
+    .modalGrafico {
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8); /* Backdrop semi-transparente */
       display: flex;
-      flex-flow: column nowrap;
       justify-content: center;
       align-items: center;
-      
-      height: auto;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 15px;
-      gap: 10px;
-      margin-block-end: 20px;
-      border: 1.5px solid #c824bb;
-      box-shadow: 0 0 10px #c44384;
-      border-radius: 20px;
-      background-color: rgb(255, 255, 255, .75);
-        &:focus-within{
-          background-color: rgb(255, 255, 255);
-        }
+      animation: fadeIn 0.3s ease; /* Transición suave */
     }
-      form h1{
-        color: #264143;
-        font-weight: 850;
-        font-size: 1.5em;
-        margin-block-start: 0;
-        margin-block-end: 0;
-      }
-      form p{
+
+    .modal-content {
+      position: relative;
+      background: white;
+      border-radius: 8px;
+      max-width: 95vw;
+      max-height: 95vh;
+      overflow: hidden;
+    }
+
+    .close-modal {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    #modalChartContainer{
+      width: 100%;  /* Ocupa todo el content */
+      height: 100%; /* Ocupa toda la altura */
+      margin: 0;    /* Sin márgenes extra */
+    }
+
+    .close-modal:hover {
+      color: black;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+}
+
+
+
+
+
+    /* --- de Pagina Crear tu Producto --- */
+        
+        
+    .checkbox-item {
+      display: flex;
+      flex-direction: row;  /* esto hace que queden al lado */
+      align-items: center;
+      gap: 10px;
+    }
+        //uso css nesting
+    #definirProducto{
+
+      div{
         display: flex;
         flex-direction: column;
-        align-items: baseline;
-        margin-block-start: 0;
-        margin-block-end: 0;
-        text-wrap: balance;
-      } 
-      form label{
-        font-weight: 550;
-        margin: 3px 0;
-      }
-      form input{
-        outline: none;
-        border: 1.5px solid #333333;
-        width: 325px;
-        padding: 12px 10px;
-        border-radius: 4px;
-        font-size: 15px;
-      }
-      form textarea{
-        outline: none;
-        border: 1.5px solid #333333;
-        width: 290px;
-        height: auto;
-        padding: 12px 10px;
-        border-radius: 4px;
-        font-size: 15px;
-      }
-      form select{
-        outline: none;
-        border: 1.5px solid #333333;
-        width: auto;
-        height: auto;
-        padding: 12px 10px;
-        border-radius: 4px;
-        font-size: 15px;
-      }
-      form button{
-        color: white;
-      }
-      form section{
-        width:700px;
-      }
-      .BotonesAggSuprMateria{
-        align-self: flex-start;
-      }
-      .seccionMateriaPrima{
-        align-self: flex-start;
-        display: flex;
-        flex-flow: column nowrap;
-        gap: 3px;
-        margin-block-end: 10px;
-      }
-    #contenedorElementos{
-      display: flex;
-      justify-content: space-between;
-      
-      width: 100%;
-      gap: 10px;
-      padding-block: 0px;
-      padding: 15px;
-      border: 1.5px solid #333333;
-      border-radius: 20px;
-      margin-inline: 0;
-      margin-block-start: 10px;
-    }
-      .element, .cant, unit{
-        width: 100%;
-      }
-      .element select, .cant input, unit select{
-        width: 100%;
-      }
-        
-      .botonEnviar {
-        margin: 15px 0px;
-        width: 290px;
-        height: 60px;
-        font-size: 16px;
-        font-weight: 800;
-        background-color: #05b7b3;
-        border-radius: 20px;
-        font-weight: 800;
-      }
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
 
-    .containerCard-CreaProducto{
-      display: flex;
-      flex-flow: row wrap;
-      align-items: center;
-      justify-content: space-between;
-      
-      max-width: 1200px;
-      height: auto;
-      margin: 0 auto;
-      margin-block-end: 20px;
-    }
-      .containerCard-CreaProducto label{
-        font-weight: 550;
-        margin: 3px 0;
-      }
-      .containerCard-CreaProducto select{
-        outline: none;
-        border: 1.5px solid #333333;
-        width: auto;
-        height: auto;
-        padding: 12px 10px;
-        border-radius: 4px;
-        font-size: 15px;
-      }
-      .borrar-Receta{
-        align-content: center;
+        max-width: 1200px;
+        margin: 0 auto;
         
-        width: 49%;
-        padding: 10px;
-        border: 1.5px solid #c824bb;
-        border-radius: 20px;
-        box-shadow: 0 0 10px #c44384;
+        form{
+          gap: 15px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          border: 1.5px solid #c824bb;
+          box-shadow: 0 0 10px #c44384;
+          border-radius: 20px;
+          background-color: rgb(255, 255, 255, .75);
+          padding: 10px;
 
-        background-color: rgb(255, 255, 255);
-      }
-      .borrar-MateriaPrima{
-        align-content: center;
-        
-        width: 49%;
-        padding: 10px;
-        border: 1.5px solid #c824bb;
-        border-radius: 20px;
-        box-shadow: 0 0 10px #c44384;
+          section{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-flow: wrap column;
+            align-items: center;
+            gap: 25px;
 
-        background-color: rgb(255, 255, 255);
+            h1{
+              color: #264143;
+              font-weight: 850;
+              font-size: 1.5em;
+            }
+
+            img{
+              max-width: 180px;
+              height: auto;
+              aspect-ratio: 89 / 67;
+              transition: transform 0.4s ease;
+              cursor: pointer;
+              border: 1.5px solid #c44384;
+              box-shadow: 0 0 10px #c44384;
+              border-radius: 5px;
+              
+              &:hover{
+                transform: scale(1.11);
+                transition: 0.3s;
+              }
+            }
+
+            .botones-de-clonado{
+              flex-direction: row;
+              gap: 10px;
+            }
+
+            .servicios-container{
+              padding: 20px;
+              border: 1.5px solid #c824bb;
+              border-radius: 5px;
+              box-shadow: 0 0 10px #c44384;
+
+              .checkbox-group{
+                border: 1.5px solid black;
+                border-radius: 5px;
+                width: 100%;
+                background-color: lightblue;
+                padding-block: 12px;                
+                
+                &:empty::after { content: '-Seleccioná un Empleado para ver sus servicios-'; }
+
+                input{
+                  padding: 8px;
+                }
+              }
+
+              .checkbox-item{
+                display: flex;
+                flex-direction: row;
+                gap: 1rem;
+              }
+            }
+          
+          }
+          
+          fieldset{
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: flex-start;
+            border: 0;
+
+            button{
+              padding: 8px;
+              align-self: center;
+            }
+          }
+
+          p{
+            label{
+              font-weight: 550;
+              margin: 3px 0;
+            }
+            input{
+              outline: none;
+              border: 1.5px solid #333333;
+              width: 325px;
+              padding: 12px 10px;
+              border-radius: 4px;
+              font-size: 15px;
+            }
+            select{
+              outline: none;
+              border: 1.5px solid #333333;
+              width: auto;
+              height: auto;
+              padding: 12px 10px;
+              border-radius: 4px;
+              font-size: 15px;
+            }
+          }
+          .botonEnviar {
+            margin: 15px 0px;
+            width: 290px;
+            height: 60px;
+            font-size: 16px;
+            font-weight: 800;
+            background-color: #05b7b3;
+            border-radius: 20px;
+            font-weight: 800;
+          }
+
+          .eliminar-elementos{
+            display: flex;
+            flex-flow: row wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+          }
+
+          &:focus-within{
+            background-color: rgb(255, 255, 255);
+          }
+        }
+
+        footer{
+          border-radius: 20px;
+          margin-block-end: 20px;
+          
+          img{
+            width: 100%;
+            border-radius: 20px;
+          }
+        }
+
       }
-    .seccionMaterias,
-    .seccionPaquetes{
-      border: 1.5px solid #05b7b3;
-      padding: 5px;
-      border-radius: 20px;
-      margin-block-end: 15px;
     }
-    .seccionMaterias section button,
-    .seccionPaquetes section button{
-      width: 325px;
-    }
-    .pregunta{
-      position: relative;
-      right: 49%;
-      z-index: 5;
-    }
-    .banner{
-      display: flex;
-      justify-content: center;
-      
-      max-width:1200px;
-      margin: 0 auto;
-      border-radius: 20px;
-      margin-block-end: 20px;
-    }
-    .banner img{
-      width: 100%;
-      border: 1.5px;
-      border-radius: 20px;
-    }
+
+
+  
   
     /* --- Botones--- */
     button{
@@ -709,6 +831,42 @@
       color: white;
       border-color: #4caf50;
     }
+
+
+
+
+
+      .boton-purpura-chingon {
+        background-color: #BF40BF; /* punto medio entre fucsia y morado */
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .boton-purpura-chingon:hover {
+        background-color: #a330a3; /* un poco más oscuro en hover */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .boton-purpura-chingon:active {
+        background-color: #8b2c8b; /* aún más oscuro al hacer click */
+        transform: translateY(0);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      }
+
+
+
+
+
+
+
     /*////////////////////////////*/
     /* ==== MEDIA QUERIES ==== */
     /*////////////////////////////*/
@@ -721,12 +879,30 @@
       .contenido{
         height: auto;
       }
+      #gestion {
+        & > div {
+          & .containerCards-Gestion {
+            
+            :nth-child(4){
+              grid-column-start: auto;
+              grid-column-end: auto;
+            }
+            :nth-child(5){
+              grid-column-start: auto;
+              grid-column-end: auto;
+            }
+          }
+        }
+      }
       .containerCards-Gestion {
-        grid-template-columns: 1fr;
-        grid-auto-rows: 1fr;
+        grid-template-columns: 1fr !important;
+        grid-auto-rows: 1fr !important;
+
       } 
+        
       .card-gestion{
         max-width: 350px;
+        grid-column: span 1 !important;
       }
       .card-gestion img{
         max-width: 240px;

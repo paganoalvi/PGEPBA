@@ -1,115 +1,64 @@
 
-
-
-
-
-///////////////////////////////////////////////////////////////
-////AÑADIR UNA NUEVA OPCION A UN FORMULARIO /////////////////////////////////
-///////////////////////////////////////////////////////////////
-
-function agregarFinal(nuevaOpcion,botonId){
-  const datosForm = seleccionDatosForm(botonId);
-  agregarOpcionAFormulario(nuevaOpcion,datosForm[0],datosForm[1]);
-}
-
-function seleccionDatosForm(botonId){
-  let formularioId;
-  let cambiarItem;
-  switch(botonId){
-    case "Compras":
-    formularioId = PropertiesService.getUserProperties().getProperty("formComprasEditUrl");
-    cambiarItem = "Nombre del Artículo";
-    break;
-    case "Produccion":
-    formularioId = PropertiesService.getUserProperties().getProperty("formProduccionEditUrl");
-    cambiarItem = "PRODUCTO";
-    break;
-    case "Pedidos":
-    formularioId = PropertiesService.getUserProperties().getProperty("formPedidosEditUrl");
-    cambiarItem = "CLIENTE";
-    break;
-    case "CostoFijo":
-    formularioId = PropertiesService.getUserProperties().getProperty("formCostoFijoEditUrl");
-    cambiarItem = "Elija un Empleado";
-    break;
+function agregarOpcionAFormulario(nuevaOpcion, tituloItem, tipoItem, formulario) {
+  /*const nuevaOpcion = "Limpiezaaaa" ;
+  const tituloItem = "Servicio a eliminar";
+  const tipoItem = "list";
+  const formulario = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty("formularioEliminacionServicioEditUrl"));*/
+  const items = formulario.getItems();
+  const itemElegido = items.find(i => i.getTitle() === tituloItem);
+  if (!itemElegido) {
+    Logger.log(`No se encontró el ítem con título: ${tituloItem}`);
+    return;
   }
-  return [formularioId, cambiarItem];
-}
 
-function agregarOpcionAFormulario(nuevaOpcion,fId,nombreItem) {  
-  if (fId) {
-    // Abrir el formulario por su URL
-    let formulario = FormApp.openByUrl(fId);
+  let itemObj;
+  switch (tipoItem) {
+    case "list":
+      itemObj = itemElegido.asListItem();
+      break;
+    case "checkBox":
+      itemObj = itemElegido.asCheckboxItem();
+      break;
+    default:
+      Logger.log("Tipo de ítem inválido");
+      return;
+  }
 
-    // Buscar el ListItem con el título "Nombre del producto"
-    let items = formulario.getItems(FormApp.ItemType.LIST);
-    let encontrado = false;
-
-    for (let item of items) {
-      let listItem = item.asListItem();
-      if (listItem.getTitle() === nombreItem) {
-        let opciones = listItem.getChoices().map(choice => choice.getValue());
-        opciones.push(nuevaOpcion);
-        opciones.sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
-
-        // Establecer las opciones ordenadas
-        listItem.setChoiceValues(opciones);
-        encontrado = true;
-        break;
-      }
-    }
-    if (!encontrado) {
-      Logger.log('No se encontró el ListItem "Nombre del producto".');
-      throw new Error('No se encontró el ListItem "Nombre del producto".');
-    }
-  } else {
-    throw new Error('No se ha encontrado el ID del formulario.');
+  const opcionesActuales = itemObj.getChoices().map(c => c.getValue());
+  if (!opcionesActuales.includes(nuevaOpcion)) {
+    opcionesActuales.push(nuevaOpcion);
+    itemObj.setChoices(opcionesActuales.map(v => itemObj.createChoice(v)));
   }
 }
-
 
 ////////////////////////////////////////////////////
 //PARA ELIMINAR UNA OPCION DE UN FORM//////////////
 ///////////////////////////////////////////////////
-function eliminarElemento(val, botonId){
-  const datosForm = seleccionDatosForm(botonId);
-  eliminarOpcionDeFormulario(val,datosForm[0],datosForm[1]);
+
+
+function eliminarOpcionDeFormulario(opcionAEliminar, formulario, numItem,tipoItem) {        
+    let items = formulario.getItems();
+    let itemElegido;
+    switch(tipoItem){
+      case "list":
+        itemElegido= items[numItem].asListItem();
+        break;
+      case "checkBox":
+        itemElegido= items[numItem].asCheckboxItem();
+        break;
+      default:
+        Logger.log("que carajo pasaste, eso no existe");
+        return;
+    }
+    let opciones = itemElegido.getChoices().map(choice => choice.getValue());
+    let nuevasOpciones = opciones.filter(opcion => opcion !== opcionAEliminar);  
+    itemElegido.setChoiceValues(nuevasOpciones);
 }
 
-function eliminarOpcionDeFormulario(opcionAEliminar, fId, nombreItem) {  
-  if (fId) {
-    // Abrir el formulario por su URL
-    let formulario = FormApp.openByUrl(fId);
-
-    // Buscar el ListItem con el título especificado
-    let items = formulario.getItems(FormApp.ItemType.LIST);
-    let encontrado = false;
-
-    for (let item of items) {
-      let listItem = item.asListItem();
-      if (listItem.getTitle() === nombreItem) {
-        let opciones = listItem.getChoices().map(choice => choice.getValue());
-
-        // Filtrar la opción que se desea eliminar
-        let nuevasOpciones = opciones.filter(opcion => opcion !== opcionAEliminar);
-
-        if (opciones.length === nuevasOpciones.length) {
-          Logger.log(`La opción "${opcionAEliminar}" no existe en el ListItem "${nombreItem}".`);
-          throw new Error(`La opción "${opcionAEliminar}" no existe en el ListItem "${nombreItem}".`);
-        }
-
-        // Establecer las opciones actualizadas
-        listItem.setChoiceValues(nuevasOpciones);
-        encontrado = true;
-        break;
-      }
-    }
-
-    if (!encontrado) {
-      Logger.log(`No se encontró el ListItem con el título "${nombreItem}".`);
-      throw new Error(`No se encontró el ListItem con el título "${nombreItem}".`);
-    }
-  } else {
-    throw new Error('No se ha encontrado el ID del formulario.');
-  }
+function eliminarBlanco(form, numItem){
+  const items = form.getItems();
+  const itemBlanco = items[numItem].asCheckboxItem();
+  let opciones = itemBlanco.getChoices().map(choice => choice.getValue());
+  let nuevasOpciones = opciones.filter(opcion => opcion !== "");
+  itemBlanco.setChoiceValues(nuevasOpciones);
 }

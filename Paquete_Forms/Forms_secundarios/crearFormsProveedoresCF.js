@@ -19,23 +19,23 @@ function proveedorCF (){
 
     // Titulos específicos a validar
     const TITULO_DNI= "CUIT/CUIL/DNI";
-    const TITULO_CORREO_ELECTRONICO = "Correo electronico"
-    const TITULO_TELEFONO = "Telefono"
+    const TITULO_CORREO_ELECTRONICO = "Correo electrónico"
+    const TITULO_TELEFONO = "Teléfono"
 
     formularioProveedorCF.setDescription(
-        "Este formulario permite llevar registro de los proveedores de costos fijos de tu emprendimiento"
+        "Este formulario permite llevar registro de los proveedores de costos fijos de tu emprendimiento."
     );
 
-    let opcionesTipoPersona = ["Persona fisica", "Persona juridica"];;
+    let opcionesTipoPersona = ["Persona física", "Persona jurídica"];
     
 
     const preguntasProveedorCF = [
-      { tipo: "list", titulo: "Tipo de personeria", opciones: opcionesTipoPersona, requerido: true},
-      { tipo: "text", titulo: "Nombre y apellido o Razon social", requerido: true},
-      { tipo: "text", titulo: "CUIT/CUIL/DNI",textoAyuda: "sin puntos, comas o guiones"},
-      { tipo: "text", titulo: "Telefono", requerido: true},
-      { tipo: "text", titulo: "Correo electronico"},
-      { tipo: "text", titulo: "Descripcion adicional"},
+      { tipo: "list", titulo: "Personería", opciones: opcionesTipoPersona, requerido: true},
+      { tipo: "text", titulo: "Nombre o razón social", requerido: true},
+      { tipo: "text", titulo: TITULO_DNI,textoAyuda: "Ingresá el número correspondiente, sin puntos, comas ni guiones."},
+      { tipo: "text", titulo: TITULO_TELEFONO, requerido: true,textoAyuda: "Ingresá un número válido de contacto."},
+      { tipo: "text", titulo: TITULO_CORREO_ELECTRONICO, textoAyuda: "Correo válido, por ejemplo: usuario@dominio.com"},
+      { tipo: "text", titulo: "Descripción adicional",textoAyuda:"Cualquier información extra que quieras registrar sobre el proveedor."},
     ];
 
     preguntasProveedorCF.forEach(p => {
@@ -88,6 +88,9 @@ function proveedorCF (){
     Logger.log("PROVEEDORES CF: " + formProveedorCFUrl)
     PropertiesService.getUserProperties().setProperty("formularioProveedorCFUrl", formProveedorCFUrl);
     PropertiesService.getUserProperties().setProperty("formularioProveedorCFEditUrl", formularioProveedorCF.getEditUrl());
+    //Logger.log(formularioProveedor.getEditUrl());
+  
+    //Logger.log("Formulario de compras creado con ID: " + formularioProveedor.getId());
 
     return formularioProveedorCF;
 

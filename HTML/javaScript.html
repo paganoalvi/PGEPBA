@@ -4,10 +4,9 @@
     //visualizar estos datos.
       
 
-    
-    /* EVENTO PARA OCULTAR Y MOSTRAR LAS PAGINAS CORRESPONDIENTES */
-    
-    
+    //////////////////////////////////////////////////////////////
+    // EVENTO PARA OCULTAR Y MOSTRAR LAS PAGINAS CORRESPONDIENTES
+    //////////////////////////////////////////////////////////////
     function mostrarPagina(id, navegador) {
       document.startViewTransition(() => {
         // Ocultar todos los divs(páginas) de contenido
@@ -21,6 +20,14 @@
       //Estila el Header de la sección donde se encuentra el usuario
       navegador.parentElement.querySelectorAll('li').forEach(li => li.classList.remove('activo'));
       navegador.classList.add('activo');
+
+      // Controlar visibilidad del botón(svg(flechita)) "volver"
+      const botonVolver = document.querySelector('#nav-inicio');
+      if (id === 'definirProducto') {
+        botonVolver.classList.add('show');
+      } else {
+        botonVolver.classList.remove('show');
+      }
     }       
 
     /////////////////////////////////////////////////////
@@ -28,39 +35,19 @@
     /////////////////////////////////////////////////////
     function repetirCompras(){
       google.script.run.envioRespuestasCompras()
-      Swal.fire({
-        icon: 'success',
-        title: 'Formulario compras',
-        text: 'Repetido con éxito',
-        confirmButtonText: 'Aceptar'
-      });
+      alert("Formulario ventas Repetido con exito")
     }
     function repetirVentas(){
       google.script.run.envioRespuestasVentas()
-      Swal.fire({
-        icon: 'success',
-        title: 'Formulario ventas',
-        text: 'Repetido con éxito',
-        confirmButtonText: 'Aceptar'
-      });
+      alert("Formulario ventas Repetido con exito")
     }
     function repetirProduccion(){
       google.script.run.envioRespuestasProduccion()
-      Swal.fire({
-        icon: 'success',
-        title: 'Formulario producción',
-        text: 'Repetido con éxito',
-        confirmButtonText: 'Aceptar'
-      });
+      alert("Formulario ventas Repetido con exito")
     }
     function repetirCostoFijo(){
       google.script.run.envioRespuestasCostoFijo()
-      Swal.fire({
-        icon: 'success',
-        title: 'Formulario costo fijo',
-        text: 'Repetido con éxito',
-        confirmButtonText: 'Aceptar'
-      });
+      alert("Formulario ventas Repetido con exito")
     }   
 
     
@@ -159,12 +146,7 @@
         }
         mostrarAlertaTemporal("Por favor espere - guardando form", 7000);
       }else{
-        Swal.fire({
-          icon: 'warning',
-          title: 'Atención',
-          text: 'Por favor seleccione un botón donde guardarlo',
-          confirmButtonText: 'Aceptar'
-        });
+        alert("Porfavor seleccione un boton donde guardarlo");
       }
     }
 
@@ -173,27 +155,7 @@
       google.script.run.aplicarDatosPropertiesPrellenado(enlace,name,num);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-
-    function ventasGrafico() {
-      ventasChart();
-    }
-    function comprasGrafico() {
-      comprasChart();
-    }
-    async function obtenerBalance() {
-      const ventas = await ventasChart();   // Espera a que se resuelva la Promesa
-      const compras = await comprasChart(); // Igual aquí
-      const valorBalance = ventas - compras;
-      const visualizacionDiv = document.getElementById("balance_div");
-      const balanceFormateado = formatearNumero(valorBalance);
-      console.log("BALANCE"+balanceFormateado);
-      if (balanceFormateado >= 0) {
-        visualizacionDiv.innerHTML = `BALANCE :: <span style="color: green; font-weight: bold;">$${balanceFormateado}</span>`;
-      } else {
-        visualizacionDiv.innerHTML = `BALANCE :: <span style="color: red; font-weight: bold;">$${balanceFormateado}</span>`;
-      }
-    }
+    
 
     function mostrarAlertaTemporal(mensaje, duracionMs = 2000) {
       const alerta = document.getElementById("alertaTemporal");
@@ -211,163 +173,59 @@
     }
 
 
-
-    //-----------------Agregar elementos------------------//
-    function agregarElemento(idFormulario) {
-      let contador = 1;
-      const form = document.getElementById(idFormulario);
-      const original = form.querySelector("fieldset");
-      const clon = original.cloneNode(true);
-
-      // Agregar clase para identificar que es un clon
-      clon.classList.add("clonado");
-
-      //°°°°°°°Unicidad de IDs para correcto manejo de datos°°°°°°//
-      // Limpiar los valores del clon y generar nuevos IDs únicos
-      const inputs = clon.querySelectorAll("input, select, textarea");
-      inputs.forEach((input) => {
-        input.value = "";
-
-        if (input.id) {
-          const baseId = input.id.split("-")[0]; // id base sin sufijo
-          const nuevoId = baseId + "-" + contador;
-          input.id = nuevoId;
-
-          // Buscar el label asociado al id base y actualizar su atributo for
-          const label = clon.querySelector(`label[for="${baseId}"]`);
-          if (label) {
-            label.setAttribute("for", nuevoId);
-          }
-        }
-      });
-      // Recargar las opciones de materia prima en el nuevo select clonado
-      const newSelectMateriaPrima = clon.querySelector('select[name="materiaPrima[]"]');
-      if (newSelectMateriaPrima) {
-          // Limpiar opciones existentes (excepto la primera)
-          while (newSelectMateriaPrima.options.length > 1) {
-              newSelectMateriaPrima.remove(1);
-          }
-          // Añadir las opciones actualizadas
-          materiasPrimasDisponibles.sort().forEach(mp => {
-              const option = document.createElement("option");
-              option.value = mp;
-              option.textContent = mp;
-              newSelectMateriaPrima.appendChild(option);
-          });
-          newSelectMateriaPrima.value = ""; // Resetear la selección del clon
-      }
-
-      //°°°°°° Insertar antes del mensaje final (mantener botón al final)°°°°°°//
-      form.appendChild(clon);
-
-      // Incrementar contador
-      contador++;
-
-      //°°°°°°Hace el scroll automatico hasta el nuevo clon°°°°°//
-      //clon.scrollIntoView({ behavior: "smooth" });
-    }
-
-    //---------------Eliminar elementos------------------//
-    function eliminarElemento(idFormulario){
-      const form = document.getElementById(idFormulario);
-      const clones = form.querySelectorAll("fieldset.clonado");
-      if (clones.length > 0) {
-        form.removeChild(clones[clones.length - 1]);
-        contador--;
-      }
-    }
-
-
-
-
-
-
-
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //-----------Enviar datos del formulario------------//
-    document.getElementById("form").addEventListener("submit", function (e) {
+    document.getElementById("form").addEventListener("submit", async function (e) {
       e.preventDefault();
 
       const form = e.target;
       const datos = new FormData(form);
 
-      // Construir arrays desde el formulario
-      const materiaPrima = datos.getAll("materiaPrima[]");
-      const cantidad = datos.getAll("cantidad[]");
-      const unidad = datos.getAll("unidad[]");
-      console.log("MATERIAS PRIMAS"+ materiaPrima + "CANTIDAD"+ cantidad+"UNIDADES" +unidad)
-      const datoDivisor = (datos.get("user_message") || 1);
-      const receta = materiaPrima.map((mat, i) => [
-        mat ? mat.trim() : "",
-        cantidad[i] || "",
-        unidad[i],
-        (!datoDivisor || datoDivisor < 1) 
-        ? cantidad[i] 
-        : cantidad[i] / datoDivisor
-      ]);
+      const fechaPago = datos.get("fechaPago");
+      const nombreEmpleado = datos.get("Nempleado");
+      const cantServicios = datos.getAll("Nservicios[]");
+      const sueldo = datos.get("Nsueldo");
+      const sueldoEntreCantServicios = sueldo / cantServicios.length;
+      const letraExactaQuery =await columnaExactaEmpleado(nombreEmpleado);
+      const servYpagosHoras = {};
+      console.log(nombreEmpleado);
+      console.log(letraExactaQuery);
+      for (const servicio of cantServicios) {
+        const response = await fetchSheetData(
+          'Pago de Sueldos',
+          `SELECT ${letraExactaQuery} WHERE F = '${servicio}'`
+        );
 
-      const nombreProducto = normalizarTexto( (datos.get("producto") || "").toString() );
-      
+        const data = response.getDataTable();
 
-      if (!nombreProducto) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Atención',
-          text: 'Por favor ingrese el nombre del producto.',
-          confirmButtonText: 'Aceptar'
-        });
-        return;
+        if (data.getNumberOfRows() > 0 && data.getNumberOfColumns() > 0) {
+          const horas = data.getValue(0, 0);
+          const sueldoPorHora = `#${parseInt(sueldoEntreCantServicios / horas)}`;
+          servYpagosHoras[servicio] = sueldoPorHora;
+        } else {
+          console.log("No se encontraron datos para:", servicio);
+        }
       }
-
-      // Feedback: desactivar botón submit
       const submitBtn = form.querySelector('button[type="submit"]');
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.dataset.orig = submitBtn.textContent;
         submitBtn.textContent = "Guardando...";
       }
-
-      // Llamada al servidor: usamos 'receta' (no listaMateriasP)
-      google.script.run
-        .withSuccessHandler(function(exito) {
-          // Rehabilitar botón
-          if (submitBtn) {
+      const serviciosAnidados = cantServicios.join(",")
+      google.script.run.withSuccessHandler(function(){
+        if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.textContent = submitBtn.dataset.orig || "Enviar";
-          }
-
-          if (exito) {             
-            cargarProductosDesdeSheets(); // lista de productos sin tener que recarga(javascriptReceta.html)
-
-            // limpiar dinámicos y formulario
-            document.querySelectorAll("fieldset.clonado").forEach(el => el.remove());
+          }     
             form.reset();
-
-            // reiniciar contador 
-            contador = 1;
-
-            // refrescar selects de materias primas si hace falta
-            if (typeof cargarMateriasPrimasEnSelects === "function") {
-              cargarMateriasPrimasEnSelects(); // llamado a app script
-            }
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error al guardar la receta',
-              text: 'Tal vez ya existe',
-              confirmButtonText: 'Aceptar'
-            });
-          }
-        })
-        .withFailureHandler(function(error) {
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = submitBtn.dataset.orig || "Enviar";
-            }
-            console.error("Error guardando receta:", error);
-            alert("Error al guardar la receta: " + (error.message || error));
-        })
-        .guardarRecetaSheet(receta, nombreProducto, datoDivisor); // llamado a app script
+      }).gestionarPagoSueldo(nombreEmpleado,servYpagosHoras,sueldo,idParaGraficoPrueba,serviciosAnidados);
     });
+
+//////////FUNCION  ELIMINAR TODO O RESETEO//////////////////////
+
+
+
 
     //Reiniciar el Script desde 0
     document.getElementById('delete-btn').addEventListener('click', () => {
@@ -391,8 +249,9 @@
         }
       });
     });
-    
+
     function limpiar(){
       google.script.run.limpiezaParaPagina();
     }
+    
 </script>

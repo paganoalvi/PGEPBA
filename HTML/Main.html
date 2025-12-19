@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +10,13 @@
   <title>Portal de Gestión</title>
   <?!= include('estilos'); ?>
 </head>
+
 <body>
- <header>
+  <header>
     <nav>
       <ul>
-        <li class="liProducto" onclick="mostrarPagina('definirProducto', this)" >CREA TU PRODUCTO</li>
-        <li onclick="mostrarPagina('gestion', this)">Carga de Datos</li>
+        <li id="nav-inicio" class="nav-volver" onclick="mostrarPagina('gestion', document.querySelector('#nav-gestion'))"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevrons-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7l5 5l-5 5" /><path d="M13 7l5 5l-5 5" /></svg></li>
+        <li id="nav-gestion" onclick="mostrarPagina('gestion', this)">Carga de Datos</li>
         <li onclick="mostrarPagina('resultado', this)">Resultados</li>
         <li>
           <div>
@@ -34,154 +36,205 @@
       </ul>
     </nav>
   </header>
-  <main>    
-      <!-- ////// PÁGINA GESTION ////// -->
-      <div id="gestion" class="contenido visible">
-        <div class="container containerCards-Gestion">
-            <section class="card card-gestion">
-              <div class="card" onclick="window.open('<?= fComprasUrl ?>', '_blank')">
-                  <img src="https://i.imgur.com/T73XpyE.jpeg"
-                        alt="icono-hacia-el-formulario-compra">  
+  <main>
+    <!-- ////// PÁGINA GESTION ////// -->
+    <div id="gestion" class="contenido visible">
+
+      <div>
+        <div class="container containerCards-Gestion">          
+          <section class="card card-gestion">
+            <div class="card" onclick="window.open('<?= fConstitucionUrl ?>' , '_blank')">
+              <img  src="https://i.imgur.com/SCA3Wpc.png"
+                            alt="icono-hacia-el-formulario-miServicio">
+            </div>
+            <div class="card">
+              <div>
+                <!-- Checkbox para el toggle -->
+                <input type="checkbox" id="toggle-produccion">
+                <!-- Botón principal -->
+                <!--<label class="toggle-label" for="toggle-produccion">
+                          Formularios Predefinidos
+                          <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
+                </label> -->
+                <!-- Contenedor de botones ocultos -->
+                <div class="buttons-container">
+                  <button type="button" onclick="abrirModal(20)">
+                            Asignar Form Producción
+                          </button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[4] ?>', '_blank')" id="e4"><?= nombresPrellenado[4] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[5] ?>', '_blank')" id="e5"><?= nombresPrellenado[5] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[6] ?>', '_blank')" id="e6"><?= nombresPrellenado[6] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[7] ?>', '_blank')" id="e7"><?= nombresPrellenado[7] ?></button>
+                  <button type="button">Opción 5</button>
+                </div>
               </div>
-              <div class="card">
-                  <button type="button" onclick="repetirCompras()" class="BotonRepetir">
-                    Repetir Formulario Compra
-                  </button>
-                  <div>
-                    <!-- Checkbox para el toggle -->
-                    <input type="checkbox" id="toggle-compra">
-                    <!-- Botón principal -->
-                    <label class="toggle-label" for="toggle-compra">
-                      Formularios Predefinidos
-                      <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
-                    </label>
-                    <!-- Contenedor de botones ocultos -->
-                    <div class="buttons-container">
-                      <button type="button" onclick="abrirModal(10)">
-                        Asignar Form Compras
+              <div class="card" onclick="window.open('<?= fEliminacionServ ?>' , '_blank')" style="cursor: pointer;">
+                  <img src="https://i.imgur.com/h4mtqCO.png" alt="Formulario de eliminación" style="width: 200px; height: 50px; display: block;">
+              </div>
+            </div>
+          </section>
+
+          <section class="card card-gestion">
+            <div class="card" onclick="window.open('<?= fCoCoUrl ?>' , '_blank')">
+              <img  src="https://i.imgur.com/fCMMJmi.png"
+                            alt="icono-hacia-el-formulario-entrega">
+            </div>
+            <div class="card">
+              <div>
+                <!-- Checkbox para el toggle -->
+                <input type="checkbox" id="toggle-produccion">
+                <!-- Botón principal -->
+                <!-- <label class="toggle-label" for="toggle-produccion">
+                          Formularios Predefinidos
+                          <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
+                </label> -->
+                <!-- Contenedor de botones ocultos -->
+                <div class="buttons-container">
+                  <button type="button" onclick="abrirModal(20)">
+                            Asignar Form Producción
+                          </button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[4] ?>', '_blank')" id="e4"><?= nombresPrellenado[4] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[5] ?>', '_blank')" id="e5"><?= nombresPrellenado[5] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[6] ?>', '_blank')" id="e6"><?= nombresPrellenado[6] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[7] ?>', '_blank')" id="e7"><?= nombresPrellenado[7] ?></button>
+                  <button type="button">Opción 5</button>
+                </div>
+              </div>
+              <div class="card" onclick="window.open('<?= fCobros ?>' , '_blank')" style="cursor: pointer;">
+                  <img src="https://imgur.com/Dm2riFi.png" alt="Formulario de cobros" style="width: 200px; height: 50px; display: block;">
+              </div>
+            </div>
+          </section>
+
+          <section class="card card-gestion">
+            <div class="card" onclick="window.open('<?= fEntregaUrl ?>' , '_blank')">
+              <img  src="https://i.imgur.com/RaPqyWN.png"
+                            alt= "icono-hacia-el-formulario-ContratacionCobro">
+            </div>
+            <div class="card">
+              <div>
+                <!-- Checkbox para el toggle -->
+                <input type="checkbox" id="toggle-venta">
+                <!-- Botón principal -->
+                <!--<label class="toggle-label" for="toggle-venta">
+                          Formularios Predefinidos
+                          <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
+                        </label> -->
+                <!-- Contenedor de botones ocultos -->
+                <div class="buttons-container">
+                  <button type="button" onclick="abrirModal(30)">
+                            Asignar Form Ventas
+                          </button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[8] ?>', '_blank')" id="e8"><?= nombresPrellenado[8] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[9] ?>', '_blank')" id="e9"><?= nombresPrellenado[9] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[10] ?>', '_blank')" id="e10"><?= nombresPrellenado[10] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[11] ?>', '_blank')" id="e11"><?= nombresPrellenado[11] ?></button>
+                  <button type="button">Opción 5</button>
+                </div>
+              </div>
+              <div class="card" onclick="mostrarPagina('definirProducto', document.querySelector('#nav-inicio'))" style="cursor: pointer;">
+                  <img src="https://imgur.com/YGRpg4L.png" alt="Formulario Pago sueldos" style="width: 200px; height: 50px; display: block;">
+              </div>
+            </div>
+          </section>
+          <section class="card card-gestion">
+            <div class="card" onclick="window.open('<?= fComprasUrl ?>', '_blank')">
+              <img src="https://i.imgur.com/T73XpyE.jpeg"
+                            alt="icono-hacia-el-formulario-compra">
+            </div>
+            <div class="card" onclick="window.open('<?= fArticulo ?>' , '_blank')" style="cursor: pointer;">
+                  <img src="https://i.imgur.com/xtoEEIN.png" alt="articulo" style="width: 200px; height: 50px; display: block;">
+            </div>
+            <div class="card">
+              <!--<button type="button" onclick="repetirCompras()" class="BotonRepetir">
+                        Repetir Formulario Compra
+                      </button> -->
+              <div>
+                <!-- Checkbox para el toggle -->
+                <input type="checkbox" id="toggle-compra">
+                <!-- Botón principal -->
+                <!--<label class="toggle-label" for="toggle-compra">
+                          Formularios Predefinidos
+                          <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
+                        </label> -->
+                <!-- Contenedor de botones ocultos -->
+                <div class="buttons-container">
+                  <button type="button" onclick="abrirModal(10)">
+                            Asignar Form Compras
+                          </button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[0] ?>', '_blank')" id="e0"><?= nombresPrellenado[0] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[1] ?>', '_blank')" id="e1"><?= nombresPrellenado[1] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[2] ?>', '_blank')" id="e2"><?= nombresPrellenado[2] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[3] ?>', '_blank')" id="e3"><?= nombresPrellenado[3] ?></button>
+                  <button type="button">Opción 5</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card card-gestion">
+            <div class="card" onclick="window.open('<?= fCostoFijoUrl ?>' , '_blank')">
+              <img  src="https://i.imgur.com/o17IxF9.jpeg"
+                            alt="icono-hacia-el-formulario-costo-fijo">
+            </div>
+            <div class="card" onclick="window.open('<?= fCalendarizacion ?>' , '_blank')" style="cursor: pointer;">
+                  <img src="https://i.imgur.com/WictOi4.png" alt="agenda" style="width: 200px; height: 50px; display: block;">
+            </div>
+            <div class="card">
+              <!--<button type="button" onclick="repetirCostoFijo()" class="BotonRepetir">
+                        Repetir Formulario Costos Fijos
                       </button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[0] ?>', '_blank')" id="e0"><?= nombresPrellenado[0] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[1] ?>', '_blank')" id="e1"><?= nombresPrellenado[1] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[2] ?>', '_blank')" id="e2"><?= nombresPrellenado[2] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[3] ?>', '_blank')" id="e3"><?= nombresPrellenado[3] ?></button>
-                      <button type="button">Opción 5</button>
-                    </div>
-                  </div>
+              <div> -->
+                <!-- Checkbox para el toggle -->
+                <input type="checkbox" id="toggle-costoFijo">
+                <!-- Botón principal -->
+                <!--<label class="toggle-label" for="toggle-costoFijo">
+                          Formularios Predefinidos
+                          <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
+                        </label> -->
+                <!-- Contenedor de botones ocultos -->
+                <div class="buttons-container">
+                  <button type="button" onclick="abrirModal(40)">
+                            Asignar Form Costo Fijo
+                          </button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[12] ?>', '_blank')" id="e12"><?= nombresPrellenado[12] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[13] ?>', '_blank')" id="e13"><?= nombresPrellenado[13] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[14] ?>', '_blank')" id="e14"><?= nombresPrellenado[14] ?></button>
+                  <button type="button" onclick="window.open('<?= enlacesPrellenado[15] ?>', '_blank')" id="e15"><?= nombresPrellenado[15] ?></button>
+                  <button type="button">Opción 5</button>
+                </div>
               </div>
-            </section>
-            <section class="card card-gestion">
-              <div class="card" onclick="window.open('<?= fProduccionUrl ?>' , '_blank')">
-                  <img  src="https://i.imgur.com/hA9f6TD.jpeg"
-                        alt="icono-hacia-el-formulario-produccion">
-              </div>
-              <div class="card">
-                  <div>
-                    <!-- Checkbox para el toggle -->
-                    <input type="checkbox" id="toggle-produccion">
-                    <!-- Botón principal -->
-                    <label class="toggle-label" for="toggle-produccion">
-                      Formularios Predefinidos
-                      <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
-                    </label>
-                    <!-- Contenedor de botones ocultos -->
-                    <div class="buttons-container">
-                      <button type="button" onclick="abrirModal(20)">
-                        Asignar Form Producción
-                      </button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[4] ?>', '_blank')" id="e4"><?= nombresPrellenado[4] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[5] ?>', '_blank')" id="e5"><?= nombresPrellenado[5] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[6] ?>', '_blank')" id="e6"><?= nombresPrellenado[6] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[7] ?>', '_blank')" id="e7"><?= nombresPrellenado[7] ?></button>
-                      <button type="button">Opción 5</button>
-                    </div>
-                  </div>
-              </div>
-            </section>
-            <section class="card card-gestion">
-              <div class="card" onclick="window.open('<?= fVentasUrl ?>' , '_blank')">
-                  <img  src="https://i.imgur.com/1gef2ig.jpeg"
-                        alt= "icono-hacia-el-formulario-venta">
-              </div>
-              <div class="card">
-                  <div>
-                    <!-- Checkbox para el toggle -->
-                    <input type="checkbox" id="toggle-venta">
-                    <!-- Botón principal -->
-                    <label class="toggle-label" for="toggle-venta">
-                      Formularios Predefinidos
-                      <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
-                    </label>
-                    <!-- Contenedor de botones ocultos -->
-                    <div class="buttons-container">
-                      <button type="button" onclick="abrirModal(30)">
-                        Asignar Form Ventas
-                      </button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[8] ?>', '_blank')" id="e8"><?= nombresPrellenado[8] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[9] ?>', '_blank')" id="e9"><?= nombresPrellenado[9] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[10] ?>', '_blank')" id="e10"><?= nombresPrellenado[10] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[11] ?>', '_blank')" id="e11"><?= nombresPrellenado[11] ?></button>
-                      <button type="button">Opción 5</button>
-                    </div>
-                  </div> 
-              </div>
-            </section>
-            <section class="card card-gestion">
-              <div class="card" onclick="window.open('<?= fCostoFijoUrl ?>' , '_blank')">
-                  <img  src="https://i.imgur.com/o17IxF9.jpeg"
-                        alt="icono-hacia-el-formulario-costo-fijo">
-              </div>
-              <div class="card">
-                  <button type="button" onclick="repetirCostoFijo()" class="BotonRepetir">
-                    Repetir Formulario Costos Fijos
-                  </button> 
-                  <div>
-                    <!-- Checkbox para el toggle -->
-                    <input type="checkbox" id="toggle-costoFijo">
-                    <!-- Botón principal -->
-                    <label class="toggle-label" for="toggle-costoFijo">
-                      Formularios Predefinidos
-                      <svg class="icon" xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-eject"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.247 3.341l-7 8c-.565 .647 -.106 1.659 .753 1.659h14c.86 0 1.318 -1.012 .753 -1.659l-7 -8a1 1 0 0 0 -1.506 0z" /><path d="M18 15h-12a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2z" /></svg>
-                    </label>
-                    <!-- Contenedor de botones ocultos -->
-                    <div class="buttons-container">
-                      <button type="button" onclick="abrirModal(40)">
-                        Asignar Form Costo Fijo
-                      </button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[12] ?>', '_blank')" id="e12"><?= nombresPrellenado[12] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[13] ?>', '_blank')" id="e13"><?= nombresPrellenado[13] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[14] ?>', '_blank')" id="e14"><?= nombresPrellenado[14] ?></button>
-                      <button type="button" onclick="window.open('<?= enlacesPrellenado[15] ?>', '_blank')" id="e15"><?= nombresPrellenado[15] ?></button>
-                      <button type="button">Opción 5</button>
-                    </div>
-                  </div>   
-              </div>
-            </section> 
+            </div>
+          </section>
         </div>
-        <!-- Bloquea el fondo -->
+      </div>
+      <!-- Bloquea el fondo -->
+      <div>
+        <!-- Lo encierro en un div temporalmente para ordern visual con las herramientas del navegador -->
         <div id="overlayBloqueo" style="
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.3); /* fondo semitransparente */
-            z-index: 9998;
-        "></div>
+                  display: none;
+                  position: fixed;
+                  top: 0; left: 0;
+                  width: 100vw;
+                  height: 100vh;
+                  background-color: rgba(0, 0, 0, 0.3); /* fondo semitransparente */
+                  z-index: 9998;
+              "></div>
         <!-- Alerta flotante -->
         <div id="alertaTemporal" style="
-            display: none;
-            position: fixed;
-            top: 30%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: yellow;
-            padding: 15px 25px;
-            border: 2px solid black;
-            font-size: 18px;
-            z-index: 9999;
-            box-shadow: 0 0 10px gray;
-          ">
-            POR FAVOR ESPERE
+                  display: none;
+                  position: fixed;
+                  top: 30%;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  background-color: yellow;
+                  padding: 15px 25px;
+                  border: 2px solid black;
+                  font-size: 18px;
+                  z-index: 9999;
+                  box-shadow: 0 0 10px gray;
+                ">
+          POR FAVOR ESPERE
         </div>
         <!-- Modal para asignar prellenado -->
         <section id="modalOverlay" class="modal-prellenado">
@@ -197,229 +250,200 @@
 
             <button type="button" onclick="aceptarYguardarModal()">Aceptar y guardar</button>
             <button type="button"  onclick="cerrarModal()">Cerrar sin guardar</button>
-          </div>       
+          </div>
         </section>
-      </div>      
-      <!-- ////// PÁGINA RESULTADOS ////// -->
-      <div id="resultado" class="contenido">
-        
-        <div class="container containerCards-Resultados1">
-            <section class="card cardGrafica cardResultado1 cardTexResultados">
-              <p>Seleccioná el periodo de tiempo para visualizar tus gráficos de dinero</p>
-              <p>
-                <label for="fechaInicio">Desde:</label>
-                <input type="date" id="fechaInicio" name="fecha">  
-              </p>
-              <p>
-                <label for="fechaFin">Hasta:</label>
-                <input type="date" id="fechaFin" name="fecha">
-              </p>
-            </section>
-            <section class="card cardGrafica cardResultado1 cardTexResultados">
-              <section class="tarjeta tarjetaGrafico">
-                <button onclick="obtenerBalance()">
+      </div>
+    </div>
+    <!-- ////// PÁGINA RESULTADOS ////// -->
+    <div id="resultado" class="contenido">
+
+      <div class="container containerCards-Resultados1">
+        <section class="card cardGrafica cardResultado1 cardTexResultados">
+          <p>Seleccioná el periodo de tiempo para visualizar tus gráficos de dinero</p>
+          <p>
+            <label for="fechaInicio">Desde:</label>
+            <input type="date" id="fechaInicio" name="fecha">
+          </p>
+          <p>
+            <label for="fechaFin">Hasta:</label>
+            <input type="date" id="fechaFin" name="fecha">
+          </p>
+        </section>
+        <section class="card cardGrafica cardResultado1 cardTexResultados">
+          <section class="tarjeta tarjetaGrafico">
+            <button onclick="obtenerBalance()">
                   Mostrar Balance 
                 </button>
-                <div id="balance_div"></div>
-              </section>
-              <div>
-                <p>Ventas y compras totales por periodo seleccionado:</p>
-                <div id="comprasVentasTotales_div"></div>
-              </div>
-              <p>$ Ventas: <span style="color: green; font-weight:bold;" id="tVentas"></span></p>
-              <p>$ Gastos: <span style="color: red; font-weight:bold;" id="tGastos"></span></p>
-              <button onclick="mostrarIndicador()">
-                Mostrar producto mas vendido
+            <div id="balance_div"></div>
+          </section>
+          <div>
+            <p>Ventas y compras totales por periodo seleccionado:</p>
+            <div id="comprasVentasTotales_div"></div>
+          </div>
+          <p>$ Ventas: <span style="color: green; font-weight:bold;" id="tVentas"></span></p>
+          <p>$ Gastos: <span style="color: red; font-weight:bold;" id="tGastos"></span></p>
+          <button onclick="mostrarIndicador()">
+                Mostrar servicio mas contratado
               </button>
-              <div>
-                <p>Producto más vendido:</p>
-                <p id="productoMax_div" style="color: blue"></p>
-              </div>
-            </section>
+          <div>
+            <p>Servicio más contratado:</p>
+            <p id="productoMax_div" style="color: blue"></p>
+          </div>
+        </section>
 
-            <section class="card cardGrafica cardResultado1">
-              <button onclick="stockChart()">
-                Stock de Productos
+        <section class="card cardGrafica cardResultado1">
+          <button onclick="comparacionEstimacionesChart()">
+            Estimado vs Real
+          </button>
+          <div class="containerGrafico-Stok">
+            <div id="comparacionEstimaciones_div"></div>
+          </div>
+        </section>
+        <section class="card cardGrafica cardResultado1">
+          <button onclick="materiasPrimasChart()">
+                Stock Insumos
               </button>
-              <div class="containerGrafico-Stok">
-                <div id="stockChart_div"></div>
-              </div>
-            </section>
-            <section class="card cardGrafica cardResultado1">
-              <button onclick="materiasPrimasChart()">
-                Stock Materias Primas
-              </button>
-              <div class="containerGrafico-Stok">
-                <div id="mpChart_div"></div>
-              </div>
-            </section>
+          <div class="containerGrafico-Stok">
+            <div id="mpChart_div"></div>
+          </div>
+        </section>
 
-            <section class="card cardGrafica cardResultado1">
-              <button onclick="ventasGrafico()">
+        <section class="card cardGrafica cardResultado1">
+          <button onclick="ventasGrafico()">
                 Mostrar Ventas
               </button>
-              <div class="containerGrafico-Compra-Venta">
-                <div id="ventasChart_div" ></div>
-              </div>
-            </section>
-            <section class="card cardGrafica cardResultado1">
-              <button onclick="comprasGrafico()">
+          <div class="containerGrafico-Compra-Venta">
+            <div id="ventasChart_div"></div>
+          </div>
+        </section>
+        <section class="card cardGrafica cardResultado1">
+          <button onclick="comprasGrafico()">
                 Mostrar Gastos
               </button>
-              <div class="containerGrafico-Compra-Venta">
-                <div id="comprasChart_div"></div>
-              </div>
-            </section>
-        </div>
+          <div class="containerGrafico-Compra-Venta">
+            <div id="comprasChart_div"></div>
+          </div>
+        </section>
+      </div>
 
-        <div class="container containerCards-Resultados2">
-            <section class="card cardGrafica cardResultado2">
-              <button onclick="crearGraficoDispersion()">
+      <div class="container containerCards-Resultados2">
+        <section class="card cardGrafica cardResultado2">
+          <button onclick="crearGraficoDispersion()">
                 Punto de equilibrio
               </button>
-              <div class="containerGrafico-PuntoDeEquilibrio">
-                <div id="puntoEQ_chart"></div>
-              </div>
-            </section>
-            <section class="card cardGrafica cardResultado2">
-              <button onclick="indicadoresClaveChart()">
+          <div class="containerGrafico-PuntoDeEquilibrio">
+            <div id="puntoEQ_chart"></div>
+          </div>
+        </section>
+        <section class="card cardGrafica cardResultado2">
+          <button onclick="indicadoresClaveChart()">
                 Indicadores Punto Eq.
               </button>
-              <div class="containerGrafico-TabladeDeIndicadores">
-                <div id="precioUnitarioChart_div"></div>
-              </div>
-            </section>
-        </div>
+          <div class="containerGrafico-TabladeDeIndicadores">
+            <div id="precioUnitarioChart_div"></div>
+          </div>
+        </section>
+      </div>
 
-        <h2>Hoja de Resultados</h2>
-        <div class="containerCards-Resultados3">
-          <section class="card">
-            <img  onclick="window.open('<?= urlClientes ?>' , '_blank')"  
+      <h2>Hoja de Resultados</h2>
+      <div class="containerCards-Resultados3">
+        <section class="card">
+          <img  onclick="window.open('<?= urlClientes ?>' , '_blank')"
               src="https://i.imgur.com/Z8fl8xm.png"
-              alt="icono-hacia-hoja-del-excel-de-Cliente">                
-          </section>
-          <section class="card">
-            <img  onclick="window.open('<?= urlProveedores ?>' , '_blank')"  
+              alt="icono-hacia-hoja-del-excel-de-Cliente">
+        </section>
+        <section class="card">
+          <img  onclick="window.open('<?= urlProveedores ?>' , '_blank')"
               src="https://i.imgur.com/zQ4rmhU.png"
               alt="icono-hacia-hoja-del-excel-de-Provedor">
-          </section>
-          <section class="card">
-            <img  onclick="window.open('<?= urlEmpleados?>' , '_blank')"  
+        </section>
+        <section class="card">
+          <img  onclick="window.open('<?= urlEmpleados?>' , '_blank')"
               src="https://i.imgur.com/KocQJGG.png"
-              alt="icono-hacia-hoja-del-excel-de-Empleados">               
-          </section>
-          <section class="card">
-            <img  onclick="window.open('<?= urlProductos ?>' , '_blank')"  
-              src="https://i.imgur.com/hohC93F.png"
-              alt="icono-hacia-hoja-del-excel-de-Productos">               
-          </section>
-        </div>
-        
+              alt="icono-hacia-hoja-del-excel-de-Empleados">
+        </section>
       </div>
-      <!-- ////// PÁGINA PARA DEFINIR UNA RECETA ////// -->
-      <div id="definirProducto" class="contenido">
-        <form method="post" id="form">
-          <h1 class="tituloFormulario">Definí tu receta productiva</h1>
-          <p>¿Qué necesitas para crear lo que ofrecés y cómo lo ofrecés?</p>
-          <section>
-            <p>Tené en cuenta que no solo las materias primas constituyen tu receta productiva, también tenés que incluir tus envoltorios, cajas, palets, etiquetas, etc.</p>
-          </section>
-          <p class="sectionImput producto">
-              <label for="nombreProducto">Nombre de tu producto (unidad comercial):</label>
-              <input type="text" id="nombreProducto" name="producto" required/>
-          </p>
 
-          <div class="seccionMaterias" id="clonMaterias">
-            <h2>Materias Primas, empaques y etiquetado</h2>
-            <div>
-              <section class="seccionMateriaPrima">
-                  <p class="element">
-                    <label for="inputNuevaMateriaPrima">Actualizá listas desplegables:</label>
-                    <input type="text" id="inputNuevaMateriaPrima" name="materiaPrima"/>
-                  </p>
-                  <button id="agg" type="button" onclick="anadirNuevaMateriaPrima(event)"> + Añadir Insumo a la lista</button>
-              </section>
-            </div>
-            <div class="BotonesAggSuprMateria">
-              <button id="agg" type="button" onclick="agregarElemento('clonMaterias')"> + Añadir Insumo a la receta</button>
-              <button id="supr" type="button" onclick="eliminarElemento('clonMaterias')"> - Quitar Insumo de la receta</button>
-            </div>
-
-            <fieldset id="contenedorElementos">
-              <p class="element">
-                <label for="materiaPrima">Listado de Insumos:</label>
-                <select name="materiaPrima[]" id="materiaPrima" required>
-                  <option value="">--Seleccioná un Insumo--</option>
-                </select>
-              </p>
-              <p class="cant">
-                <label for="cantidad">Cantidad asociada a la receta:</label>
-                <input type="number" id="cantidad" name="cantidad[]" min="0" step="any" required/>
-              </p>
-              <p class="unit">
-              <label for="unidad">Unidad:</label>
-                <select name="unidad[]" id="unidad" required>
-                  <option value="">--Elegí la unidad asociada--</option>
-                  <option value="unidades">Unidad</option>
-                  <option value="litros">Litros</option>
-                  <option value="mililitro">Mililitros</option>
-                  <option value="gramos">Gramos</option>
-                  <option value="kilogramo">Kg</option>
-                  <option value="metro">Metros</option>
-                  <option value="metro cuadrado">Metros²</option>
-                </select>
-              </p>
-            </fieldset>
+        <!-- Modal para Gráficos Ampliados -->
+        <div id="chartModal" class="modalGrafico" style="display: none;">
+          <div class="modal-content">
+            <span class="close-modal" onclick="closeModalChart()" aria-label="Cerrar gráfico ampliado">&times;</span>
+            <div id="modalChartContainer" style="width: 90vw; height: 80vh; margin: auto;"></div>
           </div>
-          <p id="msgFinal">
-              <label for="msg">Rendimiento Asociado a tu receta:</label>
-              <input type="number" id="msg" name="user_message" min="0" step="any" required/>
-          </p>
-          <button class="botonEnviar" type="submit">Enviar</button>
-        </form>
-
-        <div class="containerCard-CreaProducto">
-          <section class="borrar-MateriaPrima card">
-            <h2>Eliminar Insumo</h2>
-            <p class="suprMateriaPrima">
-              <label for="eliminarMateriaPrima">Insumo a eliminar:</label>
-              <select id="eliminarMateriaPrima" name="materiaPrima" required>
-                <option value="">--Seleccione Insumo--</option>
-              </select>
-            </p>
-            <button id="supr" type="button" onclick="eliminarMateriaPrimaSelec(event)">
-              Eliminar Insumo
-            </button>
-          </section>
-          <section class="borrar-Receta card">
-            <h2>Eliminar Producto existente</h2>
-            <p class="suprProducto">
-              <label for="eliminarProducto">Producto a eliminar:</label>
-              <select id="eliminarProducto" name="Producto" required>
-                <option value="">--Seleccione Producto--</option>
-              </select>
-            </p>
-            <button id="supr" type="button" onclick="eliminarRecetaPorNombre(event)"> 
-              Eliminar Producto
-            </button>
-          </section>
         </div>
 
-        <div class="banner">
-          <img src="https://i.imgur.com/2DavDyU.jpeg"
-                          alt="img-Banner-Escuela-Productiva-Bonaerense"> 
+    </div>
+
+
+    <!-- ////// PÁGINA PARA PAGO DE SUELDOS ////// -->
+
+  <div id="definirProducto" class="contenido">
+        <div>
+            <form method="post" id="form">
+
+                <section id="empleadosPago">
+
+                    <h1>Pago de Sueldos</h1>
+                    <img style="width:200px ; height:150px" onclick="window.open('<?= fEmpleadoUrl ?>', '_blank')" src="https://i.imgur.com/KocQJGG.png"
+                    alt="icono-anadir-empleado"/>
+                      <div class="card" onclick="window.open('<?= fEliminacionEmpe ?>' , '_blank')" style="cursor: pointer;">
+                          <img src="https://imgur.com/PQv6FbJ.png" alt="Formulario Eliminar empe" style="width: 200px; height: 50px; display: block;">
+                      </div>                  
+                    <fieldset id="fielsetEmpleado">
+                        <p class="cant">
+                            <label for="cantidadEmpleado">Fecha de Pago:</label>
+                            <input type="date" id="fechaPago" name="fechaPago" required/>
+                        </p>
+
+                        <p class="element">
+                            <label for="empleado">Empleado:</label>
+                            <select id="empleado" name="Nempleado" required>
+                            </select>
+                        </p>
+
+                        <button type="button" onclick="mostrarServicios()">Ver Servicios</button>
+
+
+                    </fieldset>
+
+                    <!-- Contenedor de servicios con checkboxes -->
+                    <div id="servicios-contenedor" class="servicios-container">
+                        <h3>Servicios</h3>
+                        <div id="servicios" class="checkbox-group"></div>
+                        
+                        <div class="sueldo-section">
+                            <p class="element">
+                                <label for="sueldoPagado">Sueldo total pagado:</label>
+                                <input type="number" id="sueldoPagado" name="Nsueldo" placeholder="Ingresá el sueldo pagado" step="0.01" min="0" required/>
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <button class="botonEnviar" type="submit">Enviar</button>
+
+            </form>
+
+            <footer class="banner">
+                <img src="https://i.imgur.com/2DavDyU.jpeg" alt="img-Banner-Escuela-Productiva-Bonaerense">
+            </footer>
         </div>
-      </div>
+    </div>
   </main>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
-    <script src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script>const idParaGraficoPrueba = "<?= idParaGraficoPrueba ?>";
-            const idParaHojaMensual = "<?= idHojaMensuales ?>"
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <?!= include('javascript'); ?>
-    <?!= include('javascriptReceta'); ?>
-    <?!= include('javascriptGraficos'); ?>
+
+  <?!= include('javascript'); ?>
+  <?!= include('javascriptReceta'); ?>
+  <?!= include('javascriptSelects'); ?>
+  <?!= include('javascriptGraficos'); ?>
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+    const idParaGraficoPrueba = "<?= idParaGraficoPrueba ?>"; const idParaHojaMensual = "<?= idHojaMensuales ?>"
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </body>
+
 </html>

@@ -1,5 +1,5 @@
 function recorrer2(){
-  let link = PropertiesService.getUserProperties().getProperty("formularioComprasEditUrl");
+  let link = PropertiesService.getUserProperties().getProperty("formularioEntregaEditUrl");
   Logger.log(link);
   let form = FormApp.openByUrl(link);
   let items = form.getItems();
@@ -24,8 +24,9 @@ function obtenerUltimaRespuesta(hojaNum,nombreHoja) {
 }
 
 ///////////////////////////////////////////////////////////
-//PARA REPETIR EL ENVIO DE UN FORMULARIO PRODUCCION//////////////////
+//PARA REPETIR EL ENVIO DE UN FORMULARIO PRODUCCION////////
 ///////////////////////////////////////////////////////////
+// ESTO CORRESPONDE A PRODUCTOR DE BIENES PERO PODRIA LLEGAR A SER UTIL
 
 function envioRespuestasProduccion() {
   let formUrl= PropertiesService.getUserProperties().getProperty("formularioProduccionEditUrl");

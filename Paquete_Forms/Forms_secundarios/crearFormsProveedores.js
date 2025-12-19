@@ -4,12 +4,13 @@
 function proveedor (){
     Logger.log("Iniciando creación del formulario de proveedor");
 
+
     let formularioProveedor = FormApp.create("Proveedor");
     let formularioProveedorID = formularioProveedor.getId();
     PropertiesService.getScriptProperties().setProperty("Formulario_ID", formularioProveedorID);
 
     formularioProveedor.setDescription(
-        "Este formulario permite llevar registro de la informacion de tus proveedores "
+        "Este formulario permite llevar registro de la información de tus proveedores."
     );
 
      const val = FormApp.createTextValidation()
@@ -21,21 +22,21 @@ function proveedor (){
       .requireTextIsEmail()
       .build();
       
-    let opcionesTipoPersona = ["Persona fisica", "Persona juridica"];
-    let opcionesTipoProveedor = ["Materia prima","Herramiena o maquinaria", "Servicio","Otro"];
+    let opcionesTipoPersona = ["Persona física", "Persona jurídica"];
+    let opcionesTipoProveedor = ["Insumos","Herramiena/maquinaria", "Servicios","Otro"];
 
     const TITULO_TELEFONO = "Teléfono";
-    const TITULO_CORREO_ELECTRONICO = "Correo Electrónico";
+    const TITULO_CORREO_ELECTRONICO = "Correo electrónico";
 
     const preguntasProveedor = [
       { tipo: "seleccion", titulo: "Tipo de proveedor", opciones: opcionesTipoProveedor, requerido: true},
-      { tipo: "list", titulo: "Tipo de personeria", opciones: opcionesTipoPersona, requerido: true},
-      { tipo: "text", titulo: "Nombre completo o Razón social", requerido: true},
-      { tipo: "text", titulo: "CUIT/CUIL/DNI",textoAyuda: "sin puntos, comas o guiones"},
-      { tipo: "text", titulo: "Domicilio completo del proveedor"},
-      { tipo: "text", titulo: "Teléfono", textoAyuda: "Ingrese número telefónico valido"},
-      { tipo: "text", titulo: "Correo Electrónico", textoAyuda: "Correo válido, por ejemplo: usuario@dominio.com"},
-      { tipo: "text", titulo: "Descripcion adicional"}
+      { tipo: "list", titulo: "Personería", opciones: opcionesTipoPersona, requerido: true},
+      { tipo: "text", titulo: "Nombre o razón social", requerido: true},
+      { tipo: "text", titulo: "CUIT/CUIL/DNI",textoAyuda: "Ingresá el número correspondiente, sin puntos, comas ni guiones."},
+      { tipo: "text", titulo: TITULO_TELEFONO, textoAyuda: "Ingresá un número válido de contacto."},
+      { tipo: "text", titulo: "Dirección del proveedor"},
+      { tipo: "text", titulo: TITULO_CORREO_ELECTRONICO, textoAyuda: "Correo válido, por ejemplo: usuario@dominio.com"},
+      { tipo: "text", titulo: "Descripción adicional",textoAyuda:"Cualquier información extra que quieras registrar sobre el proveedor."}
     ];
     preguntasProveedor.forEach(p => {
       let pregunta;
@@ -52,7 +53,7 @@ function proveedor (){
             if (p.titulo === TITULO_TELEFONO) {
               pregunta.setValidation(val);
             }
-            //Validación formato para correo electrónico
+            //Validación para correo electrónico
             if (p.titulo === TITULO_CORREO_ELECTRONICO) {
               pregunta.setValidation(valCE);
             }
@@ -80,6 +81,9 @@ function proveedor (){
     Logger.log("PROVEEDORES: " + formProveedorUrl)
     PropertiesService.getUserProperties().setProperty("formularioProveedorUrl", formProveedorUrl);
     PropertiesService.getUserProperties().setProperty("formularioProveedorEditUrl", formularioProveedor.getEditUrl());
+    //Logger.log(formularioProveedor.getEditUrl());
+ 
+    //Logger.log("Formulario de compras creado con ID: " + formularioProveedor.getId());
 
     return formularioProveedor;
 

@@ -18,20 +18,20 @@ function cliente (){
       .build();
 
     formularioClientes.setDescription(
-      "Este formulario permite llevar registro de los clientes de tu emprendimiento"
+      "Este formulario permite llevar registro de los clientes de tu emprendimiento."
     );
 
     let opcionesCondFrenteIva = ["Responsable Inscripto","Monotributista","Exento","No categorizado","No alcanzado por IVA"];
-    let opcionesPersoneria = ["Persona Fisica","Persona Juridica"];
+    let opcionesPersoneria = ["Persona Física","Persona Jurídica"];
 
     const preguntasClientes =  [
-      {tipo: "list",titulo: "Personeria",opciones: opcionesPersoneria,requerido: true},
-      {tipo: "text",titulo: "Nombre completo o Razón social",requerido: true},
-      {tipo: "text",titulo: "CUIT/CUIL/DNI",textoAyuda: "sin puntos, comas o guiones"}, // VALIDACION SOLO NUMEROS
+      {tipo: "list",titulo: "Personería",opciones: opcionesPersoneria,requerido: true,textoAyuda:"Seleccioná si el cliente es una persona individual o una empresa, asociación, etc."},
+      {tipo: "text",titulo: "Nombre completo o Razón social",requerido: true,textoAyuda:"Ingresá el nombre completo del cliente si es una persona física, o la razón social si es una persona jurídica."},
+      {tipo: "list",titulo: "Condición frente al IVA",opciones: opcionesCondFrenteIva},
+      {tipo: "text",titulo: "CUIT/CUIL/DNI",textoAyuda: "(CUIT si es persona jurídica, CUIL/DNI si es una persona física) Sin puntos, comas o guiones."},
       {tipo: "text",titulo: "Teléfono"},
       {tipo: "text",titulo: "Domicilio"},      
       {tipo: "text",titulo: "Correo electrónico"},
-      {tipo: "list",titulo: "Condicion frente al IVA",opciones: opcionesCondFrenteIva},
       {tipo: "text",titulo: "Datos adicionales"},
     ]
     preguntasClientes.forEach(p =>{
@@ -72,8 +72,14 @@ function cliente (){
     Logger.log("CLIENTES: " + formClientesUrl)
     PropertiesService.getUserProperties().setProperty("formularioClientesUrl", formClientesUrl);
     PropertiesService.getUserProperties().setProperty("formularioClientesEditUrl", formularioClientes.getEditUrl());
+    //Logger.log(formularioClientes.getEditUrl());
+
+
+    //Logger.log("Formulario de clientes creado con ID: " + formularioClientes.getId());
+
 
     return formularioClientes;
+
 
   } catch (error) {
     console.error("Error al crear el formulario de clientes:", error.message);

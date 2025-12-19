@@ -1,21 +1,26 @@
 function crearPaquete() {
-  // Crear carpetas principales en el drive del usuario
+  // Crear carpetas principales
   
   let folderPortal = DriveApp.createFolder("Portal Gestión");
   let folderResultados = folderPortal.createFolder("Resultados");
   let folderGestion = folderPortal.createFolder("Gestion");
 
-  // Crear todos los formularios
+  // Crear los formularios
   const formularios = [
-    proveedorCF(),         // índice 0
-    proveedor(),           // índice 1
-    compras(),             // índice 2
-    cliente(),             // índice 3
-    ventas(),              // índice 4
-    empleado(),            // índice 5
-    costosFijos(),         // índice 6
-    produccion(),          // índice 7
-    articulo(),            // índice 8
+    crearFormCalendarizacion(), //indice 13
+    crearFormCobro(),         //indice 12
+    eliminacionEmpleado(),    // indice 11
+    eliminacionServicio(),    // indice 10
+    proveedorCF(),             // índice 9
+    proveedor(),              // índice 8
+    compras(),                 // índice 7
+    cliente(),                 // índice 6  
+    empleado(),               // índice 5
+    costosFijos(),              // índice 4
+    crearFormConstitucionDelServicio(), // índice 3
+    crearFormCoCo(),             // índice 2
+    crearFormEntregaServicio(),  //indice 1
+    articulo()                //indice 0 
   ];
 
   // Crear hoja de resultados
@@ -52,36 +57,47 @@ function crearPaquete() {
   return folderPortal;
 }
 
+
 /////////////////////////////////////////////////////////////////////////////////////
-/////////////////CONECTAR RESPUESTAS DE FORMS CON HOJA DE RESPUESTAS/////////////////
+/////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 function configurarHojas() {
   const propert = PropertiesService.getUserProperties();
   const sheet = SpreadsheetApp.openByUrl(propert.getProperty("HojaResultados"));
   
+
+
+
   let hojas = sheet.getSheets();
    
   hojas[0].setName("Articulo");
-  hojas[1].setName("Producción");
-  hojas[2].setName("Costos fijos");
-  hojas[3].setName("Empleados");
-  hojas[4].setName("Ventas");
-  hojas[5].setName("Clientes");
-  hojas[6].setName("Compras");
-  hojas[7].setName("Proveedor");
-  hojas[8].setName("Proveedor Costo fijo");
-  hojas[9].setName("Stock");
-  let hojaReceta = sheet.insertSheet("Recetas");
+  hojas[1].setName("Prestación de servicio");
+  hojas[2].setName("Contratación");
+  hojas[3].setName("Mis servicios");
+  hojas[4].setName("Costos fijos");
+  hojas[5].setName("Empleados");
+  hojas[6].setName("Clientes");
+  hojas[7].setName("Compras");
+  hojas[8].setName("Proveedor");
+  hojas[9].setName("Proveedor Costo fijo");
+  hojas[10].setName("Servicios Eliminados");
+  hojas[11].setName("Empleados Eliminados");
+  hojas[12].setName("Cobros");
+  hojas[13].setName("Calendarizacion");
+  hojas[14].setName("Stock");
   let hojaEquilibrio = sheet.insertSheet("Punto Eq");
+  const hojaSueldos = sheet.insertSheet("Pago de Sueldos");
+  const encabezadosHojaSueldos = ["Nombre Empleado","Servicios pagados","Pago total","Fecha de pago","Marca de analisis","Pagos Pendientes"];
+  hojaSueldos.getRange(1,1,1,encabezadosHojaSueldos.length).setValues([encabezadosHojaSueldos]).setWrap(true);
+  
+
+
   // SE INICIA A1 "BAJAS" EN 0 PORQUE NO HAY Y A2 "ULTIMO ESPACIO" EN 2 PARA TENER 2 COLUMNAS LIBRES
-  hojaReceta.getRange("A1").setValue(0);
-  hojaReceta.getRange("A2").setValue(3);
-  hojaReceta.getRange("B1").setValue("GUIA").setBackground("#F5BE27").setFontWeight("bold")
   // MISMA LOGICA PARA LAS CELDAS A1 COMO BAJAS Y A2 "ULTIMO ESPACIO" PARA MATERIAS PRIMAS pero de Stock stock
-  hojas[9].getRange("A1").setValue(0);
+  hojas[14].getRange("A1").setValue(2);
   //ESPACIO VACIO PARA PT's TOTALES
   // ESPACIO VACIO PARA PT´s POR LOTE
-  hojas[9].getRange("A2:A4").setValue(2);
+  hojas[14].getRange("A2:A4").setValue(2);
   
   ////////////////inicializar mes//////////////////////
   sheet.setSpreadsheetLocale('en_US');
@@ -90,25 +106,26 @@ function configurarHojas() {
   hojaEquilibrio.getRange("C2").setValue(0);
    ////////////////instalacion formulas//////////////
   hojaEquilibrio.getRange("C5").setFormula("=SUM(K2:K50)");
-  hojaEquilibrio.getRange("C8").setFormula("=SUM(H2:H50)");
+  hojaEquilibrio.getRange("C8").setFormula("=SUM(I2:I50)");
   hojaEquilibrio.getRange("C12").setFormula("=SUM(L2:L50)");
   hojaEquilibrio.getRange("C15").setFormula("=SUM(N2:N50)");
-  hojaEquilibrio.getRange("C18").setFormula("=SUM(I2:I50)");
+  hojaEquilibrio.getRange("C18").setFormula("=SUM(J2:J50)");
   hojaEquilibrio.getRange("C21").setFormula("=SUM(M2:M50)");
 
-  hojaEquilibrio.getRange("L2:L50").setFormula("=I2-H2");
+  hojaEquilibrio.getRange("L2:L50").setFormula("=J2-I2");
   hojaEquilibrio.getRange("M2:M50").setFormula("=ROUND(K2/$C$5,2)");
   hojaEquilibrio.getRange("N2:N50").setFormula("=ROUND(L2*M2,2)");
   hojaEquilibrio.getRange("O2:O50").setFormula("=ROUND(M2*$E$2,2)");
   hojaEquilibrio.getRange("P2:P50").setFormula("=ROUND(O2*I2,2)");
+  hojaEquilibrio.getRange("I2:I50").setFormula("=ROUND(H2+G2,2)");
   
   //////////////SEGUNDA TANDA DE CALCULOS////////////////////////////////////
   hojaEquilibrio.getRange("E2").setFormula("=ROUND(C2/C15,2)");
   hojaEquilibrio.getRange("E5").setFormula("=ROUND(SUM(P2:P50),2)");
   hojaEquilibrio.getRange("E8").setFormula("=ROUND(SUM(Q2:Q50),2)");
   hojaEquilibrio.getRange("E12").setFormula("=ROUND(SUM(R2:R50),2)");
-  hojaEquilibrio.getRange("Q2:Q50").setFormula("=ROUND(M2*I2,2)");
-  hojaEquilibrio.getRange("R2:R50").setFormula("=ROUND(M2*H2,2)");
+  hojaEquilibrio.getRange("Q2:Q50").setFormula("=ROUND(M2*J2,2)");
+  hojaEquilibrio.getRange("R2:R50").setFormula("=ROUND(M2*I2,2)");
 
   //////////////MATRIZ////////////////////////////////////////////////////////
   hojaEquilibrio.getRange("T2").setFormula("=ARRAYFORMULA((ROW(T2:T21)-ROW(T2)+1)*0.1)");
@@ -133,12 +150,13 @@ function configurarHojas() {
   hojaEquilibrio.getRange("E7").setValue("Precio Pond. Total");
   hojaEquilibrio.getRange("E11").setValue("Costo Pond. Total");
 
-  hojaEquilibrio.getRange(1,7,1,20).setValues([
-    ["Productos", 
+  hojaEquilibrio.getRange(1,6,1,21).setValues([
+    ["Servicios",
+    "Costo Ref. Empleados", 
+    "Costos Ref. Insumos",
     "Costo Var. Unit.",
     "Precio Venta Unit.",
-    "",
-    "Cantidad ventas * Producto",
+    "Cantidad ventas * Servicio",
     "Contribucion Marginal Unitaria",
     "Faccion Participacion Ventas",
     "Contribución Marginal Prom Ponderada",
@@ -155,37 +173,33 @@ function configurarHojas() {
     "Costo Total",
     "Utilidades"]
   ]);
-  hojas[9].getRange(1,2,1,9).setValues([
-    [ "Nombre de los productos terminados",
-    "Stock pt",
-    "Unidad Producto",
-    "Nombre materia prima",
-    "Stock mp",
+  hojas[14].getRange(1,2,1,10).setValues([
+    [ "Insumos No Cons.",
+    "Stock no Cons.",
+    "",
+    "Insumos Cons.",
+    "Stock Cons.",
     "Precio Ref. x Und",
-    "Unidad compra.",
+    "Und.",
     "",
     "Productos terminados x lote",
+    "Precio Ref."
     ]
   ]);
   ///////////////////ESTILAR SHEET///////////////////////
   hojaEquilibrio.getRange("A1:Z1").setFontColor("#FFFFFF").setFontWeight("bold");
   hojaEquilibrio.getRange("A1").setBackground("black");
-  hojaEquilibrio.getRange("T1:Z21").applyRowBanding(SpreadsheetApp.BandingTheme.ORANGE);
-  hojaEquilibrio.getRange("L1:R50").applyRowBanding(SpreadsheetApp.BandingTheme.GREY);
-  hojaEquilibrio.getRange("G1:I50").applyRowBanding(SpreadsheetApp.BandingTheme.GREY);
-  hojaEquilibrio.getRange("K1:K50").applyRowBanding(SpreadsheetApp.BandingTheme.BLUE);
   hojaEquilibrio.getRangeList(["C1", "C4", "C7","C11" ,"C14", "C17", "C20", "E1","E4","E7","E11"]).setBackground("#F54927").setFontColor("#FFFFFF");
 
   //////Modificacion para autoajuste de texto/////////
   hojaEquilibrio.getRange(1,1,1,24).setWrap(true);
-  hojas[9].getRange(1,2,1,9).setWrap(true);
+  hojas[14].getRange(1,2,1,9).setWrap(true);
   hojas.forEach(hoja => {
     const protection = hoja.protect().setDescription("Aviso: No modifiques la hoja completa");
     protection.setWarningOnly(true);
+    
   });
-  hojaReceta.protect()
-  const protectionUltima = hojaReceta.protect().setDescription("Aviso: No modifiques la hoja completa");
-  protectionUltima.setWarningOnly(true);
+  
   
   const docId = sheet.getId(); 
 
@@ -196,8 +210,6 @@ function configurarHojas() {
     // Guardamos en PropertiesService con clave basada en el nombre
     propert.setProperty(`Hoja${i}`, url);
   });
-  const url2 = `https://docs.google.com/spreadsheets/d/${docId}/edit#gid=${hojaReceta.getSheetId()}`;
-  propert.setProperty(`Hoja10`, url2);
   
   crearTriggers(sheet);
   formsLayers();
@@ -223,11 +235,10 @@ function configurarHojas() {
     .after(1 * 60 * 1000) // 1 minuto después de que este script termina
     .create();
 }
-
-
+///////////////////////////////revisar acceso hoja guia//////////////////////
 function tieneAcceso(id) {
   try {
-    SpreadsheetApp.openById(id); // si no tiene acceso, rompe aca
+    SpreadsheetApp.openById(id); // si no tiene acceso, explota acá
     return true;
   } catch (e) {
     return false;
@@ -237,35 +248,24 @@ function pintarHoja(){
   const props = PropertiesService.getUserProperties();
   const sheet = SpreadsheetApp.openById(props.getProperty("HojaResultadosID"));
   const hojaStock = sheet.getSheetByName("Stock");
-  const hojaRecetas = sheet.getSheetByName("Recetas");
-  const titulos = ["Nombre prod. + Nombre mat. pr.", "Cant mp consumida", "Tipo Unidad", "Cant mp * rendimiento"];
-  const guia = [...titulos, ...titulos];
-  hojaRecetas.getRange(1, 3, 1, guia.length)
-     .setValues([guia])
-     .setWrap(true)
-     .setFontColor("white")
-     .setBackground("#873100");
-  hojaRecetas.getRange(1,7,1,4).setBackground("#007013");
-  hojaRecetas.getRange("A1:A3").setBackground("black").setFontColor("white");
-  hojaRecetas.getRange("A3").setValue("NO MODIFICAR ESTOS VALORES").setWrap(true);
+  const hojaSueldos = sheet.getSheetByName("Pago de Sueldos");
+  const hojaEquilibrio = sheet.getSheetByName("Punto Eq")
+  hojaSueldos.getRange("A1:F1").setFontColor("white");
+  hojaSueldos.getRange("A1:F100").applyRowBanding(SpreadsheetApp.BandingTheme.CYAN);
+
   hojaStock.getRange(1,2,1,9).setFontColor("white");
   hojaStock.getRange("A5").setValue("NO MODIFICAR ESTOS VALORES").setWrap(true);
   hojaStock.getRange("A1:A5").setBackground("black").setFontColor("white");
-  hojaStock.getRange("B1:D100").applyRowBanding(SpreadsheetApp.BandingTheme.CYAN);
+  hojaStock.getRange("B1:C100").applyRowBanding(SpreadsheetApp.BandingTheme.CYAN);
   hojaStock.getRange("E1:H100").applyRowBanding(SpreadsheetApp.BandingTheme.TEAL);
-  hojaStock.getRange("J1:J100").applyRowBanding(SpreadsheetApp.BandingTheme.ORANGE);
-  let cambio = true;
-  for (let i = 3; i < 61; i += 4) {
-    if(cambio){
-      hojaRecetas.getRange(2,i,100,4).setFontWeight("bold").applyRowBanding(SpreadsheetApp.BandingTheme.BROWN);
-      cambio = false;
-    }else{
-      hojaRecetas.getRange(2,i,100,4).setFontWeight("bold").applyRowBanding(SpreadsheetApp.BandingTheme.TEAL);
-      cambio = true;
-    }
-  }
-}
+  hojaStock.getRange("J1:K100").applyRowBanding(SpreadsheetApp.BandingTheme.ORANGE);
 
+  hojaEquilibrio.getRange("T1:Z21").applyRowBanding(SpreadsheetApp.BandingTheme.ORANGE);
+  hojaEquilibrio.getRange("L1:R50").applyRowBanding(SpreadsheetApp.BandingTheme.GREY);
+  hojaEquilibrio.getRange("F1:J50").applyRowBanding(SpreadsheetApp.BandingTheme.GREY);
+  hojaEquilibrio.getRange("K1:K50").applyRowBanding(SpreadsheetApp.BandingTheme.BLUE);
+  
+}
 
 /* CONSTANTE INDICES DE PREGUNTAS EN FORMULARIOS PRINCIPALES*/
 // Indices de FORMS COMPRAS
@@ -279,7 +279,8 @@ function pintarHoja(){
 
 // Indices de FORMS COSTOS FIJOS
   const indicePreguntaEmpleados = 3;
-  const indicePreguntaProveedorCF = 9;
+  const indicePreguntaProveedorCF = 5;
+
 
 
 function insertarPublishedUrlCompras(editForm,urlArticulo,urlProveedor){
@@ -287,34 +288,84 @@ function insertarPublishedUrlCompras(editForm,urlArticulo,urlProveedor){
   let items = formCompras.getItems(); 
   const urlArt = PropertiesService.getUserProperties().getProperty(urlArticulo);
   const urlProvee = PropertiesService.getUserProperties().getProperty(urlProveedor );
-  items[indicePreguntaArticulo].setHelpText("Seleccione un articulo para llevar registro o agreguelo con el siguiente enlace => " + urlArt); // seteo helpText de forms compras item articulo con link a forms articulo
-  items[indicePreguntaProveedor].setHelpText("Seleccione un proveedor para llevar registro o agreguelo con el siguiente enlace => " + urlProvee ); // seteo helpText de forms compras item proveedor con link a forms proveedor
 
-  items[indicePreguntaProveedorServ].setHelpText("Seleccione un proveedor para llevar registro o agreguelo con el siguiente enlace => " + urlProvee ); // seteo helpText de forms compras item proveedor con link a forms proveedor
+  items[3].setHelpText("Seleccioná un insumo existente o agregá uno usando el siguiente enlace ➡" + urlArt); // seteo helpText de forms compras item insumo con link a forms articulo
+  items[indicePreguntaArticulo].setHelpText("Seleccioná una herramienta/maquinaria o agregá una usando el siguiente enlace ➡" + urlArt); // seteo helpText de forms compras item herramienta con link a forms articulo
 
+  items[indicePreguntaProveedor].setHelpText("Seleccioná un proveedor existente o agregá uno usando el siguiente enlace ➡" + urlProvee ); // seteo helpText de forms compras item proveedor con link a forms proveedor
+
+  items[indicePreguntaProveedorServ].setHelpText("Seleccioná un proveedor existente o agregá uno usando el siguiente enlace ➡" + urlProvee ); // seteo helpText de forms compras item proveedor con link a forms proveedor
+
+  // AGREGAR PROVEEDOR DE SERVICIOS EN COMPRAS?? SISI
 }
 
-function insertarPublishedUrlVentas(editForm,unCliente){
-  const formVentas = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty(editForm));
-  let items = formVentas.getItems();
-  const urlClie = PropertiesService.getUserProperties().getProperty(unCliente );
-  items[indicePreguntaClientes].setHelpText("Seleccione desde la casilla desplegable o agregue un CLIENTE con el siguiente enlace => " + urlClie); // seteo helpText de forms compras item articulo con link a forms articulo
-  //items[14].setHelpText("Seleccione desde la casilla desplegable o agregue un CLIENTE con el siguiente enlace => " + urlClie); // seteo helpText de forms compras item articulo con link a forms articulo
+function insertarPublishedUrlConstitucionServ(editForm,unArticulo){
+  const formConstitucionServ = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty(editForm));
+  let items = formConstitucionServ.getItems();
+  const urlArt = PropertiesService.getUserProperties().getProperty(unArticulo );
+  items[indicePreguntaClientes].setHelpText("Seleccioná un INSUMO o agregá uno con el siguiente enlace ➡" + urlArt); // seteo helpText de forms compras item articulo con link a forms articulo
+  
+  items[4].setHelpText("Seleccioná HERRAMIENTA / MÁQUINA o agregá una con el siguiente enlace ➡" + urlArt);
 } 
 
-////////////////////////////////////////////////
-////// insertar link a forms secundarios ///////
-////////////////////////////////////////////////
-function insertarPublishedUrlCostosFijos(editForm,unEmpleado,unProveedor){
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+////// insertar url de forms secundarios ADMINISTRACION,COMERCIALIZACION,SERVICIO CF,SUELDOS,IMPUESTOS en forms primario COSTOS FIJOS///////
+/////////////////////////////////////////////////////////////////////////////////////////////// 
+function insertarPublishedUrlCostosFijos(editForm,unProveedor){
 
   const formCostosfijos = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty(editForm));
   let items = formCostosfijos.getItems();
 
-  const urlSueldos = PropertiesService.getUserProperties().getProperty(unEmpleado);
-  items[indicePreguntaEmpleados].setHelpText("Seleccione desde la casilla desplegable o agregue un EMPLEADO con el siguiente enlace => " + urlSueldos); // seteo helpText de forms COSTOS FIJOS item SUELDOS con link a forms empleados
-  
   const urlServCF = PropertiesService.getUserProperties().getProperty(unProveedor);
-  items[indicePreguntaProveedorCF].setHelpText("Seleccione desde la casilla desplegable o agregue un PROVEEDOR con el siguiente enlace => "+ unProveedor + urlServCF); // seteo helpText de forms COSTOS FIJOS item SERVICIOS con link a forms serviciosCF
+  items[indicePreguntaProveedorCF].setHelpText("Seleccioná un PROVEEDOR o agregá uno nuevo a tu cartera con el siguiente enlace ➡" + urlServCF); // seteo helpText de forms COSTOS FIJOS item SERVICIOS con link a forms serviciosCF
+}
+
+function eliminarSeccionFinalizar() {
+  const form = FormApp.openByUrl(
+    PropertiesService.getUserProperties().getProperty("formularioEntregaEditUrl")
+  );
+
+  const items = form.getItems();
+
+  //  Buscar la pregunta que tiene la ramificación
+  const preguntaInsumos = items.find(i => i.getTitle() === "¿Uso de insumos o herramientas?");
+  if (!preguntaInsumos) {
+    Logger.log("No se encontró la pregunta '¿Uso de insumos o herramientas?'");
+    return;
+  }
+
+  // 2Romper la ramificación (quitar los destinos de página)
+  const mc = preguntaInsumos.asMultipleChoiceItem();
+  mc.setChoices([
+    mc.createChoice("Sí", FormApp.PageNavigationType.CONTINUE), // sigue normal a Insumos
+    mc.createChoice("No", FormApp.PageNavigationType.SUBMIT)    // ahora 'No' envía directamente
+  ]);
+
+  // Buscar y eliminar la sección "Finalizar formulario"
+  const seccionFinal = items.find(i => i.getTitle() === "Finalizar formulario");
+  if (seccionFinal) {
+    form.deleteItem(seccionFinal);
+    Logger.log("Se eliminó la sección 'Finalizar formulario'");
+  } else {
+    Logger.log("No se encontró la sección 'Finalizar formulario'");
+  }
+}
+
+function insertarPublishedUrlCoCo(editForm,unCliente,unEmpleado){
+  /*para pruebas locales
+  const editForm = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty("formularioCoCoEditUrl"));
+  const unCliente = "formularioClientesUrl";
+  const unEmpleado = "formularioEmpleadosUrl";*/
+  const formCoCo = FormApp.openByUrl(PropertiesService.getUserProperties().getProperty(editForm));
+  let items = formCoCo.getItems();
+  const urlCliente = PropertiesService.getUserProperties().getProperty(unCliente);
+  items[1].setHelpText("Seleccioná un CLIENTE o agregá uno nuevo a tu cartera con el siguiente enlace ➡ "+ urlCliente);
+
+  const urlEmpe = PropertiesService.getUserProperties().getProperty(unEmpleado);
+  items[7].setHelpText("Seleccioná los empleados pre-asignados o agregá un empleado con el siguiente enlace ➡"+ urlEmpe);
 
 }
 
@@ -325,12 +376,20 @@ insertarPublishedUrlCompras("formularioComprasEditUrl","formularioArticulosUrl",
 Logger.log("/////////////////////////////////////////////////////////////////////////////////////");
 Logger.log("Se insertaron links a forms secundarios en compras");
 
-insertarPublishedUrlVentas("formularioVentasEditUrl","formularioClientesUrl"); // se agrega capa de formularios secundarios CLIENTES en formulario primario VENTAS
+insertarPublishedUrlConstitucionServ("formularioConstitucionEditUrl","formularioArticulosUrl"); // se agrega capa de formularios secundarios ARTICULO en formulario primario CONSTITUCUION SERVICIO
 Logger.log("/////////////////////////////////////////////////////////////////////////////////////");
-Logger.log("Se insertaron links a forms secundarios en ventas");
+Logger.log("Se insertaron links a forms secundarios en constitucion");
 
-insertarPublishedUrlCostosFijos("formularioCostosFijosEditUrl","formularioEmpleadosUrl","formularioProveedorCFUrl"); // agrego la capa de formularios secudarios EMPLEADOS Y PROVEEDORES
+insertarPublishedUrlCostosFijos("formularioCostosFijosEditUrl","formularioProveedorCFUrl"); // agrego la capa de formularios secudarios PROVEEDORESCF
 Logger.log("/////////////////////////////////////////////////////////////////////////////////////");
 Logger.log("Se insertaron links a forms secundarios en Costo fijo");
-}
 
+insertarPublishedUrlCoCo("formularioCoCoEditUrl","formularioClientesUrl","formularioEmpleadosUrl"); // agrego la capa de formularios secudarios CLIENTE
+Logger.log("/////////////////////////////////////////////////////////////////////////////////////");
+Logger.log("Se insertaron links a forms secundarios en CoCo");
+
+Logger.log("/////////////////////////////////////////////////////////////////////////////////////");
+/**ELimino la seccion finalizar en formulario entrega */
+eliminarSeccionFinalizar();
+Logger.log("Se elimino la pregunta PAGE_BRAKE del formulario entrega");
+}

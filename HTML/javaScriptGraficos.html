@@ -1,14 +1,33 @@
 <script>
+    google.charts.load('current', { packages: ['corechart'] });   
+    google.charts.setOnLoadCallback(cargarDatosEnSelects);
+    let chart;
+    const spreadsheetId = '<?= idParaGraficoPrueba ?>';
 
-  google.charts.load('current', { packages: ['corechart'] });   
-  google.charts.setOnLoadCallback(funcionesInicialesSelects);
+////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////BALANCE PUES ////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
 
-  function funcionesInicialesSelects() {
-    cargarMateriasPrimasDesdeSheets();
-    cargarProductosDesdeSheets();
-  }
-  let chart;
-  const spreadsheetId = '<?= idParaGraficoPrueba ?>';
+    function ventasGrafico() {
+      ventasChart();
+    }
+    function comprasGrafico() {
+      comprasChart();
+    }
+    async function obtenerBalance() {
+      const ventas = await ventasChart();   // Espera a que se resuelva la Promesa
+      const compras = await comprasChart(); // Igual aquí
+      const valorBalance = ventas - compras;
+      const visualizacionDiv = document.getElementById("balance_div");
+      const balanceFormateado = formatearNumero(valorBalance);
+      if (balanceFormateado >= 0) {
+        visualizacionDiv.innerHTML = `BALANCE :: <span style="color: green; font-weight: bold;">$${balanceFormateado}</span>`;
+      } else {
+        visualizacionDiv.innerHTML = `BALANCE :: <span style="color: red; font-weight: bold;">$${balanceFormateado}</span>`;
+      }
+    }
+
+
 
 
   
@@ -24,13 +43,12 @@
       let fechaFin = document.getElementById("fechaFin").value;
       let cMateriasPrimas,cArticulos,cServicio, costoEmpleado, costoServicio, costoImpuesto;
       if (!fechaInicio || !fechaFin) {
-        [cMateriasPrimas,cArticulos,cServicio, costoEmpleado, costoServicio, costoImpuesto] = await Promise.all([
+        [cMateriasPrimas,cArticulos,cServicio, costoEmpleado, costoServicio] = await Promise.all([
         fetchSheetData('Compras', `SELECT G WHERE G IS NOT NULL`),
         fetchSheetData('Compras', `SELECT L WHERE L IS NOT NULL`),
         fetchSheetData('Compras', `SELECT O WHERE O IS NOT NULL`),
         fetchSheetData('Costos fijos', `SELECT E WHERE E IS NOT NULL `),
-        fetchSheetData('Costos fijos', `SELECT H WHERE H IS NOT NULL `),
-        fetchSheetData('Costos fijos', `SELECT L WHERE L IS NOT NULL `)
+        fetchSheetData('Costos fijos', `SELECT I WHERE I IS NOT NULL `)
       ]);
       Swal.fire({
         icon: 'info',
@@ -45,20 +63,19 @@
         finDate.setDate(finDate.getDate() + 1);
         const fechaFinAjustada = finDate.toISOString().split("T")[0]; // yyyy-mm-dd
 
-        [cMateriasPrimas,cArticulos,cServicio, costoEmpleado, costoServicio, costoImpuesto] = await Promise.all([
+        [cMateriasPrimas,cArticulos,cServicio, costoEmpleado, costoServicio] = await Promise.all([
           fetchSheetData('Compras', `SELECT G WHERE G IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`),
           fetchSheetData('Compras', `SELECT L WHERE L IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`),
           fetchSheetData('Compras', `SELECT O WHERE O IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`),
           fetchSheetData('Costos fijos', `SELECT E WHERE E IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`),
-          fetchSheetData('Costos fijos', `SELECT H WHERE H IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`),
-          fetchSheetData('Costos fijos', `SELECT L WHERE L IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`)
+          fetchSheetData('Costos fijos', `SELECT H WHERE H IS NOT NULL AND B >= date '${fechaInicio}' AND B < date '${fechaFinAjustada}'`)
         ]);
       }
       
 
-      const totals = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+      const totals = [0.0, 0.0, 0.0, 0.0, 0.0];
 
-      [cMateriasPrimas,cArticulos,cServicio, costoEmpleado, costoServicio, costoImpuesto].forEach((data, index) => {
+      [cMateriasPrimas,cArticulos,cServicio, costoEmpleado, costoServicio].forEach((data, index) => {
         const rows = data.getDataTable().getFilteredRows([{ column: 0, minValue: 0 }])
            // Excluye la fila 0 (encabezado)
         rows.forEach(rowIndex => {
@@ -68,7 +85,7 @@
         });
       });
 
-      let montoTotal = totals[0] + totals[1] + totals[2] + totals[3] + totals[4] + totals[5];
+      let montoTotal = totals[0] + totals[1] + totals[2] + totals[3] + totals[4];
       const dataTable = new google.visualization.DataTable();
       dataTable.addColumn('string', 'Categoría');
       dataTable.addColumn('number', 'Monto');
@@ -76,9 +93,8 @@
         ['Materias primas - $'+totals[0], totals[0]],
         ['Articulos - $'+totals[1], totals[1]],
         ['Servicios - $'+totals[2], totals[2]],
-        ['Empleado - $'+totals[3], totals[3]],
-        ['ServicioCF - $'+totals[4], totals[4]],
-        ['Impuestos - $'+totals[5], totals[5]]
+        ['ServicioCF - $'+totals[3], totals[3]],
+        ['Impuestos - $'+totals[4], totals[4]]
       ]);
       const chartWidth = 1000;
         const chartDiv = document.getElementById('comprasChart_div');
@@ -87,13 +103,32 @@
         chartDiv.style.height = chartHeight;
 
       const options = {
-        title: `Monto total de compras realizadas ::${montoTotal}`,
-        pieHole: 0.4,
+        title: `Monto total de compras realizadas: ${montoTotal}`,
+        //pieHole: 0.4,
         legend: { position: 'right' }
       };
 
-      chart = new google.visualization.ColumnChart(document.getElementById('comprasChart_div'));
+      // NUEVO: Usa 'const' para el chart (antes era global sin declarar)
+      const chart = new google.visualization.ColumnChart(document.getElementById('comprasChart_div'));
       chart.draw(dataTable, options);
+
+      // NUEVO: Listener para abrir modal al clic en el div del gráfico
+      chartDiv.addEventListener('click', function(event) {
+        // Si hay selección en el gráfico (clic en barra), ignora (agrega tu 'select' si lo necesitas)
+        if (chart.getSelection().length > 0) {
+          event.stopPropagation();
+          return;
+        }
+        
+        // Abre el modal: crea el chart para modal, usa tus data y options
+        openModalChart(
+          (container) => new google.visualization.ColumnChart(container),  // Función que crea el tipo de chart
+          dataTable,  // Tus datos
+          options,    // Tus opciones
+          google.visualization.ColumnChart  // Tipo de chart (opcional, para referencia)
+        );
+      });
+      
       const muestraIndicadores = document.getElementById("tGastos");
       muestraIndicadores.textContent =` $${formatearNumero(montoTotal)}`
       return montoTotal;
@@ -117,8 +152,8 @@
         let productoResponse, montoResponse;
         if (!fechaInicio || !fechaFin) {
         [productoResponse, montoResponse] = await Promise.all([
-          fetchSheetData('Ventas', "SELECT B WHERE B IS NOT NULL"),
-          fetchSheetData('Ventas', "SELECT D WHERE D IS NOT NULL"),
+          fetchSheetData('Cobros', "SELECT B WHERE B IS NOT NULL"),
+          fetchSheetData('Cobros', "SELECT C WHERE C IS NOT NULL"),
         ]);
         Swal.fire({
             icon: 'info',
@@ -132,8 +167,8 @@
           finDate.setDate(finDate.getDate() + 1);
           const fechaFinAjustada = finDate.toISOString().split("T")[0];
           [productoResponse, montoResponse] = await Promise.all([
-          fetchSheetData('Ventas', `SELECT B WHERE B IS NOT NULL AND F >= date '${fechaInicio}' AND F < date '${fechaFinAjustada}'`),
-          fetchSheetData('Ventas', `SELECT D WHERE D IS NOT NULL AND F >= date '${fechaInicio}' AND F < date '${fechaFinAjustada}'`)
+          fetchSheetData('Cobros', `SELECT B WHERE B IS NOT NULL AND E >= date '${fechaInicio}' AND E < date '${fechaFinAjustada}'`),
+          fetchSheetData('Cobros', `SELECT C WHERE C IS NOT NULL AND E >= date '${fechaInicio}' AND E < date '${fechaFinAjustada}'`)
         ]);
         }
         
@@ -144,7 +179,7 @@
         const totales = {};
         for (let i = 0; i < rowsReal; i++) {
           let nombre = productoTable.getValue(i, 0);
-          nombre = nombre.split('|')[0].trim();
+          nombre = nombre.match(/Serv:\s*(.*?)\s*- Cant:/)[1];
           let monto = montoTable.getValue(i, 0);
           if (totales[nombre]) {
             totales[nombre] += monto;
@@ -152,7 +187,6 @@
             totales[nombre] = monto;
           }
           montoTotal += monto;
-          console.log(montoTotal);
         }
 
         const chartDataArray = [["Nombre", "Monto"]];
@@ -175,6 +209,24 @@
 
         const chart = new google.visualization.ColumnChart(chartDiv);
         chart.draw(data, options);
+
+        // NUEVO: Listener para abrir modal al clic en el div del gráfico
+        chartDiv.addEventListener('click', function(event) {
+          // Si hay selección en el gráfico (clic en barra), ignora
+          if (chart.getSelection().length > 0) {
+            event.stopPropagation();
+            return;
+          }
+          
+          // Abre el modal: crea el chart para modal, usa tus data y options
+          openModalChart(
+            (container) => new google.visualization.ColumnChart(container),  // Función que crea el tipo de chart
+            data,  // Tus datos
+            options,    // Tus opciones
+            google.visualization.ColumnChart  // Tipo de chart (opcional)
+          );
+        });
+
         const muestraIndicadores = document.getElementById("tVentas");
         muestraIndicadores.textContent = `$${formatearNumero(montoTotal)}`
         return montoTotal;
@@ -198,7 +250,6 @@
         const numRows = Math.min(productoTable.getNumberOfRows(), cantidadTable.getNumberOfRows());
         const rowssReal = Math.min( numRows,tipoUnidadTable.getNumberOfRows());
         const chartDataArray = [['Producto', 'Cantidad', { role: 'style' }]];
-        console.log(productoTable.getNumberOfRows() + " " +cantidadTable.getNumberOfRows())
         for (let i = 1; i < numRows; i++) {
           let nombre = productoTable.getValue(i, 0);
           if(!nombre){
@@ -244,6 +295,24 @@
           const nombreColumna = data.getColumnLabel(col);
           chartInternoProductoStockLote(producto.split('|')[0].trim())
         });
+
+        // NUEVO: Listener para abrir modal al clic en el div del gráfico (ignora si hay select/drill-down)
+        chartDiv.addEventListener('click', function(event) {
+          // Si hay selección (clic en barra → drill-down), ignora para que funcione primero
+          if (chart.getSelection().length > 0) {
+            event.stopPropagation();
+            return;
+          }
+          
+          // Abre el modal: crea el chart para modal, usa tus data y options
+          openModalChart(
+            (container) => new google.visualization.ColumnChart(container),  // Función que crea el tipo de chart
+            data,  // Tus datos
+            options,    // Tus opciones
+            google.visualization.ColumnChart  // Tipo de chart (opcional)
+          );
+        });
+
       }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
       async function chartInternoProductoStockLote(nombrePt){
@@ -254,17 +323,14 @@
         for (let i = 1; i < productoTable.getNumberOfRows(); i++) {
           let nombre = productoTable.getValue(i, 0);
           const nombreExtraido = nombre.split('|')[0].trim();
-          console.log("nombre Extraido:" + nombreExtraido + " Nombre comparador:  " + nombrePt);
           const resto = nombre.split('|')[1].trim();
           if(nombrePt === nombreExtraido){
             const regex = /lote:\s*([^-\s]+)-\s*stock:\s*(\d+)/i;
             const match = resto.match(regex);
-            console.log("Entramos al if"+ match);
             let lote;
             let stock;
             if (match) {
               lote = match[1];
-              console.log("Lote:"+ lote);  
               stock = Number(match[2]);  
             }
             chartDataArray.push([lote,stock]);
@@ -288,6 +354,24 @@
 
         const chart = new google.visualization.ColumnChart(chartDiv);
         chart.draw(data, options);
+
+        // NUEVO: Listener para abrir modal al clic en el div (después del drill-down)
+        chartDiv.addEventListener('click', function(event) {
+          // Si hay selección en el gráfico (clic en lote/barra), ignora
+          if (chart.getSelection().length > 0) {
+            event.stopPropagation();
+            return;
+          }
+          
+          // Abre el modal: crea el chart para modal, usa tus data y options
+          openModalChart(
+            (container) => new google.visualization.ColumnChart(container),  // Función que crea el tipo de chart
+            data,  // Tus datos
+            options,    // Tus opciones
+            google.visualization.ColumnChart  // Tipo de chart (opcional)
+          );
+        });
+
       }
     //--------------GRAFICO PRECIO UNITARIO--------//
     //---------------------------------------------//
@@ -303,12 +387,7 @@
           fetchSheetData('Stock', "SELECT E"),
           fetchSheetData('Stock', "SELECT G")
         ]);
-        Swal.fire({
-          icon: 'info',
-          title: 'Atención',
-          text: 'No hay fechas seleccionadas, se mostrará un histórico',
-          confirmButtonText: 'Aceptar'
-        });
+        alert("No hay fechas seleccionadas, se mostrará un historico")
         }else{
           let finDate = new Date(fechaFin);
           finDate.setDate(finDate.getDate() + 1);
@@ -370,7 +449,6 @@
         const numRows = Math.min(productoTable.getNumberOfRows(), cantidadTable.getNumberOfRows());
         const rowssReal = Math.min( numRows,tipoUnidadTable.getNumberOfRows());
         const chartDataArray = [['Producto', 'Cantidad']];
-        console.log(productoTable.getNumberOfRows() + " " +cantidadTable.getNumberOfRows())
         for (let i = 1; i < numRows; i++) {
           let nombre = productoTable.getValue(i, 0);
           if(!nombre){
@@ -380,7 +458,6 @@
           else nombre += " Und. Indefinida";
           let valor = cantidadTable.getValue(i, 0);
           chartDataArray.push([nombre, valor]);
-          console.log(nombre + " " +valor)
         }
 
         // Ajustar el ancho del gráfico según la cantidad de productos
@@ -400,72 +477,104 @@
 
         const chart = new google.visualization.ColumnChart(chartDiv);
         chart.draw(data, options);
+
+        // Listener para abrir modal al clic en el div del gráfico
+        chartDiv.addEventListener('click', function(event) {
+          // Si hay selección en el gráfico (clic en barra), ignora
+          if (chart.getSelection().length > 0) {
+            event.stopPropagation();
+            return;
+          }
+          
+          // Abre el modal: crea el chart para modal, usa tus data y options
+          openModalChart(
+            (container) => new google.visualization.ColumnChart(container),  // Función que crea el tipo de chart
+            data,  // Tus datos
+            options,    // Tus opciones
+            google.visualization.ColumnChart  // Tipo de chart (opcional)
+          );
+        });
       }
 
       function mostrarIndicador(){
-        productoMasVendido();
+        servicioMasContratado();
       }
 
     //-------------------------------------------//
-    //----DATO PRODUCTO MAYOR CANTIDAD VENTAS----//
-    //-------------------------------------------//
-    ///////FUNCION BUSCAR PRODUCTO MS VENDIDO//////
-      async function productoMasVendido(){
-        let divDispuesto = document.getElementById("productoMax_div");
-        let productoResponse, cantidadResponse;
-        let fechaInicio = document.getElementById("fechaInicio").value;
-        let fechaFin = document.getElementById("fechaFin").value;
-        if(!fechaInicio || !fechaFin){
-        [productoResponse, cantidadResponse] = await Promise.all([
-          fetchSheetData('Ventas', "SELECT B WHERE B IS NOT NULL"),
-          fetchSheetData('Ventas', "SELECT C WHERE C IS NOT NULL"),
-        ]);
-        Swal.fire({
-          icon: 'info',
-          title: 'Aviso',
-          text: 'No hay fechas, se mostrará un histórico.',
-          confirmButtonText: 'Aceptar',
-          allowOutsideClick: false
-        })
-        }else{
-          const finDate = new Date(fechaFin);
-          finDate.setDate(finDate.getDate() + 1);
-          const fechaFinAjustada = finDate.toISOString().split("T")[0];
-          [productoResponse, cantidadResponse] = await Promise.all([
-          fetchSheetData('Stock', `SELECT B WHERE B IS NOT NULL AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`),
-          fetchSheetData('Stock', `SELECT C WHERE C IS NOT NULL AND A >= date '${fechaInicio}' AND A < date '${fechaFinAjustada}'`)
-        ]);
-        }
-        const productoTable = productoResponse.getDataTable();
-        const cantidadTable = cantidadResponse.getDataTable();
+//---- DATO SERVICIO MAS CONTRATADO --------//
+//-------------------------------------------//
+/////// FUNCION BUSCAR SERVICIO MAS CONTRATADO //////
 
-        const rowsReal = Math.min(productoTable.getNumberOfRows() ,cantidadTable.getNumberOfRows());
-        const maximos = {
-          nombreMax : "",
-          montoMax : -1
-        }
-        let totales = {};
-        for (let i = 0; i < rowsReal; i++) {
-          let nombre = productoTable.getValue(i, 0);
-          nombre = nombre.split('|')[0].trim();
-          let monto = cantidadTable.getValue(i, 0);
-          if (totales[nombre]) {
-            totales[nombre] += monto;
-          }else{
-            totales[nombre] = monto;
-          }
-          if(totales[nombre] > maximos.montoMax){
-              maximos.montoMax = totales[nombre];
-              maximos.nombreMax = nombre;
-            }
-        }
-        divDispuesto.textContent = `${maximos.nombreMax} vendio: ${maximos.montoMax} Unidades`
-      }
+async function servicioMasContratado() {
+
+  let divDispuesto = document.getElementById("productoMax_div");
+  let servicioResponse;
+  let fechaInicio = document.getElementById("fechaInicio").value;
+  let fechaFin = document.getElementById("fechaFin").value;
+
+  // Si no hay fechas -> histórico
+  if (!fechaInicio || !fechaFin) {
+
+    servicioResponse = await fetchSheetData(
+      'Contratación',
+      "SELECT B WHERE B IS NOT NULL"
+    );
+
+    Swal.fire({
+      icon: 'info',
+      title: 'Aviso',
+      text: 'No hay fechas, se mostrará un histórico.',
+      confirmButtonText: 'Aceptar',
+      allowOutsideClick: false
+    });
+
+  } else {
+    // Ajuste de fecha fin
+    const finDate = new Date(fechaFin);
+    finDate.setDate(finDate.getDate() + 1);
+    const fechaFinAjustada = finDate.toISOString().split("T")[0];
+
+    servicioResponse = await fetchSheetData(
+      'Contratación',
+      `SELECT B 
+       WHERE B IS NOT NULL 
+       AND A >= date '${fechaInicio}' 
+       AND A < date '${fechaFinAjustada}'`
+    );
+  }
+
+  const servicioTable = servicioResponse.getDataTable();
+  const rows = servicioTable.getNumberOfRows();
+
+  // Contador de servicios
+  let conteos = {};
+  let maximo = { nombre: "", cantidad: -1 };
+
+  for (let i = 0; i < rows; i++) {
+
+    let nombre = servicioTable.getValue(i, 0);
+    nombre = nombre.split("|")[0].trim();   // por si seguís usando ese formato
+
+    if (conteos[nombre]) {
+      conteos[nombre]++;
+    } else {
+      conteos[nombre] = 1;
+    }
+
+    if (conteos[nombre] > maximo.cantidad) {
+      maximo.cantidad = conteos[nombre];
+      maximo.nombre = nombre;
+    }
+  }
+
+  divDispuesto.textContent = 
+    `${maximo.nombre} — Se contrató ${maximo.cantidad} veces.`;
+}
 
   //Grafico de Punto de Equilibrio//
   async function crearGraficoDispersion() {
     let fechaInicio = document.getElementById("fechaInicio").value;   
-  try {     
+    try {     
     // PASO 1: Obtener las 7 columnas     
     const [col1, col2, col3, col4, col5, col6, col7] = await Promise.all([       
             
@@ -489,7 +598,6 @@
 
     // PASO 3: Extraer encabezados (primera fila de cada columna)     
     const headers = tables.map(table => table.getColumnLabel(0));
-    console.log('Encabezados detectados:', headers); 
 
     // PASO 4: Crear el DataTable combinado     
     const scatterData = new google.visualization.DataTable();
@@ -500,7 +608,6 @@
 
     // PASO 5: Obtener el número de filas de datos (excluyendo encabezado)     
     const maxRows = Math.max(...tables.map(table => table.getNumberOfRows())) - 1;
-    console.log('Número de filas de datos a procesar:', maxRows);
 
     // PASO 6: Agregar los datos (saltando la primera fila que es encabezado)     
     const rows = [];     
@@ -527,8 +634,6 @@
       }
     }      
     scatterData.addRows(rows);      
-    console.log('DataTable creado con', scatterData.getNumberOfRows(), 'filas de datos y', scatterData.getNumberOfColumns(), 'columnas');
-    console.log('Primera fila de datos:', rows[0]); // Para verificar
 
     // PASO 7: Configurar y dibujar el gráfico     
     const options = {       
@@ -556,13 +661,34 @@
       }     
     };      
     // Dibujar el gráfico     
-    const chart = new google.visualization.ScatterChart(document.getElementById("puntoEQ_chart"));     
-    chart.draw(scatterData, options);      
+    // NUEVO: Define chartDiv para reutilizar
+    const chartDiv = document.getElementById("puntoEQ_chart");
+    // NUEVO: Usa 'const' para el chart
+    const chart = new google.visualization.ScatterChart(chartDiv);     
+    chart.draw(scatterData, options); 
+
+    // NUEVO: Listener para abrir modal al clic en el div del gráfico
+    chartDiv.addEventListener('click', function(event) {
+      // Si hay selección en el gráfico (clic en punto), ignora
+      if (chart.getSelection().length > 0) {
+        event.stopPropagation();
+        return;
+      }
+      
+      // Abre el modal: crea el chart para modal, usa tus data y options
+      openModalChart(
+        (container) => new google.visualization.ScatterChart(container),  // Función que crea el tipo de chart
+        scatterData,  // Tus datos
+        options,    // Tus opciones
+        google.visualization.ScatterChart  // Tipo de chart (opcional)
+      );
+    });
+
     return scatterData; // Por si necesitas usarlo después    
-  } catch (error) {     
-    console.error('Error al crear gráfico de dispersión:', error);   
-  } 
-}
+      } catch (error) {     
+      console.error('Error al crear gráfico de dispersión:', error);   
+    }
+  }
     //////////////TABLA INDICADORES CLAVE////////////////////
     async function indicadoresClaveChart() {
     try {
@@ -577,14 +703,14 @@
         }
 
         // Traer todas las filas con las columnas necesarias
-        const response = await fetchSheetData('Punto Eq', "SELECT G, H, I, K, M, N");
+        const response = await fetchSheetData('Punto Eq', "SELECT F, I, J, K, M, N");
         const dataTableOriginal = response.getDataTable();
 
         // Nuevo DataTable filtrado
         const dataTable = new google.visualization.DataTable();
-        dataTable.addColumn('string', 'Nombre Producto');                 // G
-        dataTable.addColumn('number', 'Costo Variable Unitario');         // H
-        dataTable.addColumn('number', 'Precio Venta Unitario');           // I
+        dataTable.addColumn('string', 'Nombre Servicio');                 // F
+        dataTable.addColumn('number', 'Costo Variable Unitario');         // I
+        dataTable.addColumn('number', 'Precio Venta Unitario');           // J
         dataTable.addColumn('number', 'Cantidad Vendida');                // K
         dataTable.addColumn('number', 'Participación %');                 // M (base 100)
         dataTable.addColumn('number', 'Contribución Marg Prom Ponderada');// N (base 100)
@@ -676,20 +802,254 @@
         const table = new google.visualization.Table(chartDiv);
         table.draw(dataTable, options);
 
+        // NUEVO: Listener para abrir modal al clic en el div de la tabla
+        chartDiv.addEventListener('click', function(event) {
+          // Si hay selección en la tabla (clic en fila), ignora
+          if (table.getSelection().length > 0) {
+            event.stopPropagation();
+            return;
+          }
+          
+          // Abre el modal: crea la table para modal, usa tus data y options
+          openModalChart(
+            (container) => new google.visualization.Table(container),  // Función que crea el tipo de table
+            dataTable,  // Tus datos
+            { ...options, page: 'disable' },    // Tus opciones + no paginación en modal grande
+            google.visualization.Table  // Tipo de table (opcional)
+          );
+        });
+
     } catch (error) {
         console.error('Error al generar la tabla:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al generar la tabla',
-          text: 'Ocurrió un error al generar la tabla. Por favor recarga la página.',
-          confirmButtonText: 'Aceptar'
-        });
+        alert('Ocurrió un error al generar la tabla. Por favor recarga la página.');
     }
   }
+
+//////////////TABLA COMPARACIÓN ESTIMACIONES VS REALIDAD////////////////////
+    async function comparacionEstimacionesChart() {
+    try {
+        // Cargar la librería si no está disponible
+        if (!google.visualization || !google.visualization.Table) {
+            await new Promise(resolve => {
+                google.charts.load('current', {
+                    packages: ['table'],
+                    callback: resolve
+                });
+            });
+        }
+
+        // Traer datos de las dos hojas necesarias
+        const responseMisServicios = await fetchSheetData('Mis servicios', "SELECT B, C, D");
+        const responsePrestacion = await fetchSheetData('Prestación de servicio', "SELECT B, D, E");
+        
+        const dataMisServicios = responseMisServicios.getDataTable();
+        const dataPrestacion = responsePrestacion.getDataTable();
+
+        console.log('Filas en Mis servicios:', dataMisServicios.getNumberOfRows());
+        console.log('Filas en Prestación:', dataPrestacion.getNumberOfRows());
+
+        // Crear un mapa de contratos de Mis servicios (B -> C, D)
+        const mapaMisServicios = {};
+        for (let i = 0; i < dataMisServicios.getNumberOfRows(); i++) {
+            const contrato = dataMisServicios.getValue(i, 0); // B
+            const horasEstimadas = dataMisServicios.getValue(i, 1); // C
+            const empleadosEstimados = dataMisServicios.getValue(i, 2); // D
+            console.log(`Mis servicios fila ${i}: contrato="${contrato}", horas=${horasEstimadas}, empleados=${empleadosEstimados}`);
+            if (contrato) {
+                mapaMisServicios[contrato] = {
+                    horasEstimadas: horasEstimadas,
+                    empleadosEstimados: empleadosEstimados
+                };
+            }
+        }
+        console.log('Mapa Mis servicios:', mapaMisServicios);
+
+        // Nuevo DataTable para la comparación
+        const dataTable = new google.visualization.DataTable();
+        dataTable.addColumn('string', 'Contrato');
+        dataTable.addColumn('number', 'Cant. Empleados Estimados');
+        dataTable.addColumn('number', 'Cant. Empleados Reales');
+        dataTable.addColumn('number', 'Cant. Horas Estimadas');
+        dataTable.addColumn('number', 'Cant. Horas Reales');
+
+        // Recorrer datos de Prestación y cruzar con Mis servicios
+        for (let i = 0; i < dataPrestacion.getNumberOfRows(); i++) {
+            const contratoCompleto = dataPrestacion.getValue(i, 0); // B
+            const horasReales = dataPrestacion.getValue(i, 1); // D
+            const empleadosRealesStr = dataPrestacion.getValue(i, 2); // E (string con comas)
+
+            // Extraer solo el nombre del servicio del formato "Serv: [NOMBRE] - Cant: ..."
+            let contrato = contratoCompleto;
+            if (contratoCompleto && typeof contratoCompleto === 'string') {
+                const match = contratoCompleto.match(/Serv:\s*([^-]+)\s*-/);
+                if (match && match[1]) {
+                    contrato = match[1].trim();
+                }
+            }
+
+            console.log(`Prestación fila ${i}: contratoCompleto="${contratoCompleto}", contratoExtraido="${contrato}", horas=${horasReales}, empleadosStr="${empleadosRealesStr}"`);
+
+            // Contar empleados reales separados por coma
+            let empleadosReales = 0;
+            if (empleadosRealesStr && typeof empleadosRealesStr === 'string') {
+                const empleadosArray = empleadosRealesStr.split(',').map(e => e.trim()).filter(e => e.length > 0);
+                empleadosReales = empleadosArray.length;
+            }
+
+            // Validar que el contrato exista en Mis servicios
+            if (contrato && mapaMisServicios.hasOwnProperty(contrato)) {
+                console.log(`✓ Match encontrado para contrato: ${contrato}`);
+                const datosEstimados = mapaMisServicios[contrato];
+
+                dataTable.addRow([
+                    contratoCompleto, // Mostrar el contrato completo en la tabla
+                    datosEstimados.empleadosEstimados,
+                    empleadosReales,
+                    datosEstimados.horasEstimadas,
+                    horasReales
+                ]);
+            } else {
+                console.log(`✗ No match para contrato: "${contrato}"`);
+            }
+        }
+
+        console.log('Total filas agregadas a la tabla:', dataTable.getNumberOfRows());
+
+        // --- FORMATTERS ---
+        const numberFormatter = new google.visualization.NumberFormat({
+            decimalSymbol: ',',
+            groupingSymbol: '.',
+            fractionDigits: 0
+        });
+        numberFormatter.format(dataTable, 1); // Empleados Estimados
+        numberFormatter.format(dataTable, 2); // Empleados Reales
+        numberFormatter.format(dataTable, 3); // Horas Estimadas
+        numberFormatter.format(dataTable, 4); // Horas Reales
+
+        // Renderizar tabla
+        const chartDiv = document.getElementById('comparacionEstimaciones_div');
+        chartDiv.style.width = '100%';
+        chartDiv.style.height = 'auto';
+
+        const options = {
+            title: 'Comparación Estimaciones vs Realidad',
+            showRowNumber: false,
+            width: '100%',
+            height: '100%',
+            allowHtml: true
+        };
+
+        const table = new google.visualization.Table(chartDiv);
+        table.draw(dataTable, options);
+
+        // Listener para abrir modal al clic en el div de la tabla
+        chartDiv.addEventListener('click', function(event) {
+            // Si hay selección en la tabla (clic en fila), ignora
+            if (table.getSelection().length > 0) {
+                event.stopPropagation();
+                return;
+            }
+            
+            // Abre el modal
+            openModalChart(
+                (container) => new google.visualization.Table(container),
+                dataTable,
+                { ...options, page: 'disable' },
+                google.visualization.Table
+            );
+        });
+
+    } catch (error) {
+        console.error('Error al generar la tabla de comparación:', error);
+        alert('Ocurrió un error al generar la tabla de comparación. Por favor recarga la página.');
+    }
+  }
+
+
+
+//------------------------------------------------//
+//----MODAL PARA MOSTRAR EL GRAFICO MÁS GRANDE----//
+//------------------------------------------------//
+
+function openModalChart(createChartFn, data, options, chartType) {
+  const modal = document.getElementById('chartModal');
+  const container = document.getElementById('modalChartContainer');
+  
+  // Limpiar contenedor anterior
+  container.innerHTML = '';
+  
+  // Mostrar modal PRIMERO (para que tenga tamaño)
+  modal.style.display = 'flex';
+  
+  // Pequeño delay para que el DOM se actualice
+  setTimeout(() => {
+    // Configurar opciones para tamaño grande
+    const largeOptions = {
+      ...options,
+      width: '100%',
+      height: '100%',
+      chartArea: { 
+        left: '6%',   // Espacio para eje Y
+        top: '6%',    // Espacio para título
+        width: '85%',  // Deja 20% para ejes/leyenda
+        height: '75%'  // Deja espacio abajo para eje X y leyenda
+      },
+      legend: { 
+        position: 'bottom',  // Mueve abajo para ahorrar ancho
+        textStyle: { fontSize: 15 }  // Achica fuente de leyenda
+      },
+      titleTextStyle: { 
+        fontSize: 20  // Título más chico
+      },
+      hAxis: {  // Eje X (horizontal, para etiquetas largas)
+        textStyle: { fontSize: 11, angle: -45 },  // Rota etiquetas 45° para que quepan
+        slantedText: true,  // Activa rotación
+        slantedTextAngle: 45
+      },
+      vAxis: {  // Eje Y
+        textStyle: { fontSize: 12 }
+      }
+    };
     
-//---------------------//
-//----FUNCION FETCH----//
-//-------------- ------//
+    // Crear y dibujar el chart
+    const chart = createChartFn(container);
+    chart.draw(data, largeOptions);
+    
+    // Listener para redibujar si cambia el tamaño
+    const resizeHandler = function() {  //Variable let, anónima pero referenciable
+      chart.draw(data, largeOptions);
+    };
+    window.addEventListener('resize', resizeHandler);
+    
+    // Quitar listener al cerrar 
+    const originalClose = closeModalChart;
+    closeModalChart = function() {
+      originalClose();
+      window.removeEventListener('resize', resizeHandler);  
+      closeModalChart = originalClose;  // Restaura la original para próximas aperturas
+    };
+    
+  }, 100);  // 100ms delay
+  
+  // Cerrar con ESC
+  document.addEventListener('keydown', function escHandler(e) {
+    if (e.key === 'Escape') closeModalChart();
+    document.removeEventListener('keydown', escHandler);
+  });
+}
+
+// Función para cerrar modal
+function closeModalChart() {
+  const modal = document.getElementById('chartModal');
+  modal.style.display = 'none';
+  document.getElementById('modalChartContainer').innerHTML = ''; // Limpiar chart
+}
+
+// Listener genérico para backdrop (opcional: cerrar al clic fuera)
+document.getElementById('chartModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModalChart();
+});
+
 async function fetchSheetData(sheetName, queryText) {
   const queryString = encodeURIComponent(queryText);
   const url = "https://docs.google.com/spreadsheets/d/"+idParaGraficoPrueba+"/gviz/tq?sheet="+sheetName+"&tq="+queryString;
@@ -704,5 +1064,4 @@ async function fetchSheetData(sheetName, queryText) {
     });
   });
 }
-
 </script>

@@ -1,6 +1,6 @@
-///////////////////////////////////////
-///// Interfaz Principal /////////////          
-//////////////////////////////////////
+//////////////////////////////////////////////////////////
+///// Interfaz Principal prestador servicios /////////////          
+//////////////////////////////////////////////////////////
 function doGet() {
 
   const props = PropertiesService.getUserProperties();
@@ -36,15 +36,22 @@ function doGet() {
     if(props.getProperty("verificacionTemporalPrellenado") === "true"){
       enlacesPrimeraVez();
     }
+    const fCobros = props.getProperty("formularioCobroUrl");
+    const fEntregaUrl = props.getProperty("formularioEntregaUrl");
+    const fCoCoUrl = props.getProperty("formularioCoCoUrl");
+    const fConstitucionUrl = props.getProperty("formularioConstitucionUrl");
     const fComprasUrl = props.getProperty("formularioComprasUrl");
-    const fProduccionUrl = props.getProperty("formularioProduccionUrl");
     const fVentasUrl = props.getProperty("formularioVentasUrl");
     const fCostoFijoUrl = props.getProperty("formularioCostosFijosUrl");
+    const fEmpleadoUrl = props.getProperty("formularioEmpleadosUrl");
+    const fEliminacionEmpe = props.getProperty("formularioEliminacionEmpleadoUrl");
+    const fEliminacionServ = props.getProperty("formularioEliminacionServicioUrl");
+    const fCalendarizacion = props.getProperty("formularioCalendarioUrl");
+    const fArticulo = props.getProperty("formularioArticulosUrl");
   
-    const urlClientes = props.getProperty("Hoja5"); 
-    const urlProveedores = props.getProperty("Hoja7");
-    const urlProductos = props.getProperty("Hoja10");
-    const urlEmpleados = props.getProperty("Hoja3"); 
+    const urlClientes = props.getProperty("Hoja6"); 
+    const urlProveedores = props.getProperty("Hoja8");
+    const urlEmpleados = props.getProperty("Hoja5"); 
     const idHojaMensuales = props.getProperty("HojaResultadosHistorico") 
 
     const idParaGraficoPrueba = props.getProperty("HojaResultadosID");
@@ -52,13 +59,20 @@ function doGet() {
     // CREAR TEMPLATE PARA USAR PÁGINA Y ASIGNAR LOS URLS
     const htmlTemplate = HtmlService.createTemplateFromFile("Main");
     
+    htmlTemplate.fArticulo = fArticulo;
+    htmlTemplate.fCalendarizacion = fCalendarizacion;
+    htmlTemplate.fEliminacionEmpe = fEliminacionEmpe;
+    htmlTemplate.fCobros = fCobros;
+    htmlTemplate.fEliminacionServ = fEliminacionServ;
+    htmlTemplate.fEntregaUrl = fEntregaUrl;
+    htmlTemplate.fCoCoUrl = fCoCoUrl;
+    htmlTemplate.fConstitucionUrl = fConstitucionUrl;
     htmlTemplate.fComprasUrl = fComprasUrl;
-    htmlTemplate.fProduccionUrl = fProduccionUrl;
     htmlTemplate.fVentasUrl = fVentasUrl;
     htmlTemplate.fCostoFijoUrl = fCostoFijoUrl;
+    htmlTemplate.fEmpleadoUrl = fEmpleadoUrl;
     htmlTemplate.urlClientes = urlClientes;
     htmlTemplate.urlProveedores = urlProveedores;
-    htmlTemplate.urlProductos = urlProductos;
     htmlTemplate.urlEmpleados = urlEmpleados;
     htmlTemplate.idParaGraficoPrueba = idParaGraficoPrueba;
     htmlTemplate.nombresPrellenado = nombresPrellenadoVector;
@@ -67,7 +81,7 @@ function doGet() {
     
     
     // DEVUELVE LA PÁGINA COMPLETA
-    return htmlTemplate.evaluate().setTitle("Productor y Vendedor - Página Personal");
+    return htmlTemplate.evaluate().setTitle("Prestador de Servicios - Página Personal");
     
   } catch (error) {
     console.error(`Error al generar el HTML en doGet: ${error.message}`);
