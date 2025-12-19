@@ -71,4 +71,4 @@ https://sites.google.com/view/portalgestion/inicio
 └── 📄 sitoCompleo.js           # Script central del sitio
 
 ### 👥 Contacto  
-- 📧 **paganoalvaroangel@gmail.com** — *Álvaro Ángel Pagano* (Desarrollador a cargo)  
+- 📧 **portalgestionpba@gmail.com** —  
